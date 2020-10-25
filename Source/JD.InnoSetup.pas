@@ -319,8 +319,10 @@ type
   end;
 
   TJDISArchitecture = (isaDefault, isaX86, isaX64, isaArm64, isaIa64);
+  TJDISArchitectures = set of TJDISArchitecture;
 
   TJDISArchitecture64 = (isa64Default, isa64X64, isa64Arm64, isa64Ia64);
+  TJDISArchitectures64 = set of TJDISArchitecture64;
 
   TJDISSetupInstaller = class(TPersistent)
   private
@@ -351,7 +353,7 @@ type
     FAppVerName: String;
     FAppName: String;
     FAppPublisher: String;
-    FArchitecturesAllowed: TJDISArchitecture;
+    FArchitecturesAllowed: TJDISArchitectures;
     FArchitecturesInstallIn64BitMode: TJDISArchitecture64;
     FCreateAppDir: TBoolDef;
     FDefaultUserInfoName: String;
@@ -423,7 +425,7 @@ type
     procedure SetAppUpdatesURL(const Value: String);
     procedure SetAppVerName(const Value: String);
     procedure SetAppVersion(const Value: String);
-    procedure SetArchitecturesAllowed(const Value: TJDISArchitecture);
+    procedure SetArchitecturesAllowed(const Value: TJDISArchitectures);
     procedure SetArchitecturesInstallIn64BitMode(
       const Value: TJDISArchitecture64);
     procedure SetCreateAppDir(const Value: TBoolDef);
@@ -513,8 +515,8 @@ type
     property AppUpdatesURL: String read FAppUpdatesURL write SetAppUpdatesURL;
     property AppVerName: String read FAppVerName write SetAppVerName;
     property AppVersion: String read FAppVersion write SetAppVersion;
-    property ArchitecturesAllowed: TJDISArchitecture
-      read FArchitecturesAllowed write SetArchitecturesAllowed default TJDISArchitecture.isaDefault;
+    property ArchitecturesAllowed: TJDISArchitectures
+      read FArchitecturesAllowed write SetArchitecturesAllowed;
     property ArchitecturesInstallIn64BitMode: TJDISArchitecture64
       read FArchitecturesInstallIn64BitMode write SetArchitecturesInstallIn64BitMode default TJDISArchitecture64.isa64Default;
     //property ChangesAssociations
@@ -2006,6 +2008,8 @@ begin
 end;
 
 procedure TJDISSetupInstaller.AddToScript(AScript: TStrings);
+var
+  T: String;
   procedure A(const S: String);
   begin
     AScript.Append(S);
@@ -2030,6 +2034,93 @@ procedure TJDISSetupInstaller.AddToScript(AScript: TStrings);
 begin
 
   ABD('AllowCancelDuringInstall', Self.FAllowCancelDuringInstall);
+
+  ABD('AllowNetworkDrive', Self.FAllowNetworkDrive);
+
+  ABD('AllowNoIcons', Self.FAllowNoIcons);
+
+  ABD('AllowRootDirectory', Self.FAllowRootDirectory);
+
+  ABD('AllowUNCPath', Self.FAllowUNCPath);
+
+  ABD('AlwaysRestart', Self.FAlwaysRestart);
+
+  ABD('AlwaysShowComponentsList', Self.FAlwaysShowComponentsList);
+
+  ABD('AlwaysShowDirOnReadyPage', Self.FAlwaysShowDirOnReadyPage);
+
+  ABD('AlwaysUsePersonalGroup', Self.FAlwaysUsePersonalGroup);
+
+  ABD('AppendDefaultDirName', Self.FAppendDefaultDirName);
+
+  ABD('AppendDefaultGroupName', Self.FAppendDefaultGroupName);
+
+  AST('AppComments', Self.FAppComments);
+
+  AST('AppContact', Self.FAppContact);
+
+  AST('AppId', Self.FAppId);
+
+  AST('AppModifyPath', Self.FAppModifyPath);
+
+  AST('AppMutex', Self.FAppMutex);
+
+  AP('AppName', Self.FAppName);
+
+  AST('AppPublisher', Self.FAppPublisher);
+
+  AST('AppPublisherUrl', Self.FAppPublisherURL);
+
+  AST('AppReadmeFile', Self.FAppReadmeFile);
+
+  AST('AppSupportPhone', Self.FAppSupportPhone);
+
+  AST('AppSupportURL', Self.FAppSupportURL);
+
+  AST('AppUpdatesURL', Self.FAppUpdatesURL);
+
+  AST('AppVerName', Self.FAppVerName);
+
+  AP('AppVersion', Self.FAppVersion);
+
+  T:= '';
+  if TJDISArchitecture.isaX86 in Self.FArchitecturesAllowed then
+    T:= T + 'x86 ';
+  if TJDISArchitecture.isaX64 in Self.FArchitecturesAllowed then
+    T:= T + 'x64 ';
+  if TJDISArchitecture.isaArm64 in Self.FArchitecturesAllowed then
+    T:= T + 'arm64 ';
+  if TJDISArchitecture.isaIa64 in Self.FArchitecturesAllowed then
+    T:= T + 'ia64 ';
+  if T <> '' then
+    AP('ArchitecturesAllowed', T);
+
+  T:= '';
+  if TJDISArchitecture64.isa64X64 in Self.FArchitecturesInstallIn64BitMode then
+    T:= T + 'x64 ';
+  if TJDISArchitecture64.isa64Arm64 in Self.FArchitecturesInstallIn64BitMode then
+    T:= T + 'arm64 ';
+  if TJDISArchitecture64.isa64Ia64 in Self.FArchitecturesInstallIn64BitMode then
+    T:= T + 'ia64 ';
+  if T <> '' then
+    AP('ArchitecturesInstallIn64BitMode', T);
+
+  //ChangesAssociations
+
+  //ChangesEnvironment
+
+  //CloseApplications
+
+  //CloseApplicationsFilter
+
+  ABD('CreateAppDir', Self.FCreateAppDir);
+
+  AST('DefaultDialogFontName', Self.FDefaultDialogFontName);
+
+
+
+
+
 
 
 
@@ -2173,7 +2264,7 @@ begin
 end;
 
 procedure TJDISSetupInstaller.SetArchitecturesAllowed(
-  const Value: TJDISArchitecture);
+  const Value: TJDISArchitectures);
 begin
   FArchitecturesAllowed := Value;
 end;
