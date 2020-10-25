@@ -106,6 +106,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure GetScript(AStrings: TStrings);
+    procedure SaveScript(const AFilename: String);
   published
     property Defines: TJDISDefines read FDefines write SetDefines;
     property Code: TStrings read GetCode write SetCode;
@@ -143,6 +145,7 @@ type
   TJDISDefines = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AScript: TStrings);
   end;
 
   TJDISDefine = class(TCollectionItem)
@@ -175,6 +178,7 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript);
     destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
   published
     property Compiler: TJDISSetupCompiler read FCompiler write SetCompiler;
     property Installer: TJDISSetupInstaller read FInstaller write SetInstaller;
@@ -188,6 +192,50 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
+    //property ASLRCompatible
+    //property Compression
+    //property CompressionThreads
+    //property DEPCompatible
+    //property DiskClusterSize
+    //property DiskSliceSize
+    //property DiskSpanning
+    //property Encryption
+    //property InternalCompressLevel
+    //property LZMAAlgorithm
+    //property LZMABlockSize
+    //property LZMADictionarySize
+    //property LZMAMatchFinder
+    //property LZMANumBlockThreads
+    //property LZMANumFastBytes
+    //property LZMAUseSeparateProcess
+    //property MergeDuplicateFiles
+    //property Output
+    //property OutputBaseFilename
+    //property OutputDir
+    //property OutputManifestFile
+    //property ReserveBytes
+    //property SignedUninstaller
+    //property SignedUninstallerDir
+    //property SignTool
+    //property SignToolMinimumTimeBetween
+    //property SignToolRetryCount
+    //property SignToolRetryDelay
+    //property SignToolRunMinimized
+    //property SlicesPerDisk
+    //property SolidCompression
+    //property SourceDir
+    //property TerminalServicesAware
+    //property UsedUserAreasWarning
+    //property UseSetupLdr
+    //property VersionInfoCompany
+    //property VersionInfoCopyright
+    //property VersionInfoDescription
+    //property VersionInfoOriginalFileName
+    //property VersionInfoProductName
+    //property VersionInfoProductTextVersion
+    //property VersionInfoProductVersion
+    //property VersionInfoTextVersion
+    //property VersionInfoVersion
   end;
 
   TJDISSetupInstaller = class(TPersistent)
@@ -196,7 +244,90 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
-
+    //property AllowCancelDuringInstall
+    //property AllowNetworkDrive
+    //property AllowNoIcons
+    //property AllowRootDirectory
+    //property AllowUNCPath
+    //property AlwaysRestart
+    //property AlwaysShowComponentsList
+    //property AlwaysShowDirOnReadyPage
+    //property AlwaysShowGroupOnReadyPage
+    //property AlwaysUsePersonalGroup
+    //property AppendDefaultDirName
+    //property AppendDefaultGroupName
+    //property AppComments
+    //property AppContact
+    //property AppId
+    //property AppModifyPath
+    //property AppMutex
+    //property AppName
+    //property AppPublisher
+    //property AppPublisherURL
+    //property AppReadmeFile
+    //property AppSupportPhone
+    //property AppSupportURL
+    //property AppUpdatesURL
+    //property AppVerName
+    //property AppVersion
+    //property ArchitecturesAllowed
+    //property ArchitecturesInstallIn64BitMode
+    //property ChangesAssociations
+    //property ChangesEnvironment
+    //property CloseApplications
+    //property CloseApplicationsFilter
+    //property CreateAppDir
+    //property CreateUninstallRegKey
+    //property DefaultDialogFontName
+    //property DefaultDirName
+    //property DefaultGroupName
+    //property DefaultUserInfoName
+    //property DefaultUserInfoOrg
+    //property DefaultUserInfoSerial
+    //property DirExistsWarning
+    //property DisableDirPage
+    //property DisableFinishedPage
+    //property DisableProgramGroupPage
+    //property DisableReadyMemo
+    //property DisableReadyPage
+    //property DisableStartupPrompt
+    //property DisableWelcomePage
+    //property EnableDirDoesntExistWarning
+    //property ExtraDiskSpaceRequired
+    //property InfoAfterFile
+    //property InfoBeforeFile
+    //property LanguageDetectionMethod
+    //property LicenseFile
+    //property MinVersion
+    //property OnlyBelowVersion
+    //property Password
+    //property PrivilegesRequired
+    //property PrivilegesRequiredOverridesAllowed
+    //property RestartApplications
+    //property RestartIfNeededByRun
+    //property SetupLogging
+    //property SetupMutex
+    //property ShowLanguageDialog
+    //property TimeStampRounding
+    //property TimeStampsInUTC
+    //property TouchDate
+    //property TouchTime
+    //property Uninstallable
+    //property UninstallDisplayIcon
+    //property UninstallDisplayName
+    //property UninstallDisplaySize
+    //property UninstallFilesDir
+    //property UninstallLogMode
+    //property UninstallRestartComputer
+    //property UpdateUninstallLogAppName
+    //property UsePreviousAppDir
+    //property UsePreviousGroup
+    //property UsePreviousLanguage
+    //property UsePreviousPrivigeles
+    //property UsePreviousSetupType
+    //property UsePreviousTasks
+    //property UsePreviousUserInfo
+    //property UserInfoPage
   end;
 
   TJDISSetupCosmetic = class(TPersistent)
@@ -205,7 +336,26 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
-
+    //property AppCopyright
+    //property BackColor
+    //property BackColor2
+    //property BackColorDirection
+    //property BackSolid
+    //property FlatComponentsList
+    //property SetupIconFile
+    //property ShowComponentSizes
+    //property ShowTasksTreeLines
+    //property WindowShowCaption
+    //property WindowStartMaximized
+    //property WindowResizable
+    //property WindowVisible
+    //property WizardImageAlphaFormat
+    //property WizardImageFile
+    //property WizardImageStretch
+    //property WizardResizable
+    //property WizardSizePercent
+    //property WizardSmallImageFile
+    //property WizardStyle
   end;
 
   TJDISSetupObsolete = class(TPersistent)
@@ -214,7 +364,15 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
-
+    //property AlwaysCreateUninstallIcon
+    //property DisableAppendDir
+    //property DontMergeDuplicateFiles
+    //property MessagesFile
+    //property UninstallIconFile
+    //property UninstallIconName
+    //property UninstallStyle
+    //property WizardImageBackColor
+    //property WizardSmallImageBackColor
   end;
 
 
@@ -381,6 +539,8 @@ type
     property Flags: TJDISFileFlags read FFlags write SetFlags;
   end;
 
+  //NOTE: This is in the form of a TPersistent instead of an Enum for the
+  //  simple fact that there are too many flags to stuff inside an Enum.
   TJDISFileFlags = class(TPersistent)
   private
     FOwner: TJDISFile;
@@ -960,6 +1120,45 @@ begin
   Result:= TStrings(FCode);
 end;
 
+procedure TJDInnoSetupScript.GetScript(AStrings: TStrings);
+  procedure A(const S: String);
+  begin
+    AStrings.Append(S);
+  end;
+begin
+  AStrings.Clear;
+
+  //Header
+  A('; Script generated by the JD Inno Setup Script Component.');
+  A('');
+
+  //Defines
+  FDefines.AddToScript(AStrings);
+
+  //Setup
+  FSetup.AddToScript(AStrings);
+
+  //Languages
+
+
+
+
+
+end;
+
+procedure TJDInnoSetupScript.SaveScript(const AFilename: String);
+var
+  L: TStringList;
+begin
+  L:= TStringList.Create;
+  try
+    GetScript(L);
+    L.SaveToFile(AFilename);
+  finally
+    L.Free;
+  end;
+end;
+
 procedure TJDInnoSetupScript.SetCode(const Value: TStrings);
 begin
   FCode.Assign(Value);
@@ -1068,6 +1267,20 @@ end;
 
 { TJDISDefines }
 
+procedure TJDISDefines.AddToScript(AScript: TStrings);
+var
+  I: TJDISDefine;
+  X: Integer;
+begin
+  if Count > 0 then begin
+    for X := 0 to Count-1 do begin
+      I:= TJDISDefine(Items[X]);
+      AScript.Append('#define '+I.Name+' "'+I.Value+'"');
+    end;
+    AScript.Append('');
+  end;
+end;
+
 constructor TJDISDefines.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISDefine);
@@ -1115,6 +1328,14 @@ begin
   FInstaller.Free;
   FCompiler.Free;
   inherited;
+end;
+
+procedure TJDISSetup.AddToScript(AScript: TStrings);
+begin
+  //TODO: Add setup section to script file...
+
+
+
 end;
 
 procedure TJDISSetup.SetCompiler(const Value: TJDISSetupCompiler);

@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
-  ClientHeight = 368
-  ClientWidth = 659
+  Caption = 'JD Inno Setup Script Demo'
+  ClientHeight = 544
+  ClientWidth = 787
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,6 +14,32 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
+  object txtScript: TMemo
+    Left = 0
+    Top = 39
+    Width = 787
+    Height = 505
+    Align = alBottom
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Consolas'
+    Font.Style = []
+    ParentFont = False
+    ScrollBars = ssBoth
+    TabOrder = 0
+    WordWrap = False
+  end
+  object Button1: TButton
+    Left = 8
+    Top = 8
+    Width = 113
+    Height = 25
+    Caption = 'Generate Script'
+    TabOrder = 1
+    OnClick = Button1Click
+  end
   object InnoSetup: TJDInnoSetupScript
     Defines = <
       item
@@ -111,7 +137,7 @@ object Form1: TForm1
     Run = <>
     UninstallDelete = <>
     UninstallRun = <>
-    Left = 144
-    Top = 104
+    Left = 288
+    Top = 64
   end
 end
