@@ -592,32 +592,91 @@ type
       read FUserInfoPage write SetUserInfoPage default False;
   end;
 
+  TJDISBackColorDir = (iscdTopToBottom, iscdLeftToRight);
+
+  TJDISWizardStyle = (iswsClassic, iswsModern);
+
   TJDISSetupCosmetic = class(TPersistent)
   private
     FOwner: TJDISSetup;
+    FAppCopyright: String;
+    FBackColor: String;
+    FBackColor2: String;
+    FBackColorDirection: TJDISBackColorDir;
+    FBackSolid: Boolean;
+    FShowComponentSizes: Boolean;
+    FSetupIconFile: String;
+    FFlatComponentsList: Boolean;
+    FShowTasksTreeLines: Boolean;
+    FWindowResizable: Boolean;
+    FWindowStartMaximized: Boolean;
+    FWindowShowCaption: Boolean;
+    FWindowVisible: Boolean;
+    FWizardImageStretch: Boolean;
+    FWizardImageFile: String;
+    FWizardResizable: TBoolDef;
+    FWizardStyle: TJDISWizardStyle;
+    FWizardSmallImageFile: String;
+    procedure SetAppCopyright(const Value: String);
+    procedure SetBackColor(const Value: String);
+    procedure SetBackColor2(const Value: String);
+    procedure SetBackColorDirection(const Value: TJDISBackColorDir);
+    procedure SetBackSolid(const Value: Boolean);
+    procedure SetFlatComponentsList(const Value: Boolean);
+    procedure SetSetupIconFile(const Value: String);
+    procedure SetShowComponentSizes(const Value: Boolean);
+    procedure SetShowTasksTreeLines(const Value: Boolean);
+    procedure SetWindowResizable(const Value: Boolean);
+    procedure SetWindowShowCaption(const Value: Boolean);
+    procedure SetWindowStartMaximized(const Value: Boolean);
+    procedure SetWindowVisible(const Value: Boolean);
+    procedure SetWizardImageFile(const Value: String);
+    procedure SetWizardImageStretch(const Value: Boolean);
+    procedure SetWizardResizable(const Value: TBoolDef);
+    procedure SetWizardSmallImageFile(const Value: String);
+    procedure SetWizardStyle(const Value: TJDISWizardStyle);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
-    //property AppCopyright
-    //property BackColor
-    //property BackColor2
-    //property BackColorDirection
-    //property BackSolid
-    //property FlatComponentsList
-    //property SetupIconFile
-    //property ShowComponentSizes
-    //property ShowTasksTreeLines
-    //property WindowShowCaption
-    //property WindowStartMaximized
-    //property WindowResizable
-    //property WindowVisible
+  published
+    property AppCopyright: String
+      read FAppCopyright write SetAppCopyright;
+    property BackColor: String
+      read FBackColor write SetBackColor;
+    property BackColor2: String
+      read FBackColor2 write SetBackColor2;
+    property BackColorDirection: TJDISBackColorDir
+      read FBackColorDirection write SetBackColorDirection default TJDISBackColorDir.iscdTopToBottom;
+    property BackSolid: Boolean
+      read FBackSolid write SetBackSolid default False;
+    property FlatComponentsList: Boolean
+      read FFlatComponentsList write SetFlatComponentsList default True;
+    property SetupIconFile: String
+      read FSetupIconFile write SetSetupIconFile;
+    property ShowComponentSizes: Boolean
+      read FShowComponentSizes write SetShowComponentSizes default True;
+    property ShowTasksTreeLines: Boolean
+      read FShowTasksTreeLines write SetShowTasksTreeLines default False;
+    property WindowShowCaption: Boolean
+      read FWindowShowCaption write SetWindowShowCaption default True;
+    property WindowStartMaximized: Boolean
+      read FWindowStartMaximized write SetWindowStartMaximized default True;
+    property WindowResizable: Boolean
+      read FWindowResizable write SetWindowResizable default True;
+    property WindowVisible: Boolean
+      read FWindowVisible write SetWindowVisible default False;
     //property WizardImageAlphaFormat
-    //property WizardImageFile
-    //property WizardImageStretch
-    //property WizardResizable
+    property WizardImageFile: String
+      read FWizardImageFile write SetWizardImageFile;
+    property WizardImageStretch: Boolean
+      read FWizardImageStretch write SetWizardImageStretch default True;
+    property WizardResizable: TBoolDef
+      read FWizardResizable write SetWizardResizable default TBoolDef.bdDefault;
     //property WizardSizePercent
-    //property WizardSmallImageFile
-    //property WizardStyle
+    property WizardSmallImageFile: String
+      read FWizardSmallImageFile write SetWizardSmallImageFile;
+    property WizardStyle: TJDISWizardStyle
+      read FWizardStyle write SetWizardStyle default TJDISWizardStyle.iswsClassic;
   end;
 
   TJDISSetupObsolete = class(TPersistent)
@@ -2189,6 +2248,97 @@ destructor TJDISSetupCosmetic.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TJDISSetupCosmetic.SetAppCopyright(const Value: String);
+begin
+  FAppCopyright := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetBackColor(const Value: String);
+begin
+  FBackColor := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetBackColor2(const Value: String);
+begin
+  FBackColor2 := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetBackColorDirection(
+  const Value: TJDISBackColorDir);
+begin
+  FBackColorDirection := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetBackSolid(const Value: Boolean);
+begin
+  FBackSolid := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetFlatComponentsList(const Value: Boolean);
+begin
+  FFlatComponentsList := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetSetupIconFile(const Value: String);
+begin
+  FSetupIconFile := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetShowComponentSizes(const Value: Boolean);
+begin
+  FShowComponentSizes := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetShowTasksTreeLines(const Value: Boolean);
+begin
+  FShowTasksTreeLines := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWindowResizable(const Value: Boolean);
+begin
+  FWindowResizable := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWindowShowCaption(const Value: Boolean);
+begin
+  FWindowShowCaption := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWindowStartMaximized(const Value: Boolean);
+begin
+  FWindowStartMaximized := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWindowVisible(const Value: Boolean);
+begin
+  FWindowVisible := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWizardImageFile(const Value: String);
+begin
+  FWizardImageFile := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWizardImageStretch(const Value: Boolean);
+begin
+  FWizardImageStretch := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWizardResizable(const Value: TBoolDef);
+begin
+  FWizardResizable := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWizardSmallImageFile(const Value: String);
+begin
+  FWizardSmallImageFile := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWizardStyle(const Value: TJDISWizardStyle);
+begin
+  FWizardStyle := Value;
 end;
 
 { TJDISSetupObsolete }
