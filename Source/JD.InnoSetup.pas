@@ -59,7 +59,7 @@ type
   TJDISUninstallRuns = class;
   TJDISUninstallRun = class;
 
-
+  TBoolDef = (bdDefault, bdFalse, bdTrue);
 
 
   TJDInnoSetupScript = class(TComponent)
@@ -186,21 +186,95 @@ type
     property Obsolete: TJDISSetupObsolete read FObsolete write SetObsolete;
   end;
 
+  TJDISCompression = (iscZip, iscZipVer, iscBzip, iscBzipVer, iscLzma,
+    iscLzmaFast, iscLzmaNormal, iscLzmaMax, iscLzmaUltra, iscLzmaUltra64,
+    iscLzma2, iscLzma2Fast, iscLzma2Normal, iscLzma2Max, iscLzma2Ultra,
+    iscLzma2Ultra64, iscNone);
+
+  TJDISInternalCompression = (isicNormal, isicZip, isicZipVer, isicBzip, isicBzipVer, isicLzma,
+    isicLzmaFast, isicLzmaNormal, isicLzmaMax, isicLzmaUltra, isicLzmaUltra64,
+    isicLzma2, isicLzma2Fast, isicLzma2Normal, isicLzma2Max, isicLzma2Ultra,
+    isicLzma2Ultra64, isicNone);
+
   TJDISSetupCompiler = class(TPersistent)
   private
     FOwner: TJDISSetup;
+    FCompressionVer: Integer;
+    FCompression: TJDISCompression;
+    FASLRCompatible: TBoolDef;
+    FCompressionThreads: Integer;
+    FDEPCompatible: TBoolDef;
+    FDiskClusterSize: Integer;
+    FDiskSliceSize: Int64;
+    FEncryption: TBoolDef;
+    FDiskSpanning: TBoolDef;
+    FInternalCompressLevel: TJDISInternalCompression;
+    FMergeDuplicateFiles: TBoolDef;
+    FOutput: TBoolDef;
+    FOutputBaseFilename: String;
+    FOutputManifestFile: String;
+    FOutputDir: String;
+    FReserveBytes: Int64;
+    FSlicesPerDisk: Integer;
+    FSolidCompression: TBoolDef;
+    FSourceDir: String;
+    FTerminalServicesAware: TBoolDef;
+    FUsedUserAreasWarning: TBoolDef;
+    FUseSetupLdr: TBoolDef;
+    FVersionInfoDescription: String;
+    FVersionInfoTextVersion: String;
+    FVersionInfoCopyright: String;
+    FVersionInfoProductTextVersion: String;
+    FVersionInfoOriginalFileName: String;
+    FVersionInfoVersion: String;
+    FVersionInfoProductVersion: String;
+    FVersionInfoProductName: String;
+    FVersionInfoCompany: String;
+    procedure SetASLRCompatible(const Value: TBoolDef);
+    procedure SetCompression(const Value: TJDISCompression);
+    procedure SetCompressionVer(const Value: Integer);
+    procedure SetCompressionThreads(const Value: Integer);
+    procedure SetDEPCompatible(const Value: TBoolDef);
+    procedure SetDiskClusterSize(const Value: Integer);
+    procedure SetDiskSliceSize(const Value: Int64);
+    procedure SetDiskSpanning(const Value: TBoolDef);
+    procedure SetEncryption(const Value: TBoolDef);
+    procedure SetInternalCompressLevel(const Value: TJDISInternalCompression);
+    procedure SetMergeDuplicateFiles(const Value: TBoolDef);
+    procedure SetOutput(const Value: TBoolDef);
+    procedure SetOutputBaseFilename(const Value: String);
+    procedure SetOutputDir(const Value: String);
+    procedure SetOutputManifestFile(const Value: String);
+    procedure SetReserveBytes(const Value: Int64);
+    procedure SetSlicesPerDisk(const Value: Integer);
+    procedure SetSolidCompression(const Value: TBoolDef);
+    procedure SetSourceDir(const Value: String);
+    procedure SetTerminalServicesAware(const Value: TBoolDef);
+    procedure SetUsedUserAreasWarning(const Value: TBoolDef);
+    procedure SetUseSetupLdr(const Value: TBoolDef);
+    procedure SetVersionInfoCompany(const Value: String);
+    procedure SetVersionInfoCopyright(const Value: String);
+    procedure SetVersionInfoDescription(const Value: String);
+    procedure SetVersionInfoOriginalFileName(const Value: String);
+    procedure SetVersionInfoProductName(const Value: String);
+    procedure SetVersionInfoProductTextVersion(const Value: String);
+    procedure SetVersionInfoProductVersion(const Value: String);
+    procedure SetVersionInfoTextVersion(const Value: String);
+    procedure SetVersionInfoVersion(const Value: String);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
-    //property ASLRCompatible
-    //property Compression
-    //property CompressionThreads
-    //property DEPCompatible
-    //property DiskClusterSize
-    //property DiskSliceSize
-    //property DiskSpanning
-    //property Encryption
-    //property InternalCompressLevel
+    property ASLRCompatible: TBoolDef read FASLRCompatible write SetASLRCompatible default TBoolDef.bdDefault;
+    property Compression: TJDISCompression read FCompression write SetCompression default TJDISCompression.iscLzma2Max;
+    property CompressionVer: Integer read FCompressionVer write SetCompressionVer default 1;
+    property CompressionThreads: Integer read FCompressionThreads write SetCompressionThreads default 0;
+    property DEPCompatible: TBoolDef read FDEPCompatible write SetDEPCompatible default TBoolDef.bdDefault;
+    property DiskClusterSize: Integer read FDiskClusterSize write SetDiskClusterSize default 512;
+    property DiskSliceSize: Int64 read FDiskSliceSize write SetDiskSliceSize default 2100000000;
+    property DiskSpanning: TBoolDef read FDiskSpanning write SetDiskSpanning default TBoolDef.bdDefault;
+    property Encryption: TBoolDef read FEncryption write SetEncryption default TBoolDef.bdDefault;
+    property InternalCompressLevel: TJDISInternalCompression
+      read FInternalCompressLevel write SetInternalCompressLevel default TJDISInternalCompression.isicNormal;
     //property LZMAAlgorithm
     //property LZMABlockSize
     //property LZMADictionarySize
@@ -208,12 +282,13 @@ type
     //property LZMANumBlockThreads
     //property LZMANumFastBytes
     //property LZMAUseSeparateProcess
-    //property MergeDuplicateFiles
-    //property Output
-    //property OutputBaseFilename
-    //property OutputDir
-    //property OutputManifestFile
-    //property ReserveBytes
+    property MergeDuplicateFiles: TBoolDef
+      read FMergeDuplicateFiles write SetMergeDuplicateFiles default TBoolDef.bdDefault;
+    property Output: TBoolDef read FOutput write SetOutput default TBoolDef.bdDefault;
+    property OutputBaseFilename: String read FOutputBaseFilename write SetOutputBaseFilename;
+    property OutputDir: String read FOutputDir write SetOutputDir;
+    property OutputManifestFile: String read FOutputManifestFile write SetOutputManifestFile;
+    property ReserveBytes: Int64 read FReserveBytes write SetReserveBytes default 0;
     //property SignedUninstaller
     //property SignedUninstallerDir
     //property SignTool
@@ -221,21 +296,24 @@ type
     //property SignToolRetryCount
     //property SignToolRetryDelay
     //property SignToolRunMinimized
-    //property SlicesPerDisk
-    //property SolidCompression
-    //property SourceDir
-    //property TerminalServicesAware
-    //property UsedUserAreasWarning
-    //property UseSetupLdr
-    //property VersionInfoCompany
-    //property VersionInfoCopyright
-    //property VersionInfoDescription
-    //property VersionInfoOriginalFileName
-    //property VersionInfoProductName
-    //property VersionInfoProductTextVersion
-    //property VersionInfoProductVersion
-    //property VersionInfoTextVersion
-    //property VersionInfoVersion
+    property SlicesPerDisk: Integer read FSlicesPerDisk write SetSlicesPerDisk default 1;
+    property SolidCompression: TBoolDef
+      read FSolidCompression write SetSolidCompression default TBoolDef.bdDefault;
+    property SourceDir: String read FSourceDir write SetSourceDir;
+    property TerminalServicesAware: TBoolDef
+      read FTerminalServicesAware write SetTerminalServicesAware default TBoolDef.bdDefault;
+    property UsedUserAreasWarning: TBoolDef
+      read FUsedUserAreasWarning write SetUsedUserAreasWarning default TBoolDef.bdDefault;
+    property UseSetupLdr: TBoolDef read FUseSetupLdr write SetUseSetupLdr default TBoolDef.bdDefault;
+    property VersionInfoCompany: String read FVersionInfoCompany write SetVersionInfoCompany;
+    property VersionInfoCopyright: String read FVersionInfoCopyright write SetVersionInfoCopyright;
+    property VersionInfoDescription: String read FVersionInfoDescription write SetVersionInfoDescription;
+    property VersionInfoOriginalFileName: String read FVersionInfoOriginalFileName write SetVersionInfoOriginalFileName;
+    property VersionInfoProductName: String read FVersionInfoProductName write SetVersionInfoProductName;
+    property VersionInfoProductTextVersion: String read FVersionInfoProductTextVersion write SetVersionInfoProductTextVersion;
+    property VersionInfoProductVersion: String read FVersionInfoProductVersion write SetVersionInfoProductVersion;
+    property VersionInfoTextVersion: String read FVersionInfoTextVersion write SetVersionInfoTextVersion;
+    property VersionInfoVersion: String read FVersionInfoVersion write SetVersionInfoVersion;
   end;
 
   TJDISSetupInstaller = class(TPersistent)
@@ -1370,6 +1448,164 @@ destructor TJDISSetupCompiler.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TJDISSetupCompiler.SetASLRCompatible(const Value: TBoolDef);
+begin
+  FASLRCompatible := Value;
+end;
+
+procedure TJDISSetupCompiler.SetCompression(const Value: TJDISCompression);
+begin
+  FCompression := Value;
+end;
+
+procedure TJDISSetupCompiler.SetCompressionThreads(const Value: Integer);
+begin
+  FCompressionThreads := Value;
+end;
+
+procedure TJDISSetupCompiler.SetCompressionVer(const Value: Integer);
+begin
+  FCompressionVer := Value;
+end;
+
+procedure TJDISSetupCompiler.SetDEPCompatible(const Value: TBoolDef);
+begin
+  FDEPCompatible := Value;
+end;
+
+procedure TJDISSetupCompiler.SetDiskClusterSize(const Value: Integer);
+begin
+  FDiskClusterSize := Value;
+end;
+
+procedure TJDISSetupCompiler.SetDiskSliceSize(const Value: Int64);
+begin
+  FDiskSliceSize := Value;
+end;
+
+procedure TJDISSetupCompiler.SetDiskSpanning(const Value: TBoolDef);
+begin
+  FDiskSpanning := Value;
+end;
+
+procedure TJDISSetupCompiler.SetEncryption(const Value: TBoolDef);
+begin
+  FEncryption := Value;
+end;
+
+procedure TJDISSetupCompiler.SetInternalCompressLevel(
+  const Value: TJDISInternalCompression);
+begin
+  FInternalCompressLevel := Value;
+end;
+
+procedure TJDISSetupCompiler.SetMergeDuplicateFiles(const Value: TBoolDef);
+begin
+  FMergeDuplicateFiles := Value;
+end;
+
+procedure TJDISSetupCompiler.SetOutput(const Value: TBoolDef);
+begin
+  FOutput := Value;
+end;
+
+procedure TJDISSetupCompiler.SetOutputBaseFilename(const Value: String);
+begin
+  FOutputBaseFilename := Value;
+end;
+
+procedure TJDISSetupCompiler.SetOutputDir(const Value: String);
+begin
+  FOutputDir := Value;
+end;
+
+procedure TJDISSetupCompiler.SetOutputManifestFile(const Value: String);
+begin
+  FOutputManifestFile := Value;
+end;
+
+procedure TJDISSetupCompiler.SetReserveBytes(const Value: Int64);
+begin
+  FReserveBytes := Value;
+end;
+
+procedure TJDISSetupCompiler.SetSlicesPerDisk(const Value: Integer);
+begin
+  FSlicesPerDisk := Value;
+end;
+
+procedure TJDISSetupCompiler.SetSolidCompression(const Value: TBoolDef);
+begin
+  FSolidCompression := Value;
+end;
+
+procedure TJDISSetupCompiler.SetSourceDir(const Value: String);
+begin
+  FSourceDir := Value;
+end;
+
+procedure TJDISSetupCompiler.SetTerminalServicesAware(const Value: TBoolDef);
+begin
+  FTerminalServicesAware := Value;
+end;
+
+procedure TJDISSetupCompiler.SetUsedUserAreasWarning(const Value: TBoolDef);
+begin
+  FUsedUserAreasWarning := Value;
+end;
+
+procedure TJDISSetupCompiler.SetUseSetupLdr(const Value: TBoolDef);
+begin
+  FUseSetupLdr := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoCompany(const Value: String);
+begin
+  FVersionInfoCompany := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoCopyright(const Value: String);
+begin
+  FVersionInfoCopyright := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoDescription(const Value: String);
+begin
+  FVersionInfoDescription := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoOriginalFileName(
+  const Value: String);
+begin
+  FVersionInfoOriginalFileName := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoProductName(const Value: String);
+begin
+  FVersionInfoProductName := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoProductTextVersion(
+  const Value: String);
+begin
+  FVersionInfoProductTextVersion := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoProductVersion(const Value: String);
+begin
+  FVersionInfoProductVersion := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoTextVersion(const Value: String);
+begin
+  FVersionInfoTextVersion := Value;
+end;
+
+procedure TJDISSetupCompiler.SetVersionInfoVersion(const Value: String);
+begin
+  FVersionInfoVersion := Value;
 end;
 
 { TJDISSetupInstaller }
