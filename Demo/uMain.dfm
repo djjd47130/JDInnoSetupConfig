@@ -11,6 +11,7 @@ object Form1: TForm1
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object InnoSetup: TJDInnoSetupScript
@@ -95,6 +96,21 @@ object Form1: TForm1
         Flags.UnsetNTFSCompression = False
       end>
     Icons = <>
+    Ini = <>
+    InstallDelete = <>
+    Languages = <>
+    Messages = <>
+    CustomMessages = <>
+    LangOptions.LanguageCodePage = 0
+    LangOptions.DialogFontSize = 0
+    LangOptions.WelcomeFontSize = 0
+    LangOptions.TitleFontSize = 0
+    LangOptions.CopyrightFontSize = 0
+    LangOptions.RightToLeft = False
+    Registry = <>
+    Run = <>
+    UninstallDelete = <>
+    UninstallRun = <>
     Left = 144
     Top = 104
   end

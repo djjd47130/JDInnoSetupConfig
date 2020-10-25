@@ -9,6 +9,7 @@ uses
 type
   TForm1 = class(TForm)
     InnoSetup: TJDInnoSetupScript;
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -21,5 +22,10 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  ReportMemoryLeaksOnShutdown:= True;
+end;
 
 end.
