@@ -37,18 +37,28 @@ type
   TJDISFiles = class;
   TJDISFile = class;
   TJDISFileFlags = class;
+  TJDISIcons = class;
+  TJDISIcon = class;
+  TJDISInis = class;
+  TJDISIni = class;
+  TJDISInstallDeletes = class;
+  TJDISInstallDelete = class;
+  TJDISLanguages = class;
+  TJDISLanguage = class;
 
 
 
   TJDInnoSetupScript = class(TComponent)
   private
     FDefines: TJDISDefines;
+    FCode: TStringList;
     FSetup: TJDISSetup;
     FTypes: TJDISTypes;
     FComponents: TJDISComponents;
     FTasks: TJDISTasks;
     FDirs: TJDISDirs;
     FFiles: TJDISFiles;
+    FIcons: TJDISIcons;
     procedure SetDefines(const Value: TJDISDefines);
     procedure SetSetup(const Value: TJDISSetup);
     procedure SetTypes(const Value: TJDISTypes);
@@ -56,18 +66,24 @@ type
     procedure SetTasks(const Value: TJDISTasks);
     procedure SetDirs(const Value: TJDISDirs);
     procedure SetFiles(const Value: TJDISFiles);
+    procedure SetIcons(const Value: TJDISIcons);
+    function GetCode: TStrings;
+    procedure SetCode(const Value: TStrings);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
     property Defines: TJDISDefines read FDefines write SetDefines;
+    property Code: TStrings read GetCode write SetCode;
     property Setup: TJDISSetup read FSetup write SetSetup;
     property Types: TJDISTypes read FTypes write SetTypes;
     property Components: TJDISComponents read FComponents write SetComponents;
     property Tasks: TJDISTasks read FTasks write SetTasks;
     property Dirs: TJDISDirs read FDirs write SetDirs;
     property Files: TJDISFiles read FFiles write SetFiles;
+    property Icons: TJDISIcons read FIcons write SetIcons;
   end;
+
 
 
   TJDISBaseCollection = class(TOwnedCollection)
@@ -450,6 +466,144 @@ type
   end;
 
 
+
+  TJDISIcons = class(TJDISBaseCollection)
+  public
+    constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+  end;
+
+  TJDISIconFlag = (isifCloseOnExit, isifCreateOnlyIfFileExists, isifDontCloseOnExit,
+    isifExcludeFromShowInNewInstall, isifFolderShortcut, isifPreventPinning,
+    isifRunMaximized, isifRunMinimized, isifUninsNeverUninstall, isifUseAppPaths);
+  TJDISIconFlags = set of TJDISIconFlag;
+
+  TJDISIcon = class(TCollectionItem)
+  private
+    FFilename: String;
+    FName: String;
+    FIconIndex: Integer;
+    FHotKey: String;
+    FComment: String;
+    FWorkingDir: String;
+    FAppUserModelID: String;
+    FIconFilename: String;
+    FParameters: String;
+    FFlags: TJDISIconFlags;
+    procedure SetAppUserModelID(const Value: String);
+    procedure SetComment(const Value: String);
+    procedure SetFilename(const Value: String);
+    procedure SetFlags(const Value: TJDISIconFlags);
+    procedure SetHotKey(const Value: String);
+    procedure SetIconFilename(const Value: String);
+    procedure SetIconIndex(const Value: Integer);
+    procedure SetName(const Value: String);
+    procedure SetParameters(const Value: String);
+    procedure SetWorkingDir(const Value: String);
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+  published
+    property Name: String read FName write SetName;
+    property Filename: String read FFilename write SetFilename;
+    property Parameters: String read FParameters write SetParameters;
+    property WorkingDir: String read FWorkingDir write SetWorkingDir;
+    property HotKey: String read FHotKey write SetHotKey;
+    property Comment: String read FComment write SetComment;
+    property IconFilename: String read FIconFilename write SetIconFilename;
+    property IconIndex: Integer read FIconIndex write SetIconIndex;
+    property AppUserModelID: String read FAppUserModelID write SetAppUserModelID;
+    property Flags: TJDISIconFlags read FFlags write SetFlags;
+  end;
+
+
+
+  TJDISInis = class(TJDISBaseCollection)
+  public
+    constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+  end;
+
+  TJDISIniFlag = (isinfCreateKeyIfDoesntExist, isinfUninsDeleteEntry,
+    isinfUninsDeleteSection, isinfUninsDeleteSectionIfEmpty);
+  TJDISIniFlags = set of TJDISIniFlag;
+
+  TJDISIni = class(TCollectionItem)
+  private
+    FKey: String;
+    FFilename: String;
+    FSection: String;
+    FString: String;
+    FFlags: TJDISIniFlags;
+    procedure SetFilename(const Value: String);
+    procedure SetKey(const Value: String);
+    procedure SetSection(const Value: String);
+    procedure SetString(const Value: String);
+    procedure SetFlags(const Value: TJDISIniFlags);
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+  published
+    property Filename: String read FFilename write SetFilename;
+    property Section: String read FSection write SetSection;
+    property Key: String read FKey write SetKey;
+    property &String: String read FString write SetString;
+    property Flags: TJDISIniFlags read FFlags write SetFlags;
+  end;
+
+
+
+  TJDISInstallDeletes = class(TJDISBaseCollection)
+  public
+    constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+  end;
+
+  TJDISInstallDeleteType = (isdtFiles, isdtFilesAndOrDirs, isdtDirIfEmpty);
+
+  TJDISInstallDelete = class(TCollectionItem)
+  private
+    FName: String;
+    FType: TJDISInstallDeleteType;
+    procedure SetName(const Value: String);
+    procedure SetType(const Value: TJDISInstallDeleteType);
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+  published
+    property &Type: TJDISInstallDeleteType read FType write SetType;
+    property Name: String read FName write SetName;
+  end;
+
+
+
+  TJDISLanguages = class(TJDISBaseCollection)
+  public
+    constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+  end;
+
+  TJDISLanguage = class(TCollectionItem)
+  private
+    FMessagesFile: String;
+    FName: String;
+    FLicenseFile: String;
+    FInfoAfterFile: String;
+    FInfoBeforeFile: String;
+    procedure SetInfoAfterFile(const Value: String);
+    procedure SetInfoBeforeFile(const Value: String);
+    procedure SetLicenseFile(const Value: String);
+    procedure SetMessagesFile(const Value: String);
+    procedure SetName(const Value: String);
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+  published
+    property Name: String read FName write SetName;
+    property MessagesFile: String read FMessagesFile write SetMessagesFile;
+    property LicenseFile: String read FLicenseFile write SetLicenseFile;
+    property InfoBeforeFile: String read FInfoBeforeFile write SetInfoBeforeFile;
+    property InfoAfterFile: String read FInfoAfterFile write SetInfoAfterFile;
+  end;
+
+
+
 implementation
 
 { TJDInnoSetupScript }
@@ -458,26 +612,40 @@ constructor TJDInnoSetupScript.Create(AOwner: TComponent);
 begin
   inherited;
   FDefines:= TJDISDefines.Create(Self);
+  FCode:= TStringList.Create;
   FSetup:= TJDISSetup.Create(Self);
   FTypes:= TJDISTypes.Create(Self);
   FComponents:= TJDISComponents.Create(Self);
   FTasks:= TJDISTasks.Create(Self);
   FDirs:= TJDISDirs.Create(Self);
   FFiles:= TJDISFiles.Create(Self);
+  FIcons:= TJDISIcons.Create(Self);
 
 end;
 
 destructor TJDInnoSetupScript.Destroy;
 begin
 
+  FIcons.Free;
   FFiles.Free;
   FDirs.Free;
   FTasks.Free;
   FComponents.Free;
   FTypes.Free;
   FSetup.Free;
+  FCode.Free;
   FDefines.Free;
   inherited;
+end;
+
+function TJDInnoSetupScript.GetCode: TStrings;
+begin
+  Result:= TStrings(FCode);
+end;
+
+procedure TJDInnoSetupScript.SetCode(const Value: TStrings);
+begin
+  FCode.Assign(Value);
 end;
 
 procedure TJDInnoSetupScript.SetComponents(const Value: TJDISComponents);
@@ -498,6 +666,11 @@ end;
 procedure TJDInnoSetupScript.SetFiles(const Value: TJDISFiles);
 begin
   FFiles.Assign(Value);
+end;
+
+procedure TJDInnoSetupScript.SetIcons(const Value: TJDISIcons);
+begin
+  FIcons.Assign(Value);
 end;
 
 procedure TJDInnoSetupScript.SetSetup(const Value: TJDISSetup);
@@ -1067,6 +1240,200 @@ end;
 procedure TJDISFileFlags.SetUnsetNTFSCompression(const Value: Boolean);
 begin
   FUnsetNTFSCompression := Value;
+end;
+
+{ TJDISIcons }
+
+constructor TJDISIcons.Create(AOwner: TJDInnoSetupScript);
+begin
+  inherited Create(AOwner, TJDISIcon);
+end;
+
+{ TJDISIcon }
+
+constructor TJDISIcon.Create(Collection: TCollection);
+begin
+  inherited;
+
+end;
+
+destructor TJDISIcon.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TJDISIcon.SetAppUserModelID(const Value: String);
+begin
+  FAppUserModelID := Value;
+end;
+
+procedure TJDISIcon.SetComment(const Value: String);
+begin
+  FComment := Value;
+end;
+
+procedure TJDISIcon.SetFilename(const Value: String);
+begin
+  FFilename := Value;
+end;
+
+procedure TJDISIcon.SetFlags(const Value: TJDISIconFlags);
+begin
+  FFlags := Value;
+end;
+
+procedure TJDISIcon.SetHotKey(const Value: String);
+begin
+  FHotKey := Value;
+end;
+
+procedure TJDISIcon.SetIconFilename(const Value: String);
+begin
+  FIconFilename := Value;
+end;
+
+procedure TJDISIcon.SetIconIndex(const Value: Integer);
+begin
+  FIconIndex := Value;
+end;
+
+procedure TJDISIcon.SetName(const Value: String);
+begin
+  FName := Value;
+end;
+
+procedure TJDISIcon.SetParameters(const Value: String);
+begin
+  FParameters := Value;
+end;
+
+procedure TJDISIcon.SetWorkingDir(const Value: String);
+begin
+  FWorkingDir := Value;
+end;
+
+{ TJDISInis }
+
+constructor TJDISInis.Create(AOwner: TJDInnoSetupScript);
+begin
+  inherited Create(AOwner, TJDISIni);
+end;
+
+{ TJDISIni }
+
+constructor TJDISIni.Create(Collection: TCollection);
+begin
+  inherited;
+
+end;
+
+destructor TJDISIni.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TJDISIni.SetFilename(const Value: String);
+begin
+  FFilename := Value;
+end;
+
+procedure TJDISIni.SetFlags(const Value: TJDISIniFlags);
+begin
+  FFlags := Value;
+end;
+
+procedure TJDISIni.SetKey(const Value: String);
+begin
+  FKey := Value;
+end;
+
+procedure TJDISIni.SetSection(const Value: String);
+begin
+  FSection := Value;
+end;
+
+procedure TJDISIni.SetString(const Value: String);
+begin
+  FString := Value;
+end;
+
+{ TJDISInstallDeletes }
+
+constructor TJDISInstallDeletes.Create(AOwner: TJDInnoSetupScript);
+begin
+  inherited Create(AOwner, TJDISInstallDelete);
+end;
+
+{ TJDISInstallDelete }
+
+constructor TJDISInstallDelete.Create(Collection: TCollection);
+begin
+  inherited;
+
+end;
+
+destructor TJDISInstallDelete.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TJDISInstallDelete.SetName(const Value: String);
+begin
+  FName := Value;
+end;
+
+procedure TJDISInstallDelete.SetType(const Value: TJDISInstallDeleteType);
+begin
+  FType := Value;
+end;
+
+{ TJDISLanguages }
+
+constructor TJDISLanguages.Create(AOwner: TJDInnoSetupScript);
+begin
+  inherited Create(AOwner, TJDISLanguage);
+end;
+
+{ TJDISLanguage }
+
+constructor TJDISLanguage.Create(Collection: TCollection);
+begin
+  inherited;
+
+end;
+
+destructor TJDISLanguage.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TJDISLanguage.SetInfoAfterFile(const Value: String);
+begin
+  FInfoAfterFile := Value;
+end;
+
+procedure TJDISLanguage.SetInfoBeforeFile(const Value: String);
+begin
+  FInfoBeforeFile := Value;
+end;
+
+procedure TJDISLanguage.SetLicenseFile(const Value: String);
+begin
+  FLicenseFile := Value;
+end;
+
+procedure TJDISLanguage.SetMessagesFile(const Value: String);
+begin
+  FMessagesFile := Value;
+end;
+
+procedure TJDISLanguage.SetName(const Value: String);
+begin
+  FName := Value;
 end;
 
 end.

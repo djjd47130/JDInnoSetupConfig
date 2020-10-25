@@ -94,6 +94,7 @@ object Form1: TForm1
         Flags.UninsNeverUninstall = False
         Flags.UnsetNTFSCompression = False
       end>
+    Icons = <>
     Left = 144
     Top = 104
   end
