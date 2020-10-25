@@ -46,6 +46,14 @@ object Form1: TForm1
         Name = 'MyAppName'
         Value = 'Test Application'
       end>
+    Setup.Compiler.Compression = iscZip
+    Setup.Compiler.CompressionVer = 0
+    Setup.Compiler.DiskClusterSize = 0
+    Setup.Compiler.DiskSliceSize = 0
+    Setup.Compiler.SlicesPerDisk = 0
+    Setup.Installer.DirExistsWarning = bdDefault
+    Setup.Installer.ShowLanguageDialog = bdDefault
+    Setup.Installer.TimeStampRounding = 0
     Types = <
       item
         Name = 'basic'

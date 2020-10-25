@@ -264,6 +264,7 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
+  published
     property ASLRCompatible: TBoolDef read FASLRCompatible write SetASLRCompatible default TBoolDef.bdDefault;
     property Compression: TJDISCompression read FCompression write SetCompression default TJDISCompression.iscLzma2Max;
     property CompressionVer: Integer read FCompressionVer write SetCompressionVer default 1;
@@ -316,77 +317,215 @@ type
     property VersionInfoVersion: String read FVersionInfoVersion write SetVersionInfoVersion;
   end;
 
+  TJDISArchitecture = (isaDefault, isaX86, isaX64, isaArm64, isaIa64);
+
+  TJDISArchitecture64 = (isa64Default, isa64X64, isa64Arm64, isa64Ia64);
+
   TJDISSetupInstaller = class(TPersistent)
   private
     FOwner: TJDISSetup;
+    FAllowNoIcons: TBoolDef;
+    FAllowCancelDuringInstall: TBoolDef;
+    FAlwaysShowGroupOnReadyPage: TBoolDef;
+    FAllowNetworkDrive: TBoolDef;
+    FAlwaysShowComponentsList: TBoolDef;
+    FAlwaysUsePersonalGroup: TBoolDef;
+    FAlwaysShowDirOnReadyPage: TBoolDef;
+    FAllowRootDirectory: TBoolDef;
+    FAlwaysRestart: TBoolDef;
+    FAllowUNCPath: TBoolDef;
+    FAppendDefaultGroupName: TBoolDef;
+    FAppendDefaultDirName: TBoolDef;
+    FAppUpdatesURL: String;
+    FAppSupportPhone: String;
+    FAppId: String;
+    FAppReadmeFile: String;
+    FAppModifyPath: String;
+    FAppSupportURL: String;
+    FAppContact: String;
+    FAppPublisherURL: String;
+    FAppComments: String;
+    FAppMutex: String;
+    FAppVersion: String;
+    FAppVerName: String;
+    FAppName: String;
+    FAppPublisher: String;
+    FArchitecturesAllowed: TJDISArchitecture;
+    FArchitecturesInstallIn64BitMode: TJDISArchitecture64;
+    FCreateAppDir: TBoolDef;
+    FDefaultUserInfoName: String;
+    FDefaultUserInfoOrg: String;
+    FDefaultUserInfoSerial: String;
+    FDefaultDialogFontName: String;
+    FDefaultGroupName: String;
+    FDefaultDirName: String;
+    FDisableStartupPrompt: TBoolDef;
+    FDirExistsWarning: TBoolDef;
+    FDisableProgramGroupPage: TBoolDef;
+    FDisableFinishedPage: TBoolDef;
+    FDisableDirPage: TBoolDef;
+    FDisableReadyPage: TBoolDef;
+    FDisableWelcomePage: TBoolDef;
+    FDisableReadyMemo: TBoolDef;
+    FEnableDirDoesntExistWarning: TBoolDef;
+    FExtraDiskSpaceRequired: Int64;
+    FInfoAfterFile: String;
+    FInfoBeforeFile: String;
+    FLicenseFile: String;
+    FMinVersion: String;
+    FPassword: String;
+    FOnlyBelowVersion: String;
+    FRestartApplications: TBoolDef;
+    FSetupLogging: TBoolDef;
+    FRestartIfNeededByRun: TBoolDef;
+    FShowLanguageDialog: TBoolDef;
+    FSetupMutex: String;
+    FTimeStampRounding: Integer;
+    procedure SetAllowCancelDuringInstall(const Value: TBoolDef);
+    procedure SetAllowNetworkDrive(const Value: TBoolDef);
+    procedure SetAllowNoIcons(const Value: TBoolDef);
+    procedure SetAllowRootDirectory(const Value: TBoolDef);
+    procedure SetAllowUNCPath(const Value: TBoolDef);
+    procedure SetAlwaysRestart(const Value: TBoolDef);
+    procedure SetAlwaysShowComponentsList(const Value: TBoolDef);
+    procedure SetAlwaysShowDirOnReadyPage(const Value: TBoolDef);
+    procedure SetAlwaysShowGroupOnReadyPage(const Value: TBoolDef);
+    procedure SetAlwaysUsePersonalGroup(const Value: TBoolDef);
+    procedure SetAppendDefaultDirName(const Value: TBoolDef);
+    procedure SetAppendDefaultGroupName(const Value: TBoolDef);
+    procedure SetAppComments(const Value: String);
+    procedure SetAppContact(const Value: String);
+    procedure SetAppId(const Value: String);
+    procedure SetAppModifyPath(const Value: String);
+    procedure SetAppMutex(const Value: String);
+    procedure SetAppName(const Value: String);
+    procedure SetAppPublisher(const Value: String);
+    procedure SetAppPublisherURL(const Value: String);
+    procedure SetAppReadmeFile(const Value: String);
+    procedure SetAppSupportPhone(const Value: String);
+    procedure SetAppSupportURL(const Value: String);
+    procedure SetAppUpdatesURL(const Value: String);
+    procedure SetAppVerName(const Value: String);
+    procedure SetAppVersion(const Value: String);
+    procedure SetArchitecturesAllowed(const Value: TJDISArchitecture);
+    procedure SetArchitecturesInstallIn64BitMode(
+      const Value: TJDISArchitecture64);
+    procedure SetCreateAppDir(const Value: TBoolDef);
+    procedure SetDefaultDialogFontName(const Value: String);
+    procedure SetDefaultDirName(const Value: String);
+    procedure SetDefaultGroupName(const Value: String);
+    procedure SetDefaultUserInfoName(const Value: String);
+    procedure SetDefaultUserInfoOrg(const Value: String);
+    procedure SetDefaultUserInfoSerial(const Value: String);
+    procedure SetDirExistsWarning(const Value: TBoolDef);
+    procedure SetDisableDirPage(const Value: TBoolDef);
+    procedure SetDisableFinishedPage(const Value: TBoolDef);
+    procedure SetDisableProgramGroupPage(const Value: TBoolDef);
+    procedure SetDisableReadyMemo(const Value: TBoolDef);
+    procedure SetDisableReadyPage(const Value: TBoolDef);
+    procedure SetDisableStartupPrompt(const Value: TBoolDef);
+    procedure SetDisableWelcomePage(const Value: TBoolDef);
+    procedure SetEnableDirDoesntExistWarning(const Value: TBoolDef);
+    procedure SetExtraDiskSpaceRequired(const Value: Int64);
+    procedure SetInfoAfterFile(const Value: String);
+    procedure SetInfoBeforeFile(const Value: String);
+    procedure SetLicenseFile(const Value: String);
+    procedure SetMinVersion(const Value: String);
+    procedure SetOnlyBelowVersion(const Value: String);
+    procedure SetPassword(const Value: String);
+    procedure SetRestartApplications(const Value: TBoolDef);
+    procedure SetRestartIfNeededByRun(const Value: TBoolDef);
+    procedure SetSetupLogging(const Value: TBoolDef);
+    procedure SetSetupMutex(const Value: String);
+    procedure SetShowLanguageDialog(const Value: TBoolDef);
+    procedure SetTimeStampRounding(const Value: Integer);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
-    //property AllowCancelDuringInstall
-    //property AllowNetworkDrive
-    //property AllowNoIcons
-    //property AllowRootDirectory
-    //property AllowUNCPath
-    //property AlwaysRestart
-    //property AlwaysShowComponentsList
-    //property AlwaysShowDirOnReadyPage
-    //property AlwaysShowGroupOnReadyPage
-    //property AlwaysUsePersonalGroup
-    //property AppendDefaultDirName
-    //property AppendDefaultGroupName
-    //property AppComments
-    //property AppContact
-    //property AppId
-    //property AppModifyPath
-    //property AppMutex
-    //property AppName
-    //property AppPublisher
-    //property AppPublisherURL
-    //property AppReadmeFile
-    //property AppSupportPhone
-    //property AppSupportURL
-    //property AppUpdatesURL
-    //property AppVerName
-    //property AppVersion
-    //property ArchitecturesAllowed
-    //property ArchitecturesInstallIn64BitMode
+  published
+    property AllowCancelDuringInstall: TBoolDef
+      read FAllowCancelDuringInstall write SetAllowCancelDuringInstall default TBoolDef.bdDefault;
+    property AllowNetworkDrive: TBoolDef
+      read FAllowNetworkDrive write SetAllowNetworkDrive default TBoolDef.bdDefault;
+    property AllowNoIcons: TBoolDef
+      read FAllowNoIcons write SetAllowNoIcons default TBoolDef.bdDefault;
+    property AllowRootDirectory: TBoolDef
+      read FAllowRootDirectory write SetAllowRootDirectory default TBoolDef.bdDefault;
+    property AllowUNCPath: TBoolDef
+      read FAllowUNCPath write SetAllowUNCPath default TBoolDef.bdDefault;
+    property AlwaysRestart: TBoolDef
+      read FAlwaysRestart write SetAlwaysRestart default TBoolDef.bdDefault;
+    property AlwaysShowComponentsList: TBoolDef
+      read FAlwaysShowComponentsList write SetAlwaysShowComponentsList default TBoolDef.bdDefault;
+    property AlwaysShowDirOnReadyPage: TBoolDef
+      read FAlwaysShowDirOnReadyPage write SetAlwaysShowDirOnReadyPage default TBoolDef.bdDefault;
+    property AlwaysShowGroupOnReadyPage: TBoolDef
+      read FAlwaysShowGroupOnReadyPage write SetAlwaysShowGroupOnReadyPage default TBoolDef.bdDefault;
+    property AlwaysUsePersonalGroup: TBoolDef
+      read FAlwaysUsePersonalGroup write SetAlwaysUsePersonalGroup default TBoolDef.bdDefault;
+    property AppendDefaultDirName: TBoolDef
+      read FAppendDefaultDirName write SetAppendDefaultDirName default TBoolDef.bdDefault;
+    property AppendDefaultGroupName: TBoolDef
+      read FAppendDefaultGroupName write SetAppendDefaultGroupName default TBoolDef.bdDefault;
+    property AppComments: String read FAppComments write SetAppComments;
+    property AppContact: String read FAppContact write SetAppContact;
+    property AppId: String read FAppId write SetAppId;
+    property AppModifyPath: String read FAppModifyPath write SetAppModifyPath;
+    property AppMutex: String read FAppMutex write SetAppMutex;
+    property AppName: String read FAppName write SetAppName;
+    property AppPublisher: String read FAppPublisher write SetAppPublisher;
+    property AppPublisherURL: String read FAppPublisherURL write SetAppPublisherURL;
+    property AppReadmeFile: String read FAppReadmeFile write SetAppReadmeFile;
+    property AppSupportPhone: String read FAppSupportPhone write SetAppSupportPhone;
+    property AppSupportURL: String read FAppSupportURL write SetAppSupportURL;
+    property AppUpdatesURL: String read FAppUpdatesURL write SetAppUpdatesURL;
+    property AppVerName: String read FAppVerName write SetAppVerName;
+    property AppVersion: String read FAppVersion write SetAppVersion;
+    property ArchitecturesAllowed: TJDISArchitecture
+      read FArchitecturesAllowed write SetArchitecturesAllowed default TJDISArchitecture.isaDefault;
+    property ArchitecturesInstallIn64BitMode: TJDISArchitecture64
+      read FArchitecturesInstallIn64BitMode write SetArchitecturesInstallIn64BitMode default TJDISArchitecture64.isa64Default;
     //property ChangesAssociations
     //property ChangesEnvironment
     //property CloseApplications
     //property CloseApplicationsFilter
-    //property CreateAppDir
+    property CreateAppDir: TBoolDef read FCreateAppDir write SetCreateAppDir default TBoolDef.bdDefault;
     //property CreateUninstallRegKey
-    //property DefaultDialogFontName
-    //property DefaultDirName
-    //property DefaultGroupName
-    //property DefaultUserInfoName
-    //property DefaultUserInfoOrg
-    //property DefaultUserInfoSerial
-    //property DirExistsWarning
-    //property DisableDirPage
-    //property DisableFinishedPage
-    //property DisableProgramGroupPage
-    //property DisableReadyMemo
-    //property DisableReadyPage
-    //property DisableStartupPrompt
-    //property DisableWelcomePage
-    //property EnableDirDoesntExistWarning
-    //property ExtraDiskSpaceRequired
-    //property InfoAfterFile
-    //property InfoBeforeFile
+    property DefaultDialogFontName: String read FDefaultDialogFontName write SetDefaultDialogFontName;
+    property DefaultDirName: String read FDefaultDirName write SetDefaultDirName;
+    property DefaultGroupName: String read FDefaultGroupName write SetDefaultGroupName;
+    property DefaultUserInfoName: String read FDefaultUserInfoName write SetDefaultUserInfoName;
+    property DefaultUserInfoOrg: String read FDefaultUserInfoOrg write SetDefaultUserInfoOrg;
+    property DefaultUserInfoSerial: String read FDefaultUserInfoSerial write SetDefaultUserInfoSerial;
+    property DirExistsWarning: TBoolDef read FDirExistsWarning write SetDirExistsWarning;
+    property DisableDirPage: TBoolDef read FDisableDirPage write SetDisableDirPage default TBoolDef.bdDefault;
+    property DisableFinishedPage: TBoolDef read FDisableFinishedPage write SetDisableFinishedPage default TBoolDef.bdDefault;
+    property DisableProgramGroupPage: TBoolDef read FDisableProgramGroupPage write SetDisableProgramGroupPage default TBoolDef.bdDefault;
+    property DisableReadyMemo: TBoolDef read FDisableReadyMemo write SetDisableReadyMemo default TBoolDef.bdDefault;
+    property DisableReadyPage: TBoolDef read FDisableReadyPage write SetDisableReadyPage default TBoolDef.bdDefault;
+    property DisableStartupPrompt: TBoolDef read FDisableStartupPrompt write SetDisableStartupPrompt default TBoolDef.bdDefault;
+    property DisableWelcomePage: TBoolDef read FDisableWelcomePage write SetDisableWelcomePage default TBoolDef.bdDefault;
+    property EnableDirDoesntExistWarning: TBoolDef
+      read FEnableDirDoesntExistWarning write SetEnableDirDoesntExistWarning default TBoolDef.bdDefault;
+    property ExtraDiskSpaceRequired: Int64 read FExtraDiskSpaceRequired write SetExtraDiskSpaceRequired default 0;
+    property InfoAfterFile: String read FInfoAfterFile write SetInfoAfterFile;
+    property InfoBeforeFile: String read FInfoBeforeFile write SetInfoBeforeFile;
     //property LanguageDetectionMethod
-    //property LicenseFile
-    //property MinVersion
-    //property OnlyBelowVersion
-    //property Password
+    property LicenseFile: String read FLicenseFile write SetLicenseFile;
+    property MinVersion: String read FMinVersion write SetMinVersion;
+    property OnlyBelowVersion: String read FOnlyBelowVersion write SetOnlyBelowVersion;
+    property Password: String read FPassword write SetPassword;
     //property PrivilegesRequired
     //property PrivilegesRequiredOverridesAllowed
-    //property RestartApplications
-    //property RestartIfNeededByRun
-    //property SetupLogging
-    //property SetupMutex
-    //property ShowLanguageDialog
-    //property TimeStampRounding
+    property RestartApplications: TBoolDef
+      read FRestartApplications write SetRestartApplications default TBoolDef.bdDefault;
+    property RestartIfNeededByRun: TBoolDef
+      read FRestartIfNeededByRun write SetRestartIfNeededByRun default TBoolDef.bdDefault;
+    property SetupLogging: TBoolDef read FSetupLogging write SetSetupLogging default TBoolDef.bdDefault;
+    property SetupMutex: String read FSetupMutex write SetSetupMutex;
+    property ShowLanguageDialog: TBoolDef
+      read FShowLanguageDialog write SetShowLanguageDialog default TBoolDef.bdTrue;
+    property TimeStampRounding: Integer read FTimeStampRounding write SetTimeStampRounding default 2;
     //property TimeStampsInUTC
     //property TouchDate
     //property TouchTime
@@ -1620,6 +1759,298 @@ destructor TJDISSetupInstaller.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TJDISSetupInstaller.SetAllowCancelDuringInstall(
+  const Value: TBoolDef);
+begin
+  FAllowCancelDuringInstall := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAllowNetworkDrive(const Value: TBoolDef);
+begin
+  FAllowNetworkDrive := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAllowNoIcons(const Value: TBoolDef);
+begin
+  FAllowNoIcons := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAllowRootDirectory(const Value: TBoolDef);
+begin
+  FAllowRootDirectory := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAllowUNCPath(const Value: TBoolDef);
+begin
+  FAllowUNCPath := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAlwaysRestart(const Value: TBoolDef);
+begin
+  FAlwaysRestart := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAlwaysShowComponentsList(
+  const Value: TBoolDef);
+begin
+  FAlwaysShowComponentsList := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAlwaysShowDirOnReadyPage(
+  const Value: TBoolDef);
+begin
+  FAlwaysShowDirOnReadyPage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAlwaysShowGroupOnReadyPage(
+  const Value: TBoolDef);
+begin
+  FAlwaysShowGroupOnReadyPage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAlwaysUsePersonalGroup(const Value: TBoolDef);
+begin
+  FAlwaysUsePersonalGroup := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppComments(const Value: String);
+begin
+  FAppComments := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppContact(const Value: String);
+begin
+  FAppContact := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppendDefaultDirName(const Value: TBoolDef);
+begin
+  FAppendDefaultDirName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppendDefaultGroupName(const Value: TBoolDef);
+begin
+  FAppendDefaultGroupName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppId(const Value: String);
+begin
+  FAppId := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppModifyPath(const Value: String);
+begin
+  FAppModifyPath := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppMutex(const Value: String);
+begin
+  FAppMutex := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppName(const Value: String);
+begin
+  FAppName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppPublisher(const Value: String);
+begin
+  FAppPublisher := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppPublisherURL(const Value: String);
+begin
+  FAppPublisherURL := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppReadmeFile(const Value: String);
+begin
+  FAppReadmeFile := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppSupportPhone(const Value: String);
+begin
+  FAppSupportPhone := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppSupportURL(const Value: String);
+begin
+  FAppSupportURL := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppUpdatesURL(const Value: String);
+begin
+  FAppUpdatesURL := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppVerName(const Value: String);
+begin
+  FAppVerName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetAppVersion(const Value: String);
+begin
+  FAppVersion := Value;
+end;
+
+procedure TJDISSetupInstaller.SetArchitecturesAllowed(
+  const Value: TJDISArchitecture);
+begin
+  FArchitecturesAllowed := Value;
+end;
+
+procedure TJDISSetupInstaller.SetArchitecturesInstallIn64BitMode(
+  const Value: TJDISArchitecture64);
+begin
+  FArchitecturesInstallIn64BitMode := Value;
+end;
+
+procedure TJDISSetupInstaller.SetCreateAppDir(const Value: TBoolDef);
+begin
+  FCreateAppDir := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDefaultDialogFontName(const Value: String);
+begin
+  FDefaultDialogFontName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDefaultDirName(const Value: String);
+begin
+  FDefaultDirName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDefaultGroupName(const Value: String);
+begin
+  FDefaultGroupName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDefaultUserInfoName(const Value: String);
+begin
+  FDefaultUserInfoName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDefaultUserInfoOrg(const Value: String);
+begin
+  FDefaultUserInfoOrg := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDefaultUserInfoSerial(const Value: String);
+begin
+  FDefaultUserInfoSerial := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDirExistsWarning(const Value: TBoolDef);
+begin
+  FDirExistsWarning := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableDirPage(const Value: TBoolDef);
+begin
+  FDisableDirPage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableFinishedPage(const Value: TBoolDef);
+begin
+  FDisableFinishedPage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableProgramGroupPage(const Value: TBoolDef);
+begin
+  FDisableProgramGroupPage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableReadyMemo(const Value: TBoolDef);
+begin
+  FDisableReadyMemo := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableReadyPage(const Value: TBoolDef);
+begin
+  FDisableReadyPage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableStartupPrompt(const Value: TBoolDef);
+begin
+  FDisableStartupPrompt := Value;
+end;
+
+procedure TJDISSetupInstaller.SetDisableWelcomePage(const Value: TBoolDef);
+begin
+  FDisableWelcomePage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetEnableDirDoesntExistWarning(
+  const Value: TBoolDef);
+begin
+  FEnableDirDoesntExistWarning := Value;
+end;
+
+procedure TJDISSetupInstaller.SetExtraDiskSpaceRequired(const Value: Int64);
+begin
+  FExtraDiskSpaceRequired := Value;
+end;
+
+procedure TJDISSetupInstaller.SetInfoAfterFile(const Value: String);
+begin
+  FInfoAfterFile := Value;
+end;
+
+procedure TJDISSetupInstaller.SetInfoBeforeFile(const Value: String);
+begin
+  FInfoBeforeFile := Value;
+end;
+
+procedure TJDISSetupInstaller.SetLicenseFile(const Value: String);
+begin
+  FLicenseFile := Value;
+end;
+
+procedure TJDISSetupInstaller.SetMinVersion(const Value: String);
+begin
+  FMinVersion := Value;
+end;
+
+procedure TJDISSetupInstaller.SetOnlyBelowVersion(const Value: String);
+begin
+  FOnlyBelowVersion := Value;
+end;
+
+procedure TJDISSetupInstaller.SetPassword(const Value: String);
+begin
+  FPassword := Value;
+end;
+
+procedure TJDISSetupInstaller.SetRestartApplications(const Value: TBoolDef);
+begin
+  FRestartApplications := Value;
+end;
+
+procedure TJDISSetupInstaller.SetRestartIfNeededByRun(const Value: TBoolDef);
+begin
+  FRestartIfNeededByRun := Value;
+end;
+
+procedure TJDISSetupInstaller.SetSetupLogging(const Value: TBoolDef);
+begin
+  FSetupLogging := Value;
+end;
+
+procedure TJDISSetupInstaller.SetSetupMutex(const Value: String);
+begin
+  FSetupMutex := Value;
+end;
+
+procedure TJDISSetupInstaller.SetShowLanguageDialog(const Value: TBoolDef);
+begin
+  FShowLanguageDialog := Value;
+end;
+
+procedure TJDISSetupInstaller.SetTimeStampRounding(const Value: Integer);
+begin
+  FTimeStampRounding := Value;
 end;
 
 { TJDISSetupCosmetic }
