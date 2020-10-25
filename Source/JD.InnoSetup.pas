@@ -381,6 +381,21 @@ type
     FShowLanguageDialog: TBoolDef;
     FSetupMutex: String;
     FTimeStampRounding: Integer;
+    FTimeStampsInUTC: Boolean;
+    FUpdateUninstallLogAppName: Boolean;
+    FUsePreviousUserInfo: Boolean;
+    FUsePreviousSetupType: Boolean;
+    FUserInfoPage: Boolean;
+    FUsePreviousPrivigeles: Boolean;
+    FUsePreviousTasks: Boolean;
+    FUsePreviousGroup: Boolean;
+    FUsePreviousLanguage: Boolean;
+    FUsePreviousAppDir: Boolean;
+    FUninstallDisplayIcon: String;
+    FUninstallDisplaySize: Int64;
+    FUninstallFilesDir: String;
+    FUninstallDisplayName: String;
+    FUninstallRestartComputer: Boolean;
     procedure SetAllowCancelDuringInstall(const Value: TBoolDef);
     procedure SetAllowNetworkDrive(const Value: TBoolDef);
     procedure SetAllowNoIcons(const Value: TBoolDef);
@@ -439,6 +454,21 @@ type
     procedure SetSetupMutex(const Value: String);
     procedure SetShowLanguageDialog(const Value: TBoolDef);
     procedure SetTimeStampRounding(const Value: Integer);
+    procedure SetTimeStampsInUTC(const Value: Boolean);
+    procedure SetUpdateUninstallLogAppName(const Value: Boolean);
+    procedure SetUsePreviousAppDir(const Value: Boolean);
+    procedure SetUsePreviousGroup(const Value: Boolean);
+    procedure SetUsePreviousLanguage(const Value: Boolean);
+    procedure SetUsePreviousPrivigeles(const Value: Boolean);
+    procedure SetUsePreviousSetupType(const Value: Boolean);
+    procedure SetUsePreviousTasks(const Value: Boolean);
+    procedure SetUsePreviousUserInfo(const Value: Boolean);
+    procedure SetUserInfoPage(const Value: Boolean);
+    procedure SetUninstallDisplayIcon(const Value: String);
+    procedure SetUninstallDisplayName(const Value: String);
+    procedure SetUninstallDisplaySize(const Value: Int64);
+    procedure SetUninstallFilesDir(const Value: String);
+    procedure SetUninstallRestartComputer(const Value: Boolean);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
@@ -525,26 +555,41 @@ type
     property SetupMutex: String read FSetupMutex write SetSetupMutex;
     property ShowLanguageDialog: TBoolDef
       read FShowLanguageDialog write SetShowLanguageDialog default TBoolDef.bdTrue;
-    property TimeStampRounding: Integer read FTimeStampRounding write SetTimeStampRounding default 2;
-    //property TimeStampsInUTC
+    property TimeStampRounding: Integer
+      read FTimeStampRounding write SetTimeStampRounding default 2;
+    property TimeStampsInUTC: Boolean read FTimeStampsInUTC write SetTimeStampsInUTC;
     //property TouchDate
     //property TouchTime
     //property Uninstallable
-    //property UninstallDisplayIcon
-    //property UninstallDisplayName
-    //property UninstallDisplaySize
-    //property UninstallFilesDir
+    property UninstallDisplayIcon: String
+      read FUninstallDisplayIcon write SetUninstallDisplayIcon;
+    property UninstallDisplayName: String
+      read FUninstallDisplayName write SetUninstallDisplayName;
+    property UninstallDisplaySize: Int64
+      read FUninstallDisplaySize write SetUninstallDisplaySize default 0;
+    property UninstallFilesDir: String
+      read FUninstallFilesDir write SetUninstallFilesDir;
     //property UninstallLogMode
-    //property UninstallRestartComputer
-    //property UpdateUninstallLogAppName
-    //property UsePreviousAppDir
-    //property UsePreviousGroup
-    //property UsePreviousLanguage
-    //property UsePreviousPrivigeles
-    //property UsePreviousSetupType
-    //property UsePreviousTasks
-    //property UsePreviousUserInfo
-    //property UserInfoPage
+    property UninstallRestartComputer: Boolean
+      read FUninstallRestartComputer write SetUninstallRestartComputer default False;
+    property UpdateUninstallLogAppName: Boolean
+      read FUpdateUninstallLogAppName write SetUpdateUninstallLogAppName default True;
+    property UsePreviousAppDir: Boolean
+      read FUsePreviousAppDir write SetUsePreviousAppDir default True;
+    property UsePreviousGroup: Boolean
+      read FUsePreviousGroup write SetUsePreviousGroup default True;
+    property UsePreviousLanguage: Boolean
+      read FUsePreviousLanguage write SetUsePreviousLanguage default True;
+    property UsePreviousPrivigeles: Boolean
+      read FUsePreviousPrivigeles write SetUsePreviousPrivigeles default True;
+    property UsePreviousSetupType: Boolean
+      read FUsePreviousSetupType write SetUsePreviousSetupType default True;
+    property UsePreviousTasks: Boolean
+      read FUsePreviousTasks write SetUsePreviousTasks default True;
+    property UsePreviousUserInfo: Boolean
+      read FUsePreviousUserInfo write SetUsePreviousUserInfo default True;
+    property UserInfoPage: Boolean
+      read FUserInfoPage write SetUserInfoPage default False;
   end;
 
   TJDISSetupCosmetic = class(TPersistent)
@@ -2050,7 +2095,86 @@ end;
 
 procedure TJDISSetupInstaller.SetTimeStampRounding(const Value: Integer);
 begin
-  FTimeStampRounding := Value;
+  if (Value >= 0) and (Value <= 60) then  
+    FTimeStampRounding := Value
+  else
+    raise Exception.Create('TimeStampRounding must be in the range of 0 to 60.');
+end;
+
+procedure TJDISSetupInstaller.SetTimeStampsInUTC(const Value: Boolean);
+begin
+  FTimeStampsInUTC := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallDisplayIcon(const Value: String);
+begin
+  FUninstallDisplayIcon := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallDisplayName(const Value: String);
+begin
+  FUninstallDisplayName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallDisplaySize(const Value: Int64);
+begin
+  FUninstallDisplaySize := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallFilesDir(const Value: String);
+begin
+  FUninstallFilesDir := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallRestartComputer(const Value: Boolean);
+begin
+  FUninstallRestartComputer := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUpdateUninstallLogAppName(
+  const Value: Boolean);
+begin
+  FUpdateUninstallLogAppName := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousAppDir(const Value: Boolean);
+begin
+  FUsePreviousAppDir := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousGroup(const Value: Boolean);
+begin
+  FUsePreviousGroup := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousLanguage(const Value: Boolean);
+begin
+  FUsePreviousLanguage := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousPrivigeles(const Value: Boolean);
+begin
+  FUsePreviousPrivigeles := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousSetupType(const Value: Boolean);
+begin
+  FUsePreviousSetupType := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousTasks(const Value: Boolean);
+begin
+  FUsePreviousTasks := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUsePreviousUserInfo(const Value: Boolean);
+begin
+  FUsePreviousUserInfo := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUserInfoPage(const Value: Boolean);
+begin
+  FUserInfoPage := Value;
 end;
 
 { TJDISSetupCosmetic }
