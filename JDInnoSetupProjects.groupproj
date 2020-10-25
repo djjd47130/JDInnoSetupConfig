@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{64C97C62-EFBE-4031-9C01-7ADD862ACECA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Packages\JDInnoSetupConfig.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Packages\dclJDInnoSetupConfig.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Demo\JDInnoSetupDemo.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="JDInnoSetupConfig">
+        <MSBuild Projects="Packages\JDInnoSetupConfig.dproj"/>
+    </Target>
+    <Target Name="JDInnoSetupConfig:Clean">
+        <MSBuild Projects="Packages\JDInnoSetupConfig.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="JDInnoSetupConfig:Make">
+        <MSBuild Projects="Packages\JDInnoSetupConfig.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dclJDInnoSetupConfig">
+        <MSBuild Projects="Packages\dclJDInnoSetupConfig.dproj"/>
+    </Target>
+    <Target Name="dclJDInnoSetupConfig:Clean">
+        <MSBuild Projects="Packages\dclJDInnoSetupConfig.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dclJDInnoSetupConfig:Make">
+        <MSBuild Projects="Packages\dclJDInnoSetupConfig.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="JDInnoSetupDemo">
+        <MSBuild Projects="Demo\JDInnoSetupDemo.dproj"/>
+    </Target>
+    <Target Name="JDInnoSetupDemo:Clean">
+        <MSBuild Projects="Demo\JDInnoSetupDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="JDInnoSetupDemo:Make">
+        <MSBuild Projects="Demo\JDInnoSetupDemo.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="JDInnoSetupConfig;dclJDInnoSetupConfig;JDInnoSetupDemo"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="JDInnoSetupConfig:Clean;dclJDInnoSetupConfig:Clean;JDInnoSetupDemo:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="JDInnoSetupConfig:Make;dclJDInnoSetupConfig:Make;JDInnoSetupDemo:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
