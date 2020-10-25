@@ -186,7 +186,7 @@ type
     property Obsolete: TJDISSetupObsolete read FObsolete write SetObsolete;
   end;
 
-  TJDISCompression = (iscZip, iscZipVer, iscBzip, iscBzipVer, iscLzma,
+  TJDISCompression = (iscDefault, iscZip, iscZipVer, iscBzip, iscBzipVer, iscLzma,
     iscLzmaFast, iscLzmaNormal, iscLzmaMax, iscLzmaUltra, iscLzmaUltra64,
     iscLzma2, iscLzma2Fast, iscLzma2Normal, iscLzma2Max, iscLzma2Ultra,
     iscLzma2Ultra64, iscNone);
@@ -264,6 +264,7 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
   published
     property ASLRCompatible: TBoolDef read FASLRCompatible write SetASLRCompatible default TBoolDef.bdDefault;
     property Compression: TJDISCompression read FCompression write SetCompression default TJDISCompression.iscLzma2Max;
@@ -472,6 +473,7 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
   published
     property AllowCancelDuringInstall: TBoolDef
       read FAllowCancelDuringInstall write SetAllowCancelDuringInstall default TBoolDef.bdDefault;
@@ -638,6 +640,7 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
   published
     property AppCopyright: String
       read FAppCopyright write SetAppCopyright;
@@ -685,6 +688,8 @@ type
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
+  published
     //property AlwaysCreateUninstallIcon
     //property DisableAppendDir
     //property DontMergeDuplicateFiles
@@ -1653,10 +1658,11 @@ end;
 
 procedure TJDISSetup.AddToScript(AScript: TStrings);
 begin
-  //TODO: Add setup section to script file...
-
-
-
+  AScript.Append('[Setup]');
+  FCompiler.AddToScript(AScript);
+  FInstaller.AddToScript(AScript);
+  FCosmetic.AddToScript(AScript);
+  FObsolete.AddToScript(AScript);
 end;
 
 procedure TJDISSetup.SetCompiler(const Value: TJDISSetupCompiler);
@@ -1685,12 +1691,146 @@ constructor TJDISSetupCompiler.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
 
+
+
 end;
 
 destructor TJDISSetupCompiler.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TJDISSetupCompiler.AddToScript(AScript: TStrings);
+  procedure A(const S: String);
+  begin
+    AScript.Append(S);
+  end;
+  procedure AP(const N, V: String);
+  begin
+    A(N+'='+V);
+  end;
+  procedure ABD(const AName: String; const AValue: TBoolDef);
+  begin
+    case AValue of
+      bdDefault:  ;
+      bdFalse:    AP(AName, 'no');
+      bdTrue:     AP(AName, 'yes');
+    end;
+  end;
+  procedure AST(const AName: String; const AValue: String);
+  begin
+    if AValue <> '' then
+      AP(AName, AValue);
+  end;
+begin
+
+  ABD('ASLRCompatible', FASLRCompatible);
+
+  case Self.FCompression of
+    iscDefault:       ;
+    iscZip:           AP('Compression', 'zip');
+    iscZipVer:        AP('Compression', 'zip/'+IntToStr(FCompressionVer));
+    iscBzip:          AP('Compression', 'bzip');
+    iscBzipVer:       AP('Compression', 'bzip/'+IntToStr(FCompressionVer));
+    iscLzma:          AP('Compression', 'lzma');
+    iscLzmaFast:      AP('Compression', 'lzma/fast');
+    iscLzmaNormal:    AP('Compression', 'lzma/normal');
+    iscLzmaMax:       AP('Compression', 'lzma/max');
+    iscLzmaUltra:     AP('Compression', 'lzma/ultra');
+    iscLzmaUltra64:   AP('Compression', 'lzma/ultra64');
+    iscLzma2:         AP('Compression', 'lzma2');
+    iscLzma2Fast:     AP('Compression', 'lzma2/fast');
+    iscLzma2Normal:   AP('Compression', 'lzma2/normal');
+    iscLzma2Max:      AP('Compression', 'lzma2/max');
+    iscLzma2Ultra:    AP('Compression', 'lzma2/ultra');
+    iscLzma2Ultra64:  AP('Compression', 'lzma2/ultra64');
+    iscNone:          AP('Compression', 'none');
+  end;
+
+  if Self.FCompressionThreads <> 0 then begin
+    AP('CompressionThreads', IntToStr(FCompressionThreads));
+  end;
+
+  ABD('DEPCompatible', FDEPCompatible);
+
+  if Self.FDiskClusterSize <> 512 then begin
+    AP('DiskClusterSize', IntToStr(FDiskClusterSize));
+  end;
+
+  if Self.FDiskSliceSize <> 2100000000 then begin
+    AP('DiskSliceSize', IntToStr(FDiskSliceSize));
+  end;
+
+  ABD('DiskSpanning', FDiskSpanning);
+
+  ABD('Encryption', FEncryption);
+
+  case Self.FInternalCompressLevel of
+    isicNormal:       ;
+    isicZip:          AP('InternalCompressLevel', 'zip');
+    isicZipVer:       AP('InternalCompressLevel', 'zip/'+IntToStr(FCompressionVer));
+    isicBzip:         AP('InternalCompressLevel', 'bzip');
+    isicBzipVer:      AP('InternalCompressLevel', 'bzip/'+IntToStr(FCompressionVer));
+    isicLzma:         AP('InternalCompressLevel', 'lzma');
+    isicLzmaFast:     AP('InternalCompressLevel', 'lzma/fast');
+    isicLzmaNormal:   AP('InternalCompressLevel', 'lzma/normal');
+    isicLzmaMax:      AP('InternalCompressLevel', 'lzma/max');
+    isicLzmaUltra:    AP('InternalCompressLevel', 'lzma/ultra');
+    isicLzmaUltra64:  AP('InternalCompressLevel', 'lzma/ultra64');
+    isicLzma2:        AP('InternalCompressLevel', 'lzma2');
+    isicLzma2Fast:    AP('InternalCompressLevel', 'lzma2/fast');
+    isicLzma2Normal:  AP('InternalCompressLevel', 'lzma2/normal');
+    isicLzma2Max:     AP('InternalCompressLevel', 'lzma2/max');
+    isicLzma2Ultra:   AP('InternalCompressLevel', 'lzma2/ultra');
+    isicLzma2Ultra64: AP('InternalCompressLevel', 'lzma2/ultra64');
+    isicNone:         AP('InternalCompressLevel', 'none');
+  end;
+
+  ABD('MergeDuplicateFiles', FMergeDuplicateFiles);
+
+  ABD('Output', FOutput);
+
+  AST('OutputBaseFilename', FOutputBaseFilename);
+
+  AST('OutputDir', FOutputDir);
+
+  AST('OutputManifestFile', FOutputManifestFile);
+
+  if Self.FReserveBytes <> 0 then begin
+    AP('ReserveBytes', IntToStr(FReserveBytes));
+  end;
+
+  if Self.FSlicesPerDisk <> 1 then begin
+    AP('SlicesPerDisk', IntToStr(FSlicesPerDisk));
+  end;
+
+  ABD('SolidCompression', FSolidCompression);
+
+  AST('SourceDir', FSourceDir);
+
+  ABD('TerminalServicesAware', FTerminalServicesAware);
+
+  ABD('UsedUserAreasWarning', Self.FUsedUserAreasWarning);
+
+  AST('VersionInfoCompany', FVersionInfoCompany);
+
+  AST('VersionInfoCopyright', FVersionInfoCopyright);
+
+  AST('VersionInfoDescription', FVersionInfoDescription);
+
+  AST('VersionInfoOriginalFileName', FVersionInfoOriginalFileName);
+
+  AST('VersionInfoProductName', FVersionInfoProductName);
+
+  AST('VersionInfoProductTextVersion', FVersionInfoProductTextVersion);
+
+  AST('VersionInfoProductVersion', FVersionInfoProductVersion);
+
+  AST('VersionInfoTextVersion', FVersionInfoTextVersion);
+
+  AST('VersionInfoVersion', FVersionInfoVersion);
+
 end;
 
 procedure TJDISSetupCompiler.SetASLRCompatible(const Value: TBoolDef);
@@ -1863,6 +2003,39 @@ destructor TJDISSetupInstaller.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TJDISSetupInstaller.AddToScript(AScript: TStrings);
+  procedure A(const S: String);
+  begin
+    AScript.Append(S);
+  end;
+  procedure AP(const N, V: String);
+  begin
+    A(N+'='+V);
+  end;
+  procedure ABD(const AName: String; const AValue: TBoolDef);
+  begin
+    case AValue of
+      bdDefault:  ;
+      bdFalse:    AP(AName, 'no');
+      bdTrue:     AP(AName, 'yes');
+    end;
+  end;
+  procedure AST(const AName: String; const AValue: String);
+  begin
+    if AValue <> '' then
+      AP(AName, AValue);
+  end;
+begin
+
+  ABD('AllowCancelDuringInstall', Self.FAllowCancelDuringInstall);
+
+
+
+
+
+
 end;
 
 procedure TJDISSetupInstaller.SetAllowCancelDuringInstall(
@@ -2238,6 +2411,11 @@ end;
 
 { TJDISSetupCosmetic }
 
+procedure TJDISSetupCosmetic.AddToScript(AScript: TStrings);
+begin
+
+end;
+
 constructor TJDISSetupCosmetic.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
@@ -2342,6 +2520,11 @@ begin
 end;
 
 { TJDISSetupObsolete }
+
+procedure TJDISSetupObsolete.AddToScript(AScript: TStrings);
+begin
+
+end;
 
 constructor TJDISSetupObsolete.Create(AOwner: TJDISSetup);
 begin
