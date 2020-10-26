@@ -2205,13 +2205,19 @@ begin
 
   ABD('UsePreviousAppDir', Self.FUsePreviousAppDir);
 
+  ABD('UsePreviousGroup', Self.FUsePreviousGroup);
 
+  ABD('UsePreviousLanguage', Self.FUsePreviousLanguage);
 
+  ABD('UsePreviousPrivigeles', Self.FUsePreviousPrivigeles);
 
+  ABD('UsePreviousSetupType', Self.FUsePreviousSetupType);
 
+  ABD('UsePreviousTasks', Self.FUsePreviousTasks);
 
+  ABD('UsePreviousUserInfo', Self.FUsePreviousUserInfo);
 
-
+  ABD('UserInfoPage', Self.FUserInfoPage);
 
 end;
 

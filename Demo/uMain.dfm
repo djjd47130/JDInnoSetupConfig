@@ -52,24 +52,11 @@ object Form1: TForm1
     Setup.Compiler.DiskSliceSize = 0
     Setup.Compiler.SlicesPerDisk = 0
     Setup.Installer.ArchitecturesAllowed = []
+    Setup.Installer.ArchitecturesInstallIn64BitMode = []
     Setup.Installer.DirExistsWarning = bdDefault
     Setup.Installer.ShowLanguageDialog = bdDefault
     Setup.Installer.TimeStampRounding = 0
-    Setup.Installer.TimeStampsInUTC = False
-    Setup.Installer.UpdateUninstallLogAppName = False
-    Setup.Installer.UsePreviousAppDir = False
-    Setup.Installer.UsePreviousGroup = False
-    Setup.Installer.UsePreviousLanguage = False
-    Setup.Installer.UsePreviousPrivigeles = False
-    Setup.Installer.UsePreviousSetupType = False
-    Setup.Installer.UsePreviousTasks = False
-    Setup.Installer.UsePreviousUserInfo = False
-    Setup.Cosmetic.FlatComponentsList = False
-    Setup.Cosmetic.ShowComponentSizes = False
-    Setup.Cosmetic.WindowShowCaption = False
-    Setup.Cosmetic.WindowStartMaximized = False
-    Setup.Cosmetic.WindowResizable = False
-    Setup.Cosmetic.WizardImageStretch = False
+    Setup.Installer.TimeStampsInUTC = bdDefault
     Types = <
       item
         Name = 'basic'
