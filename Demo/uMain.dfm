@@ -58,6 +58,11 @@ object Form1: TForm1
         Name = 'MyAppURL'
         Value = 'http://www.jerrydodge.com'
       end>
+    Code.Strings = (
+      'procedure DoTest;'
+      'begin'
+      '  DoSomething;'
+      'end;')
     Setup.Compiler.Compression = iscLzma
     Setup.Compiler.OutputBaseFilename = 'MySetup'
     Setup.Compiler.OutputDir = '.\'

@@ -1472,6 +1472,17 @@ begin
 
 
 
+
+
+
+
+  //Code
+  if Trim(Self.FCode.Text) <> '' then begin
+    AStrings.Append('');
+    AStrings.Append('[Code]');
+    AStrings.AddStrings(Self.FCode);
+  end;
+
 end;
 
 procedure TJDInnoSetupScript.SaveScript(const AFilename: String);
