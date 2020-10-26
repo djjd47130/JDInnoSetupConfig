@@ -354,7 +354,7 @@ type
     FAppName: String;
     FAppPublisher: String;
     FArchitecturesAllowed: TJDISArchitectures;
-    FArchitecturesInstallIn64BitMode: TJDISArchitecture64;
+    FArchitecturesInstallIn64BitMode: TJDISArchitectures64;
     FCreateAppDir: TBoolDef;
     FDefaultUserInfoName: String;
     FDefaultUserInfoOrg: String;
@@ -384,21 +384,21 @@ type
     FShowLanguageDialog: TBoolDef;
     FSetupMutex: String;
     FTimeStampRounding: Integer;
-    FTimeStampsInUTC: Boolean;
-    FUpdateUninstallLogAppName: Boolean;
-    FUsePreviousUserInfo: Boolean;
-    FUsePreviousSetupType: Boolean;
-    FUserInfoPage: Boolean;
-    FUsePreviousPrivigeles: Boolean;
-    FUsePreviousTasks: Boolean;
-    FUsePreviousGroup: Boolean;
-    FUsePreviousLanguage: Boolean;
-    FUsePreviousAppDir: Boolean;
+    FTimeStampsInUTC: TBoolDef;
+    FUpdateUninstallLogAppName: TBoolDef;
+    FUsePreviousUserInfo: TBoolDef;
+    FUsePreviousSetupType: TBoolDef;
+    FUserInfoPage: TBoolDef;
+    FUsePreviousPrivigeles: TBoolDef;
+    FUsePreviousTasks: TBoolDef;
+    FUsePreviousGroup: TBoolDef;
+    FUsePreviousLanguage: TBoolDef;
+    FUsePreviousAppDir: TBoolDef;
     FUninstallDisplayIcon: String;
     FUninstallDisplaySize: Int64;
     FUninstallFilesDir: String;
     FUninstallDisplayName: String;
-    FUninstallRestartComputer: Boolean;
+    FUninstallRestartComputer: TBoolDef;
     procedure SetAllowCancelDuringInstall(const Value: TBoolDef);
     procedure SetAllowNetworkDrive(const Value: TBoolDef);
     procedure SetAllowNoIcons(const Value: TBoolDef);
@@ -427,7 +427,7 @@ type
     procedure SetAppVersion(const Value: String);
     procedure SetArchitecturesAllowed(const Value: TJDISArchitectures);
     procedure SetArchitecturesInstallIn64BitMode(
-      const Value: TJDISArchitecture64);
+      const Value: TJDISArchitectures64);
     procedure SetCreateAppDir(const Value: TBoolDef);
     procedure SetDefaultDialogFontName(const Value: String);
     procedure SetDefaultDirName(const Value: String);
@@ -457,21 +457,21 @@ type
     procedure SetSetupMutex(const Value: String);
     procedure SetShowLanguageDialog(const Value: TBoolDef);
     procedure SetTimeStampRounding(const Value: Integer);
-    procedure SetTimeStampsInUTC(const Value: Boolean);
-    procedure SetUpdateUninstallLogAppName(const Value: Boolean);
-    procedure SetUsePreviousAppDir(const Value: Boolean);
-    procedure SetUsePreviousGroup(const Value: Boolean);
-    procedure SetUsePreviousLanguage(const Value: Boolean);
-    procedure SetUsePreviousPrivigeles(const Value: Boolean);
-    procedure SetUsePreviousSetupType(const Value: Boolean);
-    procedure SetUsePreviousTasks(const Value: Boolean);
-    procedure SetUsePreviousUserInfo(const Value: Boolean);
-    procedure SetUserInfoPage(const Value: Boolean);
+    procedure SetTimeStampsInUTC(const Value: TBoolDef);
+    procedure SetUpdateUninstallLogAppName(const Value: TBoolDef);
+    procedure SetUsePreviousAppDir(const Value: TBoolDef);
+    procedure SetUsePreviousGroup(const Value: TBoolDef);
+    procedure SetUsePreviousLanguage(const Value: TBoolDef);
+    procedure SetUsePreviousPrivigeles(const Value: TBoolDef);
+    procedure SetUsePreviousSetupType(const Value: TBoolDef);
+    procedure SetUsePreviousTasks(const Value: TBoolDef);
+    procedure SetUsePreviousUserInfo(const Value: TBoolDef);
+    procedure SetUserInfoPage(const Value: TBoolDef);
     procedure SetUninstallDisplayIcon(const Value: String);
     procedure SetUninstallDisplayName(const Value: String);
     procedure SetUninstallDisplaySize(const Value: Int64);
     procedure SetUninstallFilesDir(const Value: String);
-    procedure SetUninstallRestartComputer(const Value: Boolean);
+    procedure SetUninstallRestartComputer(const Value: TBoolDef);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
@@ -517,8 +517,8 @@ type
     property AppVersion: String read FAppVersion write SetAppVersion;
     property ArchitecturesAllowed: TJDISArchitectures
       read FArchitecturesAllowed write SetArchitecturesAllowed;
-    property ArchitecturesInstallIn64BitMode: TJDISArchitecture64
-      read FArchitecturesInstallIn64BitMode write SetArchitecturesInstallIn64BitMode default TJDISArchitecture64.isa64Default;
+    property ArchitecturesInstallIn64BitMode: TJDISArchitectures64
+      read FArchitecturesInstallIn64BitMode write SetArchitecturesInstallIn64BitMode;
     //property ChangesAssociations
     //property ChangesEnvironment
     //property CloseApplications
@@ -561,7 +561,7 @@ type
       read FShowLanguageDialog write SetShowLanguageDialog default TBoolDef.bdTrue;
     property TimeStampRounding: Integer
       read FTimeStampRounding write SetTimeStampRounding default 2;
-    property TimeStampsInUTC: Boolean read FTimeStampsInUTC write SetTimeStampsInUTC;
+    property TimeStampsInUTC: TBoolDef read FTimeStampsInUTC write SetTimeStampsInUTC;
     //property TouchDate
     //property TouchTime
     //property Uninstallable
@@ -574,26 +574,26 @@ type
     property UninstallFilesDir: String
       read FUninstallFilesDir write SetUninstallFilesDir;
     //property UninstallLogMode
-    property UninstallRestartComputer: Boolean
-      read FUninstallRestartComputer write SetUninstallRestartComputer default False;
-    property UpdateUninstallLogAppName: Boolean
-      read FUpdateUninstallLogAppName write SetUpdateUninstallLogAppName default True;
-    property UsePreviousAppDir: Boolean
-      read FUsePreviousAppDir write SetUsePreviousAppDir default True;
-    property UsePreviousGroup: Boolean
-      read FUsePreviousGroup write SetUsePreviousGroup default True;
-    property UsePreviousLanguage: Boolean
-      read FUsePreviousLanguage write SetUsePreviousLanguage default True;
-    property UsePreviousPrivigeles: Boolean
-      read FUsePreviousPrivigeles write SetUsePreviousPrivigeles default True;
-    property UsePreviousSetupType: Boolean
-      read FUsePreviousSetupType write SetUsePreviousSetupType default True;
-    property UsePreviousTasks: Boolean
-      read FUsePreviousTasks write SetUsePreviousTasks default True;
-    property UsePreviousUserInfo: Boolean
-      read FUsePreviousUserInfo write SetUsePreviousUserInfo default True;
-    property UserInfoPage: Boolean
-      read FUserInfoPage write SetUserInfoPage default False;
+    property UninstallRestartComputer: TBoolDef
+      read FUninstallRestartComputer write SetUninstallRestartComputer default TBoolDef.bdDefault;
+    property UpdateUninstallLogAppName: TBoolDef
+      read FUpdateUninstallLogAppName write SetUpdateUninstallLogAppName default TBoolDef.bdDefault;
+    property UsePreviousAppDir: TBoolDef
+      read FUsePreviousAppDir write SetUsePreviousAppDir default TBoolDef.bdDefault;
+    property UsePreviousGroup: TBoolDef
+      read FUsePreviousGroup write SetUsePreviousGroup default TBoolDef.bdDefault;
+    property UsePreviousLanguage: TBoolDef
+      read FUsePreviousLanguage write SetUsePreviousLanguage default TBoolDef.bdDefault;
+    property UsePreviousPrivigeles: TBoolDef
+      read FUsePreviousPrivigeles write SetUsePreviousPrivigeles default TBoolDef.bdDefault;
+    property UsePreviousSetupType: TBoolDef
+      read FUsePreviousSetupType write SetUsePreviousSetupType default TBoolDef.bdDefault;
+    property UsePreviousTasks: TBoolDef
+      read FUsePreviousTasks write SetUsePreviousTasks default TBoolDef.bdDefault;
+    property UsePreviousUserInfo: TBoolDef
+      read FUsePreviousUserInfo write SetUsePreviousUserInfo default TBoolDef.bdDefault;
+    property UserInfoPage: TBoolDef
+      read FUserInfoPage write SetUserInfoPage default TBoolDef.bdDefault;
   end;
 
   TJDISBackColorDir = (iscdTopToBottom, iscdLeftToRight);
@@ -607,16 +607,16 @@ type
     FBackColor: String;
     FBackColor2: String;
     FBackColorDirection: TJDISBackColorDir;
-    FBackSolid: Boolean;
-    FShowComponentSizes: Boolean;
+    FBackSolid: TBoolDef;
+    FShowComponentSizes: TBoolDef;
     FSetupIconFile: String;
-    FFlatComponentsList: Boolean;
-    FShowTasksTreeLines: Boolean;
-    FWindowResizable: Boolean;
-    FWindowStartMaximized: Boolean;
-    FWindowShowCaption: Boolean;
-    FWindowVisible: Boolean;
-    FWizardImageStretch: Boolean;
+    FFlatComponentsList: TBoolDef;
+    FShowTasksTreeLines: TBoolDef;
+    FWindowResizable: TBoolDef;
+    FWindowStartMaximized: TBoolDef;
+    FWindowShowCaption: TBoolDef;
+    FWindowVisible: TBoolDef;
+    FWizardImageStretch: TBoolDef;
     FWizardImageFile: String;
     FWizardResizable: TBoolDef;
     FWizardStyle: TJDISWizardStyle;
@@ -625,17 +625,17 @@ type
     procedure SetBackColor(const Value: String);
     procedure SetBackColor2(const Value: String);
     procedure SetBackColorDirection(const Value: TJDISBackColorDir);
-    procedure SetBackSolid(const Value: Boolean);
-    procedure SetFlatComponentsList(const Value: Boolean);
+    procedure SetBackSolid(const Value: TBoolDef);
+    procedure SetFlatComponentsList(const Value: TBoolDef);
     procedure SetSetupIconFile(const Value: String);
-    procedure SetShowComponentSizes(const Value: Boolean);
-    procedure SetShowTasksTreeLines(const Value: Boolean);
-    procedure SetWindowResizable(const Value: Boolean);
-    procedure SetWindowShowCaption(const Value: Boolean);
-    procedure SetWindowStartMaximized(const Value: Boolean);
-    procedure SetWindowVisible(const Value: Boolean);
+    procedure SetShowComponentSizes(const Value: TBoolDef);
+    procedure SetShowTasksTreeLines(const Value: TBoolDef);
+    procedure SetWindowResizable(const Value: TBoolDef);
+    procedure SetWindowShowCaption(const Value: TBoolDef);
+    procedure SetWindowStartMaximized(const Value: TBoolDef);
+    procedure SetWindowVisible(const Value: TBoolDef);
     procedure SetWizardImageFile(const Value: String);
-    procedure SetWizardImageStretch(const Value: Boolean);
+    procedure SetWizardImageStretch(const Value: TBoolDef);
     procedure SetWizardResizable(const Value: TBoolDef);
     procedure SetWizardSmallImageFile(const Value: String);
     procedure SetWizardStyle(const Value: TJDISWizardStyle);
@@ -652,29 +652,29 @@ type
       read FBackColor2 write SetBackColor2;
     property BackColorDirection: TJDISBackColorDir
       read FBackColorDirection write SetBackColorDirection default TJDISBackColorDir.iscdTopToBottom;
-    property BackSolid: Boolean
-      read FBackSolid write SetBackSolid default False;
-    property FlatComponentsList: Boolean
-      read FFlatComponentsList write SetFlatComponentsList default True;
+    property BackSolid: TBoolDef
+      read FBackSolid write SetBackSolid default TBoolDef.bdDefault;
+    property FlatComponentsList: TBoolDef
+      read FFlatComponentsList write SetFlatComponentsList default TBoolDef.bdDefault;
     property SetupIconFile: String
       read FSetupIconFile write SetSetupIconFile;
-    property ShowComponentSizes: Boolean
-      read FShowComponentSizes write SetShowComponentSizes default True;
-    property ShowTasksTreeLines: Boolean
-      read FShowTasksTreeLines write SetShowTasksTreeLines default False;
-    property WindowShowCaption: Boolean
-      read FWindowShowCaption write SetWindowShowCaption default True;
-    property WindowStartMaximized: Boolean
-      read FWindowStartMaximized write SetWindowStartMaximized default True;
-    property WindowResizable: Boolean
-      read FWindowResizable write SetWindowResizable default True;
-    property WindowVisible: Boolean
-      read FWindowVisible write SetWindowVisible default False;
+    property ShowComponentSizes: TBoolDef
+      read FShowComponentSizes write SetShowComponentSizes default TBoolDef.bdDefault;
+    property ShowTasksTreeLines: TBoolDef
+      read FShowTasksTreeLines write SetShowTasksTreeLines default TBoolDef.bdDefault;
+    property WindowShowCaption: TBoolDef
+      read FWindowShowCaption write SetWindowShowCaption default TBoolDef.bdDefault;
+    property WindowStartMaximized: TBoolDef
+      read FWindowStartMaximized write SetWindowStartMaximized default TBoolDef.bdDefault;
+    property WindowResizable: TBoolDef
+      read FWindowResizable write SetWindowResizable default TBoolDef.bdDefault;
+    property WindowVisible: TBoolDef
+      read FWindowVisible write SetWindowVisible default TBoolDef.bdDefault;
     //property WizardImageAlphaFormat
     property WizardImageFile: String
       read FWizardImageFile write SetWizardImageFile;
-    property WizardImageStretch: Boolean
-      read FWizardImageStretch write SetWizardImageStretch default True;
+    property WizardImageStretch: TBoolDef
+      read FWizardImageStretch write SetWizardImageStretch default TBoolDef.bdDefault;
     property WizardResizable: TBoolDef
       read FWizardResizable write SetWizardResizable default TBoolDef.bdDefault;
     //property WizardSizePercent
@@ -2117,7 +2117,93 @@ begin
 
   AST('DefaultDialogFontName', Self.FDefaultDialogFontName);
 
+  AST('DefaultDirName', Self.FDefaultDirName);
 
+  AST('DefaultGroupName', Self.FDefaultGroupName);
+
+  AST('DefaultUserInfoName', Self.FDefaultUserInfoName);
+
+  AST('DefaultUserInfoOrg', Self.FDefaultUserInfoOrg);
+
+  AST('DefaultUserInfoSerial', Self.FDefaultUserInfoSerial);
+
+  //DirExistsWarning
+
+  //DisableDirPage
+
+  ABD('DisableFinishedPage', Self.FDisableFinishedPage);
+
+  //DisableProgramGroupPage
+
+  ABD('DisableReadyMemo', Self.FDisableReadyMemo);
+
+  ABD('DisableReadyPage', Self.FDisableReadyPage);
+
+  ABD('DisableStartupPrompt', Self.FDisableStartupPrompt);
+
+  ABD('DisableWelcomePage', Self.FDisableWelcomePage);
+
+  ABD('EnableDirDoesntExistWarning', Self.FEnableDirDoesntExistWarning);
+
+  if Self.FExtraDiskSpaceRequired > 0 then begin
+    AP('ExtraDiskSpaceRequired', IntToStr(Self.FExtraDiskSpaceRequired));
+  end;
+
+  AST('InfoAfterFile', Self.FInfoAfterFile);
+
+  AST('InfoBeforeFile', Self.FInfoBeforeFile);
+
+  //LanguageDetectionMethod
+
+  AST('LicenseFile', Self.FLicenseFile);
+
+  AST('MinVersion', Self.FMinVersion);
+
+  AST('OnlyBelowVersion', Self.FOnlyBelowVersion);
+
+  AST('Password', Self.FPassword);
+
+  //PrivilegesRequired
+
+  //PrivilegesRequiredOverridesAllowed
+
+  ABD('RestartApplications', Self.FRestartApplications);
+
+  ABD('RestartIfNeededByRun', Self.FRestartIfNeededByRun);
+
+  ABD('SetupLogging', Self.FSetupLogging);
+
+  AST('SetupMutex', Self.FSetupMutex);
+
+  //ShowLanguageDialog
+
+  if Self.FTimeStampRounding <> 2 then begin
+    AP('TimeStampRounding', IntToStr(Self.FTimeStampRounding));
+  end;
+
+  ABD('TimeStampsInUTC', Self.FTimeStampsInUTC);
+
+  //TouchDate
+
+  //TouchTime
+
+  //Uninstallable
+
+  //UninstallDisplayIcon
+
+  //UninstallDisplayName
+
+  //UninstallDisplaySize
+
+  //UninstallFilesDir
+
+  //UninstallLogMode
+
+  //UninstallRestartComputer
+
+  //UpdateUninstallLogAppName
+
+  ABD('UsePreviousAppDir', Self.FUsePreviousAppDir);
 
 
 
@@ -2270,7 +2356,7 @@ begin
 end;
 
 procedure TJDISSetupInstaller.SetArchitecturesInstallIn64BitMode(
-  const Value: TJDISArchitecture64);
+  const Value: TJDISArchitectures64);
 begin
   FArchitecturesInstallIn64BitMode := Value;
 end;
@@ -2424,7 +2510,7 @@ begin
     raise Exception.Create('TimeStampRounding must be in the range of 0 to 60.');
 end;
 
-procedure TJDISSetupInstaller.SetTimeStampsInUTC(const Value: Boolean);
+procedure TJDISSetupInstaller.SetTimeStampsInUTC(const Value: TBoolDef);
 begin
   FTimeStampsInUTC := Value;
 end;
@@ -2449,53 +2535,53 @@ begin
   FUninstallFilesDir := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUninstallRestartComputer(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUninstallRestartComputer(const Value: TBoolDef);
 begin
   FUninstallRestartComputer := Value;
 end;
 
 procedure TJDISSetupInstaller.SetUpdateUninstallLogAppName(
-  const Value: Boolean);
+  const Value: TBoolDef);
 begin
   FUpdateUninstallLogAppName := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousAppDir(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousAppDir(const Value: TBoolDef);
 begin
   FUsePreviousAppDir := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousGroup(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousGroup(const Value: TBoolDef);
 begin
   FUsePreviousGroup := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousLanguage(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousLanguage(const Value: TBoolDef);
 begin
   FUsePreviousLanguage := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousPrivigeles(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousPrivigeles(const Value: TBoolDef);
 begin
   FUsePreviousPrivigeles := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousSetupType(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousSetupType(const Value: TBoolDef);
 begin
   FUsePreviousSetupType := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousTasks(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousTasks(const Value: TBoolDef);
 begin
   FUsePreviousTasks := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUsePreviousUserInfo(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUsePreviousUserInfo(const Value: TBoolDef);
 begin
   FUsePreviousUserInfo := Value;
 end;
 
-procedure TJDISSetupInstaller.SetUserInfoPage(const Value: Boolean);
+procedure TJDISSetupInstaller.SetUserInfoPage(const Value: TBoolDef);
 begin
   FUserInfoPage := Value;
 end;
@@ -2540,12 +2626,12 @@ begin
   FBackColorDirection := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetBackSolid(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetBackSolid(const Value: TBoolDef);
 begin
   FBackSolid := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetFlatComponentsList(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetFlatComponentsList(const Value: TBoolDef);
 begin
   FFlatComponentsList := Value;
 end;
@@ -2555,32 +2641,32 @@ begin
   FSetupIconFile := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetShowComponentSizes(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetShowComponentSizes(const Value: TBoolDef);
 begin
   FShowComponentSizes := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetShowTasksTreeLines(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetShowTasksTreeLines(const Value: TBoolDef);
 begin
   FShowTasksTreeLines := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetWindowResizable(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetWindowResizable(const Value: TBoolDef);
 begin
   FWindowResizable := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetWindowShowCaption(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetWindowShowCaption(const Value: TBoolDef);
 begin
   FWindowShowCaption := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetWindowStartMaximized(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetWindowStartMaximized(const Value: TBoolDef);
 begin
   FWindowStartMaximized := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetWindowVisible(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetWindowVisible(const Value: TBoolDef);
 begin
   FWindowVisible := Value;
 end;
@@ -2590,7 +2676,7 @@ begin
   FWizardImageFile := Value;
 end;
 
-procedure TJDISSetupCosmetic.SetWizardImageStretch(const Value: Boolean);
+procedure TJDISSetupCosmetic.SetWizardImageStretch(const Value: TBoolDef);
 begin
   FWizardImageStretch := Value;
 end;
