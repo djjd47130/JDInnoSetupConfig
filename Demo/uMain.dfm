@@ -45,18 +45,39 @@ object Form1: TForm1
       item
         Name = 'MyAppName'
         Value = 'Test Application'
+      end
+      item
+        Name = 'MyAppVersion'
+        Value = '1.0'
+      end
+      item
+        Name = 'MyAppPublisher'
+        Value = 'JD Software Inc'
+      end
+      item
+        Name = 'MyAppURL'
+        Value = 'http://www.jerrydodge.com'
       end>
-    Setup.Compiler.Compression = iscZip
-    Setup.Compiler.CompressionVer = 0
-    Setup.Compiler.DiskClusterSize = 0
-    Setup.Compiler.DiskSliceSize = 0
-    Setup.Compiler.SlicesPerDisk = 0
+    Setup.Compiler.Compression = iscLzma
+    Setup.Compiler.OutputBaseFilename = 'MySetup'
+    Setup.Compiler.OutputDir = '.\'
+    Setup.Compiler.SolidCompression = bdTrue
+    Setup.Installer.AppId = '{{61571CEE-9CE0-4104-A2BB-B1B7AF19DFE2}'
+    Setup.Installer.AppName = '{#MyAppName}'
+    Setup.Installer.AppPublisher = '{#MyAppPublisher}'
+    Setup.Installer.AppPublisherURL = '{#MyAppURL}'
+    Setup.Installer.AppSupportURL = '{#MyAppURL}'
+    Setup.Installer.AppUpdatesURL = '{#MyAppURL}'
+    Setup.Installer.AppVerName = '{#MyAppName}'
+    Setup.Installer.AppVersion = '{#MyAppVersion}'
     Setup.Installer.ArchitecturesAllowed = []
     Setup.Installer.ArchitecturesInstallIn64BitMode = []
+    Setup.Installer.DefaultDirName = '{autopf}\{#MyAppPublisher}\{#MyAppName}'
+    Setup.Installer.DefaultGroupName = '{#MyAppPublisher}\{#MyAppName}'
     Setup.Installer.DirExistsWarning = bdDefault
     Setup.Installer.ShowLanguageDialog = bdDefault
-    Setup.Installer.TimeStampRounding = 0
     Setup.Installer.TimeStampsInUTC = bdDefault
+    Setup.Cosmetic.WizardStyle = iswsModern
     Types = <
       item
         Name = 'basic'

@@ -1693,6 +1693,11 @@ constructor TJDISSetupCompiler.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
 
+  //TODO: Set defaults...
+  Self.FDiskClusterSize:= 512;
+  Self.FDiskSliceSize:= 2100000000;
+  Self.FSlicesPerDisk:= 1;
+
 
 
 end;
@@ -1998,6 +2003,12 @@ end;
 constructor TJDISSetupInstaller.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
+
+  //TODO: Set defaults...
+
+  Self.FTimeStampRounding:= 2;
+
+
 
 end;
 
