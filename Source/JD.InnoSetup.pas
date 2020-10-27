@@ -63,6 +63,22 @@ type
   TBoolDef = (bdDefault, bdFalse, bdTrue);
 
 
+  TBoolDefExp = (bdeDefault, bdeFalse, bdeTrue, bdeExpression);
+  TBoolDefExpression = class(TPersistent)
+  private
+    FExpression: String;
+    FValue: TBoolDefExp;
+    procedure SetExpression(const Value: String);
+    procedure SetValue(const Value: TBoolDefExp);
+  public
+    constructor Create;
+    destructor Destroy; override;
+  published
+    property Value: TBoolDefExp read FValue write SetValue default TBoolDefExp.bdeDefault;
+    property Expression: String read FExpression write SetExpression;
+  end;
+
+
   TJDInnoSetupScript = class(TComponent)
   private
     FDefines: TJDISDefines;
@@ -338,6 +354,12 @@ type
   TJDISArchitecture64 = (isa64Default, isa64X64, isa64Arm64, isa64Ia64);
   TJDISArchitectures64 = set of TJDISArchitecture64;
 
+  TJDISBoolForce = (isbfDefault, isbfFalse, isbfTrue, isbfForce);
+
+  TBoolDefAuto = (isbaDefault, isbaFalse, isbaTrue, isbaAuto);
+
+  TJDISLanguageDetectMethod = (isldDefault, isldUILanguage, isldLocale, isldNone);
+
   TJDISSetupInstaller = class(TPersistent)
   private
     FOwner: TJDISSetup;
@@ -377,10 +399,10 @@ type
     FDefaultGroupName: String;
     FDefaultDirName: String;
     FDisableStartupPrompt: TBoolDef;
-    FDirExistsWarning: TBoolDef;
-    FDisableProgramGroupPage: TBoolDef;
+    FDirExistsWarning: TBoolDefAuto;
+    FDisableProgramGroupPage: TBoolDefAuto;
     FDisableFinishedPage: TBoolDef;
-    FDisableDirPage: TBoolDef;
+    FDisableDirPage: TBoolDefAuto;
     FDisableReadyPage: TBoolDef;
     FDisableWelcomePage: TBoolDef;
     FDisableReadyMemo: TBoolDef;
@@ -395,7 +417,7 @@ type
     FRestartApplications: TBoolDef;
     FSetupLogging: TBoolDef;
     FRestartIfNeededByRun: TBoolDef;
-    FShowLanguageDialog: TBoolDef;
+    FShowLanguageDialog: TBoolDefAuto;
     FSetupMutex: String;
     FTimeStampRounding: Integer;
     FTimeStampsInUTC: TBoolDef;
@@ -413,6 +435,12 @@ type
     FUninstallFilesDir: String;
     FUninstallDisplayName: String;
     FUninstallRestartComputer: TBoolDef;
+    FChangesEnvironment: TBoolDefExpression;
+    FChangesAssociations: TBoolDefExpression;
+    FCloseApplicationsFilter: String;
+    FCloseApplications: TJDISBoolForce;
+    FCreateUninstallRegKey: TBoolDefExpression;
+    FLanguageDetectionMethod: TJDISLanguageDetectMethod;
     procedure SetAllowCancelDuringInstall(const Value: TBoolDef);
     procedure SetAllowNetworkDrive(const Value: TBoolDef);
     procedure SetAllowNoIcons(const Value: TBoolDef);
@@ -449,10 +477,10 @@ type
     procedure SetDefaultUserInfoName(const Value: String);
     procedure SetDefaultUserInfoOrg(const Value: String);
     procedure SetDefaultUserInfoSerial(const Value: String);
-    procedure SetDirExistsWarning(const Value: TBoolDef);
-    procedure SetDisableDirPage(const Value: TBoolDef);
+    procedure SetDirExistsWarning(const Value: TBoolDefAuto);
+    procedure SetDisableDirPage(const Value: TBoolDefAuto);
     procedure SetDisableFinishedPage(const Value: TBoolDef);
-    procedure SetDisableProgramGroupPage(const Value: TBoolDef);
+    procedure SetDisableProgramGroupPage(const Value: TBoolDefAuto);
     procedure SetDisableReadyMemo(const Value: TBoolDef);
     procedure SetDisableReadyPage(const Value: TBoolDef);
     procedure SetDisableStartupPrompt(const Value: TBoolDef);
@@ -469,7 +497,7 @@ type
     procedure SetRestartIfNeededByRun(const Value: TBoolDef);
     procedure SetSetupLogging(const Value: TBoolDef);
     procedure SetSetupMutex(const Value: String);
-    procedure SetShowLanguageDialog(const Value: TBoolDef);
+    procedure SetShowLanguageDialog(const Value: TBoolDefAuto);
     procedure SetTimeStampRounding(const Value: Integer);
     procedure SetTimeStampsInUTC(const Value: TBoolDef);
     procedure SetUpdateUninstallLogAppName(const Value: TBoolDef);
@@ -486,6 +514,12 @@ type
     procedure SetUninstallDisplaySize(const Value: Int64);
     procedure SetUninstallFilesDir(const Value: String);
     procedure SetUninstallRestartComputer(const Value: TBoolDef);
+    procedure SetChangesAssociations(const Value: TBoolDefExpression);
+    procedure SetChangesEnvironment(const Value: TBoolDefExpression);
+    procedure SetCloseApplicationsFilter(const Value: String);
+    procedure SetCloseApplications(const Value: TJDISBoolForce);
+    procedure SetLanguageDetectionMethod(
+      const Value: TJDISLanguageDetectMethod);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
@@ -533,22 +567,22 @@ type
       read FArchitecturesAllowed write SetArchitecturesAllowed;
     property ArchitecturesInstallIn64BitMode: TJDISArchitectures64
       read FArchitecturesInstallIn64BitMode write SetArchitecturesInstallIn64BitMode;
-    //property ChangesAssociations
-    //property ChangesEnvironment
-    //property CloseApplications
-    //property CloseApplicationsFilter
+    property ChangesAssociations: TBoolDefExpression read FChangesAssociations write SetChangesAssociations;
+    property ChangesEnvironment: TBoolDefExpression read FChangesEnvironment write SetChangesEnvironment;
+    property CloseApplications: TJDISBoolForce read FCloseApplications write SetCloseApplications default TJDISBoolForce.isbfDefault;
+    property CloseApplicationsFilter: String read FCloseApplicationsFilter write SetCloseApplicationsFilter;
     property CreateAppDir: TBoolDef read FCreateAppDir write SetCreateAppDir default TBoolDef.bdDefault;
-    //property CreateUninstallRegKey
+    property CreateUninstallRegKey: TBoolDefExpression read FCreateUninstallRegKey;
     property DefaultDialogFontName: String read FDefaultDialogFontName write SetDefaultDialogFontName;
     property DefaultDirName: String read FDefaultDirName write SetDefaultDirName;
     property DefaultGroupName: String read FDefaultGroupName write SetDefaultGroupName;
     property DefaultUserInfoName: String read FDefaultUserInfoName write SetDefaultUserInfoName;
     property DefaultUserInfoOrg: String read FDefaultUserInfoOrg write SetDefaultUserInfoOrg;
     property DefaultUserInfoSerial: String read FDefaultUserInfoSerial write SetDefaultUserInfoSerial;
-    property DirExistsWarning: TBoolDef read FDirExistsWarning write SetDirExistsWarning;
-    property DisableDirPage: TBoolDef read FDisableDirPage write SetDisableDirPage default TBoolDef.bdDefault;
+    property DirExistsWarning: TBoolDefAuto read FDirExistsWarning write SetDirExistsWarning;
+    property DisableDirPage: TBoolDefAuto read FDisableDirPage write SetDisableDirPage;
     property DisableFinishedPage: TBoolDef read FDisableFinishedPage write SetDisableFinishedPage default TBoolDef.bdDefault;
-    property DisableProgramGroupPage: TBoolDef read FDisableProgramGroupPage write SetDisableProgramGroupPage default TBoolDef.bdDefault;
+    property DisableProgramGroupPage: TBoolDefAuto read FDisableProgramGroupPage write SetDisableProgramGroupPage;
     property DisableReadyMemo: TBoolDef read FDisableReadyMemo write SetDisableReadyMemo default TBoolDef.bdDefault;
     property DisableReadyPage: TBoolDef read FDisableReadyPage write SetDisableReadyPage default TBoolDef.bdDefault;
     property DisableStartupPrompt: TBoolDef read FDisableStartupPrompt write SetDisableStartupPrompt default TBoolDef.bdDefault;
@@ -558,7 +592,8 @@ type
     property ExtraDiskSpaceRequired: Int64 read FExtraDiskSpaceRequired write SetExtraDiskSpaceRequired default 0;
     property InfoAfterFile: String read FInfoAfterFile write SetInfoAfterFile;
     property InfoBeforeFile: String read FInfoBeforeFile write SetInfoBeforeFile;
-    //property LanguageDetectionMethod
+    property LanguageDetectionMethod: TJDISLanguageDetectMethod
+      read FLanguageDetectionMethod write SetLanguageDetectionMethod default TJDISLanguageDetectMethod.isldDefault;
     property LicenseFile: String read FLicenseFile write SetLicenseFile;
     property MinVersion: String read FMinVersion write SetMinVersion;
     property OnlyBelowVersion: String read FOnlyBelowVersion write SetOnlyBelowVersion;
@@ -569,10 +604,11 @@ type
       read FRestartApplications write SetRestartApplications default TBoolDef.bdDefault;
     property RestartIfNeededByRun: TBoolDef
       read FRestartIfNeededByRun write SetRestartIfNeededByRun default TBoolDef.bdDefault;
-    property SetupLogging: TBoolDef read FSetupLogging write SetSetupLogging default TBoolDef.bdDefault;
+    property SetupLogging: TBoolDef
+      read FSetupLogging write SetSetupLogging default TBoolDef.bdDefault;
     property SetupMutex: String read FSetupMutex write SetSetupMutex;
-    property ShowLanguageDialog: TBoolDef
-      read FShowLanguageDialog write SetShowLanguageDialog default TBoolDef.bdTrue;
+    property ShowLanguageDialog: TBoolDefAuto
+      read FShowLanguageDialog write SetShowLanguageDialog default TBoolDefAuto.isbaDefault;
     property TimeStampRounding: Integer
       read FTimeStampRounding write SetTimeStampRounding default 2;
     property TimeStampsInUTC: TBoolDef read FTimeStampsInUTC write SetTimeStampsInUTC;
@@ -614,6 +650,31 @@ type
 
   TJDISWizardStyle = (iswsClassic, iswsModern);
 
+  TJDISWizardImageAlphaFormat = (isafNone, isafDefined, isafPreMultiplied);
+
+  TJDISSetupWizardSize = class(TPersistent)
+  private
+    FOwner: TJDISSetupCosmetic;
+    FDefault: Boolean;
+    FWidth: Integer;
+    FHeight: Integer;
+    procedure SetDefault(const Value: Boolean);
+    procedure SetHeight(const Value: Integer);
+    procedure SetWidth(const Value: Integer);
+    function GetHeight: Integer;
+    function GetWidth: Integer;
+    function IsLengthStored: Boolean;
+    function IsWidthStored: Boolean;
+  public
+    constructor Create(AOwner: TJDISSetupCosmetic);
+    destructor Destroy; override;
+    function GetText: String;
+  published
+    property Default: Boolean read FDefault write SetDefault;
+    property Width: Integer read GetWidth write SetWidth stored IsWidthStored;
+    property Height: Integer read GetHeight write SetHeight stored IsLengthStored;
+  end;
+
   TJDISSetupCosmetic = class(TPersistent)
   private
     FOwner: TJDISSetup;
@@ -635,6 +696,8 @@ type
     FWizardResizable: TBoolDef;
     FWizardStyle: TJDISWizardStyle;
     FWizardSmallImageFile: String;
+    FWizardImageAlphaFormat: TJDISWizardImageAlphaFormat;
+    FWizardSizePercent: TJDISSetupWizardSize;
     procedure SetAppCopyright(const Value: String);
     procedure SetBackColor(const Value: String);
     procedure SetBackColor2(const Value: String);
@@ -653,6 +716,8 @@ type
     procedure SetWizardResizable(const Value: TBoolDef);
     procedure SetWizardSmallImageFile(const Value: String);
     procedure SetWizardStyle(const Value: TJDISWizardStyle);
+    procedure SetWizardImageAlphaFormat(
+      const Value: TJDISWizardImageAlphaFormat);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
@@ -684,14 +749,15 @@ type
       read FWindowResizable write SetWindowResizable default TBoolDef.bdDefault;
     property WindowVisible: TBoolDef
       read FWindowVisible write SetWindowVisible default TBoolDef.bdDefault;
-    //property WizardImageAlphaFormat
+    property WizardImageAlphaFormat: TJDISWizardImageAlphaFormat
+      read FWizardImageAlphaFormat write SetWizardImageAlphaFormat default TJDISWizardImageAlphaFormat.isafNone;
     property WizardImageFile: String
       read FWizardImageFile write SetWizardImageFile;
     property WizardImageStretch: TBoolDef
       read FWizardImageStretch write SetWizardImageStretch default TBoolDef.bdDefault;
     property WizardResizable: TBoolDef
       read FWizardResizable write SetWizardResizable default TBoolDef.bdDefault;
-    //property WizardSizePercent
+    property WizardSizePercent: TJDISSetupWizardSize read FWizardSizePercent;
     property WizardSmallImageFile: String
       read FWizardSmallImageFile write SetWizardSmallImageFile;
     property WizardStyle: TJDISWizardStyle
@@ -1427,9 +1493,31 @@ type
 
 
 
-
-
 implementation
+
+{ TBoolDefExpression }
+
+constructor TBoolDefExpression.Create;
+begin
+
+end;
+
+destructor TBoolDefExpression.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TBoolDefExpression.SetExpression(const Value: String);
+begin
+  FExpression := Value;
+  FValue:= bdeExpression;
+end;
+
+procedure TBoolDefExpression.SetValue(const Value: TBoolDefExp);
+begin
+  FValue := Value;
+end;
 
 { TJDInnoSetupScript }
 
@@ -1498,7 +1586,6 @@ begin
 
   //Header
   A('; Script generated by the JD Inno Setup Script Component.');
-  A('');
 
   //Defines
   FDefines.AddToScript('', AStrings);
@@ -1766,6 +1853,7 @@ end;
 
 procedure TJDISSetup.AddToScript(AScript: TStrings);
 begin
+  AScript.Append('');
   AScript.Append('[Setup]');
   FCompiler.AddToScript(AScript);
   FInstaller.AddToScript(AScript);
@@ -2110,6 +2198,10 @@ constructor TJDISSetupInstaller.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
 
+  FChangesAssociations:= TBoolDefExpression.Create;
+  FChangesEnvironment:= TBoolDefExpression.Create;
+  FCreateUninstallRegKey:= TBoolDefExpression.Create;
+
   //TODO: Set defaults...
 
   Self.FTimeStampRounding:= 2;
@@ -2121,6 +2213,9 @@ end;
 destructor TJDISSetupInstaller.Destroy;
 begin
 
+  FreeAndNil(FCreateUninstallRegKey);
+  FreeAndNil(FChangesEnvironment);
+  FreeAndNil(FChangesAssociations);
   inherited;
 end;
 
@@ -2222,15 +2317,37 @@ begin
   if T <> '' then
     AP('ArchitecturesInstallIn64BitMode', T);
 
-  //ChangesAssociations
+  case FChangesAssociations.FValue of
+    bdeDefault:     ;
+    bdeFalse:       AST('ChangesAssociations', 'no');
+    bdeTrue:        AST('ChangesAssociations', 'yes');
+    bdeExpression:  AST('ChangesAssociations', FChangesAssociations.FExpression);
+  end;
 
-  //ChangesEnvironment
+  case FChangesEnvironment.FValue of
+    bdeDefault:     ;
+    bdeFalse:       AST('ChangesEnvironment', 'no');
+    bdeTrue:        AST('ChangesEnvironment', 'yes');
+    bdeExpression:  AST('ChangesEnvironment', FChangesEnvironment.FExpression);
+  end;
 
-  //CloseApplications
+  case Self.FCloseApplications of
+    isbfDefault:  ;
+    isbfFalse:    AST('CloseApplications', 'no');
+    isbfTrue:     AST('CloseApplications', 'yes');
+    isbfForce:    AST('CloseApplications', 'force');
+  end;
 
-  //CloseApplicationsFilter
+  AST('CloseApplicationsFilter', Self.FCloseApplicationsFilter);
 
   ABD('CreateAppDir', Self.FCreateAppDir);
+
+  case FCreateUninstallRegKey.FValue of
+    bdeDefault:     ;
+    bdeFalse:       AST('CreateUninstallRegKey', 'no');
+    bdeTrue:        AST('CreateUninstallRegKey', 'yes');
+    bdeExpression:  AST('CreateUninstallRegKey', FCreateUninstallRegKey.FExpression);
+  end;
 
   AST('DefaultDialogFontName', Self.FDefaultDialogFontName);
 
@@ -2244,13 +2361,28 @@ begin
 
   AST('DefaultUserInfoSerial', Self.FDefaultUserInfoSerial);
 
-  //DirExistsWarning
+  case Self.FDirExistsWarning of
+    isbaDefault:  ;
+    isbaFalse:    AST('DirExistsWarning', 'no');
+    isbaTrue:     AST('DirExistsWarning', 'ues');
+    isbaAuto:     AST('DirExistsWarning', 'auto');
+  end;
 
-  //DisableDirPage
+  case Self.FDisableDirPage of
+    isbaDefault:  ;
+    isbaFalse:    AST('DisableDirPage', 'no');
+    isbaTrue:     AST('DisableDirPage', 'ues');
+    isbaAuto:     AST('DisableDirPage', 'auto');
+  end;
 
   ABD('DisableFinishedPage', Self.FDisableFinishedPage);
 
-  //DisableProgramGroupPage
+  case Self.FDisableProgramGroupPage of
+    isbaDefault: ;
+    isbaFalse:    AST('DisableProgramGroupPage', 'no');
+    isbaTrue:     AST('DisableProgramGroupPage', 'ues');
+    isbaAuto:     AST('DisableProgramGroupPage', 'auto');
+  end;
 
   ABD('DisableReadyMemo', Self.FDisableReadyMemo);
 
@@ -2270,7 +2402,12 @@ begin
 
   AST('InfoBeforeFile', Self.FInfoBeforeFile);
 
-  //LanguageDetectionMethod
+  case Self.FLanguageDetectionMethod of
+    isldDefault:    ;
+    isldUILanguage: AST('LanguageDetectionMethod', 'uilanguage');
+    isldLocale:     AST('LanguageDetectionMethod', 'locale');
+    isldNone:       AST('LanguageDetectionMethod', 'none');
+  end;
 
   AST('LicenseFile', Self.FLicenseFile);
 
@@ -2292,7 +2429,12 @@ begin
 
   AST('SetupMutex', Self.FSetupMutex);
 
-  //ShowLanguageDialog
+  case Self.FShowLanguageDialog of
+    isbaDefault:  ;
+    isbaFalse:    AST('ShowLanguageDialog', 'no');
+    isbaTrue:     AST('ShowLanguageDialog', 'yes');
+    isbaAuto:     AST('ShowLanguageDialog', 'auto');
+  end;
 
   if Self.FTimeStampRounding <> 2 then begin
     AP('TimeStampRounding', IntToStr(Self.FTimeStampRounding));
@@ -2484,6 +2626,28 @@ begin
   FArchitecturesInstallIn64BitMode := Value;
 end;
 
+procedure TJDISSetupInstaller.SetChangesAssociations(
+  const Value: TBoolDefExpression);
+begin
+  FChangesAssociations.Assign(Value);
+end;
+
+procedure TJDISSetupInstaller.SetChangesEnvironment(
+  const Value: TBoolDefExpression);
+begin
+  FChangesEnvironment.Assign(Value);
+end;
+
+procedure TJDISSetupInstaller.SetCloseApplications(const Value: TJDISBoolForce);
+begin
+  FCloseApplications := Value;
+end;
+
+procedure TJDISSetupInstaller.SetCloseApplicationsFilter(const Value: String);
+begin
+  FCloseApplicationsFilter := Value;
+end;
+
 procedure TJDISSetupInstaller.SetCreateAppDir(const Value: TBoolDef);
 begin
   FCreateAppDir := Value;
@@ -2519,12 +2683,12 @@ begin
   FDefaultUserInfoSerial := Value;
 end;
 
-procedure TJDISSetupInstaller.SetDirExistsWarning(const Value: TBoolDef);
+procedure TJDISSetupInstaller.SetDirExistsWarning(const Value: TBoolDefAuto);
 begin
   FDirExistsWarning := Value;
 end;
 
-procedure TJDISSetupInstaller.SetDisableDirPage(const Value: TBoolDef);
+procedure TJDISSetupInstaller.SetDisableDirPage(const Value: TBoolDefAuto);
 begin
   FDisableDirPage := Value;
 end;
@@ -2534,7 +2698,7 @@ begin
   FDisableFinishedPage := Value;
 end;
 
-procedure TJDISSetupInstaller.SetDisableProgramGroupPage(const Value: TBoolDef);
+procedure TJDISSetupInstaller.SetDisableProgramGroupPage(const Value: TBoolDefAuto);
 begin
   FDisableProgramGroupPage := Value;
 end;
@@ -2580,6 +2744,12 @@ begin
   FInfoBeforeFile := Value;
 end;
 
+procedure TJDISSetupInstaller.SetLanguageDetectionMethod(
+  const Value: TJDISLanguageDetectMethod);
+begin
+  FLanguageDetectionMethod := Value;
+end;
+
 procedure TJDISSetupInstaller.SetLicenseFile(const Value: String);
 begin
   FLicenseFile := Value;
@@ -2620,7 +2790,7 @@ begin
   FSetupMutex := Value;
 end;
 
-procedure TJDISSetupInstaller.SetShowLanguageDialog(const Value: TBoolDef);
+procedure TJDISSetupInstaller.SetShowLanguageDialog(const Value: TBoolDefAuto);
 begin
   FShowLanguageDialog := Value;
 end;
@@ -2709,22 +2879,100 @@ begin
   FUserInfoPage := Value;
 end;
 
+{ TJDISSetupWizardSize }
+
+constructor TJDISSetupWizardSize.Create(AOwner: TJDISSetupCosmetic);
+begin
+  FOwner:= AOwner;
+  FDefault:= True;
+  FWidth:= 120;
+  FHeight:= 120;
+end;
+
+destructor TJDISSetupWizardSize.Destroy;
+begin
+
+  inherited;
+end;
+
+function TJDISSetupWizardSize.GetHeight: Integer;
+begin
+  if not FDefault then
+    Result:= FHeight
+  else begin
+    case FOwner.FWizardStyle of
+      iswsClassic:  Result:= 100;
+      iswsModern:   Result:= 120;
+      else          Result:= 100;
+    end;
+  end;
+end;
+
+function TJDISSetupWizardSize.GetWidth: Integer;
+begin
+  if not FDefault then
+    Result:= FWidth
+  else begin
+    case FOwner.FWizardStyle of
+      iswsClassic:  Result:= 100;
+      iswsModern:   Result:= 120;
+      else          Result:= 100;
+    end;
+  end;
+end;
+
+function TJDISSetupWizardSize.IsLengthStored: Boolean;
+begin
+  Result:= (not FDefault);
+end;
+
+function TJDISSetupWizardSize.IsWidthStored: Boolean;
+begin
+  Result:= (not FDefault);
+end;
+
+function TJDISSetupWizardSize.GetText: String;
+begin
+  if not FDefault then
+    Result:= IntToStr(Width)+','+IntToStr(Height);
+end;
+
+procedure TJDISSetupWizardSize.SetDefault(const Value: Boolean);
+begin
+  FDefault := Value;
+end;
+
+procedure TJDISSetupWizardSize.SetHeight(const Value: Integer);
+begin
+  if Value <> FHeight then
+    FDefault:= False;
+  FHeight := Value;
+end;
+
+procedure TJDISSetupWizardSize.SetWidth(const Value: Integer);
+begin
+  if Value <> FWidth then
+    FDefault:= False;
+  FWidth := Value;
+end;
+
 { TJDISSetupCosmetic }
 
 procedure TJDISSetupCosmetic.AddToScript(AScript: TStrings);
 begin
+  //TODO
 
 end;
 
 constructor TJDISSetupCosmetic.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
-
+  FWizardSizePercent:= TJDISSetupWizardSize.Create(Self);
 end;
 
 destructor TJDISSetupCosmetic.Destroy;
 begin
-
+  FreeAndNil(FWizardSizePercent);
   inherited;
 end;
 
@@ -2792,6 +3040,12 @@ end;
 procedure TJDISSetupCosmetic.SetWindowVisible(const Value: TBoolDef);
 begin
   FWindowVisible := Value;
+end;
+
+procedure TJDISSetupCosmetic.SetWizardImageAlphaFormat(
+  const Value: TJDISWizardImageAlphaFormat);
+begin
+  FWizardImageAlphaFormat := Value;
 end;
 
 procedure TJDISSetupCosmetic.SetWizardImageFile(const Value: String);
@@ -2911,14 +3165,11 @@ end;
 function TJDISComponent.GetFullText: String;
 var
   T: String;
-  Y: Integer;
 begin
   T:= 'Name: "'+FName+'"; Description: "'+FDescription+'"';
   if FTypes.Count > 0 then begin
-    T:= T + '; Types:';
-    for Y := 0 to FTypes.Count-1 do begin
-      T:= T + ' ' + FTypes[Y];
-    end;
+    T:= T + '; Types: ';
+    T:= T + GetSpacedList(FTypes);
   end;
   if FFlags <> [] then begin
     T:= T + '; Flags:';

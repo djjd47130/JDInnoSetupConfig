@@ -59,6 +59,11 @@ object Form1: TForm1
         Value = 'http://www.jerrydodge.com'
       end>
     Code.Strings = (
+      'procedure DoSomething;'
+      'begin'
+      ''
+      'end;'
+      ''
       'procedure DoTest;'
       'begin'
       '  DoSomething;'
@@ -80,8 +85,9 @@ object Form1: TForm1
     Setup.Installer.ArchitecturesInstallIn64BitMode = []
     Setup.Installer.DefaultDirName = '{autopf}\{#MyAppPublisher}\{#MyAppName}'
     Setup.Installer.DefaultGroupName = '{#MyAppPublisher}\{#MyAppName}'
-    Setup.Installer.DirExistsWarning = bdDefault
-    Setup.Installer.ShowLanguageDialog = bdDefault
+    Setup.Installer.DirExistsWarning = isbaDefault
+    Setup.Installer.DisableDirPage = isbaDefault
+    Setup.Installer.DisableProgramGroupPage = isbaDefault
     Setup.Installer.TimeStampsInUTC = bdDefault
     Setup.Cosmetic.WizardStyle = iswsModern
     Types = <
@@ -106,7 +112,8 @@ object Form1: TForm1
         Description = 'Critical Files'
         Types.Strings = (
           'full'
-          'basic')
+          'basic'
+          'custom')
         ExtraDiskSpaceRequired = 0
         Flags = [iscfFixed]
       end
@@ -138,7 +145,7 @@ object Form1: TForm1
         Flags.DeleteAfterInstall = False
         Flags.DontCopy = False
         Flags.DontVerifyChecksum = False
-        Flags.External = False
+        Flags.External = True
         Flags.FontIsntTrueType = False
         Flags.GacInstall = False
         Flags.IgnoreVersion = True
