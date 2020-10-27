@@ -14,7 +14,8 @@ unit JD.InnoSetup;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Generics.Collections;
+  System.Classes, System.SysUtils, System.Generics.Collections,
+  JD.InnoSetup.Utils;
 
 type
   TJDInnoSetupScript = class;
@@ -138,17 +139,29 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript;
       ItemClass: TCollectionItemClass);
+    procedure AddToScript(const ASectionName: String; AScript: TStrings); virtual;
   end;
+
+  TJDISBaseCollectionItem = class(TCollectionItem)
+  protected
+    function GetDisplayName: String; override;
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    function GetFullText: String; virtual;
+  published
+
+  end;
+
 
 
 
   TJDISDefines = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AScript: TStrings);
   end;
 
-  TJDISDefine = class(TCollectionItem)
+  TJDISDefine = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FValue: String;
@@ -157,6 +170,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Value: String read FValue write SetValue;
@@ -709,13 +723,12 @@ type
   TJDISTypes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISTypeFlag = (istfIsCustom);
   TJDISTypeFlags = set of TJDISTypeFlag;
 
-  TJDISType = class(TCollectionItem)
+  TJDISType = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FDescription: String;
@@ -726,6 +739,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
@@ -737,14 +751,13 @@ type
   TJDISComponents = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISComponentFlag = (iscfCheckAbleAlone, iscfDontInheritCheck, iscfExclusive,
     iscfFixed, iscfRestart, iscfDisableNounInstallWarning);
   TJDISComponentFlags = set of TJDISComponentFlag;
 
-  TJDISComponent = class(TCollectionItem)
+  TJDISComponent = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FExtraDiskSpaceRequired: Integer;
@@ -760,6 +773,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
@@ -773,14 +787,13 @@ type
   TJDISTasks = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISTaskFlag = (istfCheckAbleAlone, istfCheckedOnce, istfDontInheritCheck,
     istfExclusive, istfRestart, istfUnchecked);
   TJDISTaskFlags = set of TJDISTaskFlag;
 
-  TJDISTask = class(TCollectionItem)
+  TJDISTask = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FGroupDescription: String;
@@ -793,6 +806,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
@@ -806,7 +820,6 @@ type
   TJDISDirs = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISDirAttrib = (isdaReadOnly, isdaHidden, isdaSystem, isdaNotContentIndexed);
@@ -816,7 +829,7 @@ type
     isdfUninsAlwaysUninstall, isdfUninsNeverUninstall, isdfUnsetNTFSCompression);
   TJDISDirFlags = set of TJDISDirFlag;
 
-  TJDISDir = class(TCollectionItem)
+  TJDISDir = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FAttribs: TJDISDirAttribs;
@@ -827,6 +840,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Attribs: TJDISDirAttribs read FAttribs write SetAttribs;
@@ -839,10 +853,9 @@ type
   TJDISFiles = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
-  TJDISFile = class(TCollectionItem)
+  TJDISFile = class(TJDISBaseCollectionItem)
   private
     FSource: String;
     FExternalSize: Int64;
@@ -850,7 +863,9 @@ type
     FDestName: String;
     FDestDir: String;
     FExcludes: String;
+    FComponents: TStringList;
     FFlags: TJDISFileFlags;
+    FFontInstall: String;
     procedure SetDestDir(const Value: String);
     procedure SetDestName(const Value: String);
     procedure SetExcludes(const Value: String);
@@ -858,9 +873,13 @@ type
     procedure SetSource(const Value: String);
     procedure SetStrongAssemblyName(const Value: String);
     procedure SetFlags(const Value: TJDISFileFlags);
+    function GetComponents: TStrings;
+    procedure SetComponents(const Value: TStrings);
+    procedure SetFontInstall(const Value: String);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Source: String read FSource write SetSource;
     property DestDir: String read FDestDir write SetDestDir;
@@ -870,8 +889,9 @@ type
     //CopyMode: Obsolete
     //Attribs
     //Permissions
-    //FontInstall
+    property FontInstall: String read FFontInstall write SetFontInstall;
     property StrongAssemblyName: String read FStrongAssemblyName write SetStrongAssemblyName;
+    property Components: TStrings read GetComponents write SetComponents;
     property Flags: TJDISFileFlags read FFlags write SetFlags;
   end;
 
@@ -962,6 +982,7 @@ type
     procedure SetUnsetNTFSCompression(const Value: Boolean);
   public
     constructor Create(AOwner: TJDISFile);
+    function GetFlagText: String;
   published
     property Is32bit: Boolean read FIs32bit write SetIs32bit;
     property Is64bit: Boolean read FIs64bit write SetIs64bit;
@@ -1010,7 +1031,6 @@ type
   TJDISIcons = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISIconFlag = (isifCloseOnExit, isifCreateOnlyIfFileExists, isifDontCloseOnExit,
@@ -1018,7 +1038,7 @@ type
     isifRunMaximized, isifRunMinimized, isifUninsNeverUninstall, isifUseAppPaths);
   TJDISIconFlags = set of TJDISIconFlag;
 
-  TJDISIcon = class(TCollectionItem)
+  TJDISIcon = class(TJDISBaseCollectionItem)
   private
     FFilename: String;
     FName: String;
@@ -1043,6 +1063,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Filename: String read FFilename write SetFilename;
@@ -1061,14 +1082,13 @@ type
   TJDISInis = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISIniFlag = (isinfCreateKeyIfDoesntExist, isinfUninsDeleteEntry,
     isinfUninsDeleteSection, isinfUninsDeleteSectionIfEmpty);
   TJDISIniFlags = set of TJDISIniFlag;
 
-  TJDISIni = class(TCollectionItem)
+  TJDISIni = class(TJDISBaseCollectionItem)
   private
     FKey: String;
     FFilename: String;
@@ -1083,6 +1103,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Filename: String read FFilename write SetFilename;
     property Section: String read FSection write SetSection;
@@ -1096,12 +1117,11 @@ type
   TJDISInstallDeletes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISInstallDeleteType = (isdtFiles, isdtFilesAndOrDirs, isdtDirIfEmpty);
 
-  TJDISInstallDelete = class(TCollectionItem)
+  TJDISInstallDelete = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FType: TJDISInstallDeleteType;
@@ -1110,6 +1130,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property &Type: TJDISInstallDeleteType read FType write SetType;
     property Name: String read FName write SetName;
@@ -1120,10 +1141,9 @@ type
   TJDISLanguages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
-  TJDISLanguage = class(TCollectionItem)
+  TJDISLanguage = class(TJDISBaseCollectionItem)
   private
     FMessagesFile: String;
     FName: String;
@@ -1138,6 +1158,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property MessagesFile: String read FMessagesFile write SetMessagesFile;
@@ -1151,10 +1172,9 @@ type
   TJDISMessages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
-  TJDISMessage = class(TCollectionItem)
+  TJDISMessage = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FValue: String;
@@ -1163,6 +1183,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Value: String read FValue write SetValue;
@@ -1173,10 +1194,9 @@ type
   TJDISCustomMessages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
-  TJDISCustomMessage = class(TCollectionItem)
+  TJDISCustomMessage = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FValue: String;
@@ -1185,6 +1205,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
     property Value: String read FValue write SetValue;
@@ -1244,7 +1265,6 @@ type
   TJDISRegistry = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISRegRoot = (isrrCurrentUser, isrrLocalMachine, isrrClassesRoot,
@@ -1258,7 +1278,7 @@ type
     isrfUninsDeleteKey, isrfUninsDeleteKeyIfEmpty, isrfUninsDeleteValue);
   TJDISRegFlags = set of TJDISRegFlag;
 
-  TJDISRegistryItem = class(TCollectionItem)
+  TJDISRegistryItem = class(TJDISBaseCollectionItem)
   private
     FValueType: TJDISRegType;
     FValueData: String;
@@ -1275,6 +1295,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Root: TJDISRegRoot read FRoot write SetRoot;
     property Subkey: String read FSubkey write SetSubkey;
@@ -1290,7 +1311,6 @@ type
   TJDISRuns = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISRunFlag = (isrnf32bit, isrnf64bit, isrnfHideWizard, isrnfNoWait,
@@ -1300,7 +1320,7 @@ type
     isrnfUnchecked, isrnfWaitUntilIdle, isrnfWaitUntilTerminated);
   TJDISRunFlags = set of TJDISRunFlag;
 
-  TJDISRun = class(TCollectionItem)
+  TJDISRun = class(TJDISBaseCollectionItem)
   private
     FFilename: String;
     FRunOnceId: String;
@@ -1321,6 +1341,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Filename: String read FFilename write SetFilename;
     property Description: String read FDescription write SetDescription;
@@ -1338,12 +1359,11 @@ type
   TJDISUninstallDeletes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISUninstallDeleteType = (isudtFiles, isudtFilesAndOrDirs, isudtDirIfEmpty);
 
-  TJDISUninstallDelete = class(TCollectionItem)
+  TJDISUninstallDelete = class(TJDISBaseCollectionItem)
   private
     FName: String;
     FType: TJDISInstallDeleteType;
@@ -1352,6 +1372,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property &Type: TJDISInstallDeleteType read FType write SetType;
     property Name: String read FName write SetName;
@@ -1362,7 +1383,6 @@ type
   TJDISUninstallRuns = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
-    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISUninstallRunFlag = (isurf32bit, isurf64bit, isurfHideWizard,
@@ -1372,7 +1392,7 @@ type
     isurfUnchecked, isurfWaitUntilIdle, isurfWaitUntilTerminated);
   TJDISUninstallRunFlags = set of TJDISUninstallRunFlag;
 
-  TJDISUninstallRun = class(TCollectionItem)
+  TJDISUninstallRun = class(TJDISBaseCollectionItem)
   private
     FFilename: String;
     FRunOnceId: String;
@@ -1393,6 +1413,7 @@ type
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
+    function GetFullText: String; override;
   published
     property Filename: String read FFilename write SetFilename;
     property Description: String read FDescription write SetDescription;
@@ -1480,31 +1501,31 @@ begin
   A('');
 
   //Defines
-  FDefines.AddToScript(AStrings);
+  FDefines.AddToScript('', AStrings);
 
   //Setup
   FSetup.AddToScript(AStrings);
 
   //Languages
-  FLanguages.AddToScript(AStrings);
+  FLanguages.AddToScript('Languages', AStrings);
 
   //Types
-  FTypes.AddToScript(AStrings);
+  FTypes.AddToScript('Types', AStrings);
 
   //Components
-  FComponents.AddToScript(AStrings);
+  FComponents.AddToScript('Components', AStrings);
 
   //Files
-  FFiles.AddToScript(AStrings);
+  FFiles.AddToScript('Files', AStrings);
 
   //Icons
-  FIcons.AddToScript(AStrings);
+  FIcons.AddToScript('Icons', AStrings);
 
   //Run
-  FRun.AddToScript(AStrings);
+  FRun.AddToScript('Run', AStrings);
 
   //Tasks
-  FTasks.AddToScript(AStrings);
+  FTasks.AddToScript('Tasks', AStrings);
 
 
 
@@ -1639,6 +1660,23 @@ end;
 
 { TJDISBaseCollection }
 
+procedure TJDISBaseCollection.AddToScript(const ASectionName: String;
+  AScript: TStrings);
+var
+  X: Integer;
+  I: TJDISBaseCollectionItem;
+begin
+  if Count > 0 then begin
+    AScript.Append('');
+    if ASectionName <> '' then
+      AScript.Append('['+ASectionName+']');
+    for X := 0 to Count-1 do begin
+      I:= TJDISBaseCollectionItem(Items[X]);
+      AScript.Append(I.GetFullText);
+    end;
+  end;
+end;
+
 constructor TJDISBaseCollection.Create(AOwner: TJDInnoSetupScript;
   ItemClass: TCollectionItemClass);
 begin
@@ -1646,21 +1684,31 @@ begin
   FOwner:= AOwner;
 end;
 
-{ TJDISDefines }
+{ TJDISBaseCollectionItem }
 
-procedure TJDISDefines.AddToScript(AScript: TStrings);
-var
-  I: TJDISDefine;
-  X: Integer;
+constructor TJDISBaseCollectionItem.Create(Collection: TCollection);
 begin
-  if Count > 0 then begin
-    for X := 0 to Count-1 do begin
-      I:= TJDISDefine(Items[X]);
-      AScript.Append('#define '+I.Name+' "'+I.Value+'"');
-    end;
-    AScript.Append('');
-  end;
+  inherited Create(Collection);
+
 end;
+
+destructor TJDISBaseCollectionItem.Destroy;
+begin
+
+  inherited;
+end;
+
+function TJDISBaseCollectionItem.GetDisplayName: String;
+begin
+  Result:= GetFullText;
+end;
+
+function TJDISBaseCollectionItem.GetFullText: String;
+begin
+  //Expected inherited to be responsible...
+end;
+
+{ TJDISDefines }
 
 constructor TJDISDefines.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -1679,6 +1727,11 @@ destructor TJDISDefine.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISDefine.GetFullText: String;
+begin
+  Result:= '#define '+FName+' "'+FValue+'"';
 end;
 
 procedure TJDISDefine.SetName(const Value: String);
@@ -2787,28 +2840,6 @@ end;
 
 { TJDISTypes }
 
-procedure TJDISTypes.AddToScript(AStrings: TStrings);
-var
-  X: Integer;
-  I: TJDISType;
-  T: String;
-begin
-  if Count > 0 then begin
-    AStrings.Append('');
-    AStrings.Append('[Types]');
-    for X := 0 to Count-1 do begin
-      I:= TJDISType(Items[X]);
-      T:= 'Name: "'+I.Name+'"; Description: "'+I.Description+'"';
-      if I.Flags <> [] then begin
-        T:= T + '; Flags: ';
-        if TJDISTypeFlag.istfIsCustom in I.Flags then
-          T:= T + 'iscustom ';
-      end;
-      AStrings.Append(T);
-    end;
-  end;
-end;
-
 constructor TJDISTypes.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISType);
@@ -2828,6 +2859,19 @@ begin
   inherited;
 end;
 
+function TJDISType.GetFullText: String;
+var
+  T: String;
+begin
+  T:= 'Name: "'+FName+'"; Description: "'+FDescription+'"';
+  if FFlags <> [] then begin
+    T:= T + '; Flags: ';
+    if TJDISTypeFlag.istfIsCustom in FFlags then
+      T:= T + 'iscustom ';
+  end;
+  Result:= T;
+end;
+
 procedure TJDISType.SetDescription(const Value: String);
 begin
   FDescription := Value;
@@ -2844,46 +2888,6 @@ begin
 end;
 
 { TJDISComponents }
-
-procedure TJDISComponents.AddToScript(AStrings: TStrings);
-var
-  X, Y: Integer;
-  I: TJDISComponent;
-  T: String;
-begin
-  if Count > 0 then begin
-    AStrings.Append('');
-    AStrings.Append('[Components]');
-    for X := 0 to Count-1 do begin
-      I:= TJDISComponent(Items[X]);
-      T:= 'Name: "'+I.Name+'"; Description: "'+I.Description+'"';
-      if I.FTypes.Count > 0 then begin
-        T:= T + '; Types:';
-        for Y := 0 to I.FTypes.Count-1 do begin
-          T:= T + ' ' + I.FTypes[Y];
-        end;
-      end;
-      if I.Flags <> [] then begin
-        T:= T + '; Flags:';
-
-        if TJDISComponentFlag.iscfCheckAbleAlone in I.Flags then
-          T:= T + ' checkablealone';
-        if TJDISComponentFlag.iscfDontInheritCheck in I.Flags then
-          T:= T + ' dontinheritcheck';
-        if TJDISComponentFlag.iscfExclusive in I.Flags then
-          T:= T + ' exclusive';
-        if TJDISComponentFlag.iscfFixed in I.Flags then
-          T:= T + ' fixed';
-        if TJDISComponentFlag.iscfRestart in I.Flags then
-          T:= T + ' restart';
-        if TJDISComponentFlag.iscfDisableNounInstallWarning in I.Flags then
-          T:= T + ' disablenouninstallwarning';
-
-      end;
-      AStrings.Append(T);
-    end;
-  end;
-end;
 
 constructor TJDISComponents.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -2902,6 +2906,36 @@ destructor TJDISComponent.Destroy;
 begin
   FreeAndNil(FTypes);
   inherited;
+end;
+
+function TJDISComponent.GetFullText: String;
+var
+  T: String;
+  Y: Integer;
+begin
+  T:= 'Name: "'+FName+'"; Description: "'+FDescription+'"';
+  if FTypes.Count > 0 then begin
+    T:= T + '; Types:';
+    for Y := 0 to FTypes.Count-1 do begin
+      T:= T + ' ' + FTypes[Y];
+    end;
+  end;
+  if FFlags <> [] then begin
+    T:= T + '; Flags:';
+    if TJDISComponentFlag.iscfCheckAbleAlone in FFlags then
+      T:= T + ' checkablealone';
+    if TJDISComponentFlag.iscfDontInheritCheck in FFlags then
+      T:= T + ' dontinheritcheck';
+    if TJDISComponentFlag.iscfExclusive in FFlags then
+      T:= T + ' exclusive';
+    if TJDISComponentFlag.iscfFixed in FFlags then
+      T:= T + ' fixed';
+    if TJDISComponentFlag.iscfRestart in FFlags then
+      T:= T + ' restart';
+    if TJDISComponentFlag.iscfDisableNounInstallWarning in FFlags then
+      T:= T + ' disablenouninstallwarning';
+  end;
+  Result:= T;
 end;
 
 function TJDISComponent.GetTypes: TStrings;
@@ -2936,11 +2970,6 @@ end;
 
 { TJDISTasks }
 
-procedure TJDISTasks.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISTasks.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISTask);
@@ -2958,6 +2987,11 @@ destructor TJDISTask.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISTask.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISTask.SetDescription(const Value: String);
@@ -2982,11 +3016,6 @@ end;
 
 { TJDISDirs }
 
-procedure TJDISDirs.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISDirs.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISDir);
@@ -3006,6 +3035,11 @@ begin
   inherited;
 end;
 
+function TJDISDir.GetFullText: String;
+begin
+
+end;
+
 procedure TJDISDir.SetAttribs(const Value: TJDISDirAttribs);
 begin
   FAttribs := Value;
@@ -3023,11 +3057,6 @@ end;
 
 { TJDISFiles }
 
-procedure TJDISFiles.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISFiles.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISFile);
@@ -3038,13 +3067,58 @@ end;
 constructor TJDISFile.Create(Collection: TCollection);
 begin
   inherited;
+  FComponents:= TStringList.Create;
   FFlags:= TJDISFileFlags.Create(Self);
 end;
 
 destructor TJDISFile.Destroy;
 begin
   FFlags.Free;
+  FComponents.Free;
   inherited;
+end;
+
+function TJDISFile.GetComponents: TStrings;
+begin
+  Result:= TStrings(FComponents);
+end;
+
+function TJDISFile.GetFullText: String;
+var
+  T: String;
+  procedure AT(const N, V: String; const Q: Boolean);
+  begin
+    if V <> '' then begin
+      T:= T + N + ': ';
+      if Q then
+        T:= T + '"';
+      T:= T + V;
+      if Q then
+        T:= T + '"';
+      T:= T + '; ';
+    end;
+  end;
+begin
+  T:= '';
+  AT('Source', FSource, True);
+  AT('DestDir', FDestDir, True);
+  AT('DestName', FDestName, True);
+  AT('Excludes', FExcludes, True);
+  if FExternalSize <> 0 then
+    AT('ExternalSize', IntToStr(FExternalSize), False);
+  //CopyMode
+  //Attribs
+  //Permissions
+  AT('FontInstall', FFontInstall, True);
+  AT('StrongAssemblyName', FStrongAssemblyName, True);
+  AT('Components', GetSpacedList(FComponents), False);
+  AT('Flags', FFlags.GetFlagText, False);
+  Result:= T;
+end;
+
+procedure TJDISFile.SetComponents(const Value: TStrings);
+begin
+  FComponents.Assign(Value);
 end;
 
 procedure TJDISFile.SetDestDir(const Value: String);
@@ -3072,6 +3146,11 @@ begin
   FFlags.Assign(Value);
 end;
 
+procedure TJDISFile.SetFontInstall(const Value: String);
+begin
+  FFontInstall := Value;
+end;
+
 procedure TJDISFile.SetSource(const Value: String);
 begin
   FSource := Value;
@@ -3087,6 +3166,61 @@ end;
 constructor TJDISFileFlags.Create(AOwner: TJDISFile);
 begin
   FOwner:= AOwner;
+
+end;
+
+function TJDISFileFlags.GetFlagText: String;
+  procedure A(const Value: Boolean; const Text: String);
+  begin
+    if Value then begin
+      if Result <> '' then
+        Result:= Result + ' ';
+      Result:= Result + LowerCase(Text);
+    end;
+  end;
+begin
+  //TODO: Return all enabled flags in space separated string...
+
+  A(Self.Is32bit, '32bit');
+  A(Self.Is64bit, '64bit');
+  A(Self.AllowUnsafeFiles, 'AllowUnsafeFiles');
+  A(Self.CompareTimestamp, 'CompareTimestamp');
+  A(Self.ConfirmOverwrite, 'ConfirmOverwrite');
+  A(Self.CreateAllSubdirs, 'CreateAllSubdirs');
+  A(Self.DeleteAfterInstall, 'DeleteAfterInstall');
+  A(Self.DontCopy, 'DontCopy');
+  A(Self.DontVerifyChecksum, 'DontVerifyChecksum');
+  A(Self.External, 'External');
+  A(Self.FontIsntTrueType, 'FontIsntTrueType');
+  A(Self.GacInstall, 'GacInstall');
+  A(Self.IgnoreVersion, 'IgnoreVersion');
+  A(Self.IsReadme, 'IsReadme');
+  A(Self.NoCompression, 'NoCompression');
+  A(Self.NoEncryption, 'NoEncryption');
+  A(Self.NoRegError, 'NoRegError');
+  A(Self.OnlyIfDestFileExists, 'OnlyIfDestFileExists');
+  A(Self.OnlyIfDoesntExists, 'OnlyIfDoesntExists');
+  A(Self.OverwriteReadOnly, 'OverwriteReadOnly');
+  A(Self.PromptIfOlder, 'PromptIfOlder');
+  A(Self.RecurseSubdirs, 'RecurseSubdirs');
+  A(Self.RegServer, 'RegServer');
+  A(Self.RegTypeLib, 'RegTypeLib');
+  A(Self.ReplaceSameVersion, 'ReplaceSameVersion');
+  A(Self.RestartReplace, 'RestartReplace');
+  A(Self.SetNTFSCompression, 'SetNTFSCompression');
+  A(Self.SharedFile, 'SharedFile');
+  A(Self.Sign, 'Sign');
+  A(Self.SignOnce, 'SignOnce');
+  A(Self.SkipIfSourceDoesntExist, 'SkipIfSourceDoesntExist');
+  A(Self.SolidBreak, 'SolidBreak');
+  A(Self.SortFileByExtension, 'SortFileByExtension');
+  A(Self.SortFileByName, 'SortFileByName');
+  A(Self.Touch, 'Touch');
+  A(Self.UninsNoSharedFilePrompt, 'UninsNoSharedFilePrompt');
+  A(Self.UninsRemoveReadOnly, 'UninsRemoveReadOnly');
+  A(Self.UninsRestartDelete, 'UninsRestartDelete');
+  A(Self.UninsNeverUninstall, 'UninsNeverUninstall');
+  A(Self.UnsetNTFSCompression, 'UnsetNTFSCompression');
 
 end;
 
@@ -3292,11 +3426,6 @@ end;
 
 { TJDISIcons }
 
-procedure TJDISIcons.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISIcons.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISIcon);
@@ -3314,6 +3443,11 @@ destructor TJDISIcon.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISIcon.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISIcon.SetAppUserModelID(const Value: String);
@@ -3368,11 +3502,6 @@ end;
 
 { TJDISInis }
 
-procedure TJDISInis.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISInis.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISIni);
@@ -3390,6 +3519,11 @@ destructor TJDISIni.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISIni.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISIni.SetFilename(const Value: String);
@@ -3419,11 +3553,6 @@ end;
 
 { TJDISInstallDeletes }
 
-procedure TJDISInstallDeletes.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISInstallDeletes.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISInstallDelete);
@@ -3443,6 +3572,11 @@ begin
   inherited;
 end;
 
+function TJDISInstallDelete.GetFullText: String;
+begin
+
+end;
+
 procedure TJDISInstallDelete.SetName(const Value: String);
 begin
   FName := Value;
@@ -3454,29 +3588,6 @@ begin
 end;
 
 { TJDISLanguages }
-
-procedure TJDISLanguages.AddToScript(AStrings: TStrings);
-var
-  X: Integer;
-  I: TJDISLanguage;
-  T: String;
-begin
-  if Count > 0 then begin
-    AStrings.Append('');
-    AStrings.Append('[Languages]');
-    for X := 0 to Count-1 do begin
-      I:= TJDISLanguage(Items[X]);
-      T:= 'Name: "'+I.Name+'"; MessagesFile: "'+I.MessagesFile+'"';
-      if I.LicenseFile <> '' then
-        T:= T + '; LicenseFile: "'+I.LicenseFile+'"';
-      if I.InfoBeforeFile <> '' then
-        T:= T + '; InfoBeforeFile: "'+I.InfoBeforeFile+'"';
-      if I.InfoAfterFile <> '' then
-        T:= T + '; InfoAfterFile: "'+I.InfoAfterFile+'"';
-      AStrings.Append(T);
-    end;
-  end;
-end;
 
 constructor TJDISLanguages.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3495,6 +3606,20 @@ destructor TJDISLanguage.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISLanguage.GetFullText: String;
+var
+  T: String;
+begin
+  T:= 'Name: "'+FName+'"; MessagesFile: "'+FMessagesFile+'"';
+  if FLicenseFile <> '' then
+    T:= T + '; LicenseFile: "'+FLicenseFile+'"';
+  if FInfoBeforeFile <> '' then
+    T:= T + '; InfoBeforeFile: "'+FInfoBeforeFile+'"';
+  if FInfoAfterFile <> '' then
+    T:= T + '; InfoAfterFile: "'+FInfoAfterFile+'"';
+  Result:= T;
 end;
 
 procedure TJDISLanguage.SetInfoAfterFile(const Value: String);
@@ -3524,11 +3649,6 @@ end;
 
 { TJDISMessages }
 
-procedure TJDISMessages.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISMessages.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISMessage);
@@ -3548,6 +3668,11 @@ begin
   inherited;
 end;
 
+function TJDISMessage.GetFullText: String;
+begin
+
+end;
+
 procedure TJDISMessage.SetName(const Value: String);
 begin
   FName := Value;
@@ -3559,11 +3684,6 @@ begin
 end;
 
 { TJDISCustomMessages }
-
-procedure TJDISCustomMessages.AddToScript(AStrings: TStrings);
-begin
-
-end;
 
 constructor TJDISCustomMessages.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3582,6 +3702,11 @@ destructor TJDISCustomMessage.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISCustomMessage.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISCustomMessage.SetName(const Value: String);
@@ -3674,11 +3799,6 @@ end;
 
 { TJDISRegistry }
 
-procedure TJDISRegistry.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISRegistry.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISRegistryItem);
@@ -3696,6 +3816,11 @@ destructor TJDISRegistryItem.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISRegistryItem.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISRegistryItem.SetFlags(const Value: TJDISRegFlags);
@@ -3730,11 +3855,6 @@ end;
 
 { TJDISRuns }
 
-procedure TJDISRuns.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISRuns.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISRun);
@@ -3752,6 +3872,11 @@ destructor TJDISRun.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISRun.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISRun.SetDescription(const Value: String);
@@ -3796,11 +3921,6 @@ end;
 
 { TJDISUninstallDeletes }
 
-procedure TJDISUninstallDeletes.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISUninstallDeletes.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISUninstallDelete);
@@ -3820,6 +3940,11 @@ begin
   inherited;
 end;
 
+function TJDISUninstallDelete.GetFullText: String;
+begin
+
+end;
+
 procedure TJDISUninstallDelete.SetName(const Value: String);
 begin
 
@@ -3831,11 +3956,6 @@ begin
 end;
 
 { TJDISUninstallRuns }
-
-procedure TJDISUninstallRuns.AddToScript(AStrings: TStrings);
-begin
-
-end;
 
 constructor TJDISUninstallRuns.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3854,6 +3974,11 @@ destructor TJDISUninstallRun.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISUninstallRun.GetFullText: String;
+begin
+
 end;
 
 procedure TJDISUninstallRun.SetDescription(const Value: String);

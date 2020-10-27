@@ -141,7 +141,7 @@ object Form1: TForm1
         Flags.External = False
         Flags.FontIsntTrueType = False
         Flags.GacInstall = False
-        Flags.IgnoreVersion = False
+        Flags.IgnoreVersion = True
         Flags.IsReadme = False
         Flags.NoCompression = False
         Flags.NoEncryption = False

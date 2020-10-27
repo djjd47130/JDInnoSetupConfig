@@ -32,6 +32,7 @@ requires
   rtl;
 
 contains
-  JD.InnoSetup in '..\Source\JD.InnoSetup.pas';
+  JD.InnoSetup in '..\Source\JD.InnoSetup.pas',
+  JD.InnoSetup.Utils in '..\Source\JD.InnoSetup.Utils.pas';
 
 end.
