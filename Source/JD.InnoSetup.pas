@@ -709,6 +709,7 @@ type
   TJDISTypes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISTypeFlag = (istfIsCustom);
@@ -736,6 +737,7 @@ type
   TJDISComponents = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISComponentFlag = (iscfCheckAbleAlone, iscfDontInheritCheck, iscfExclusive,
@@ -747,18 +749,21 @@ type
     FName: String;
     FExtraDiskSpaceRequired: Integer;
     FDescription: String;
+    FTypes: TStringList;
     FFlags: TJDISComponentFlags;
     procedure SetDescription(const Value: String);
     procedure SetExtraDiskSpaceRequired(const Value: Integer);
     procedure SetFlags(const Value: TJDISComponentFlags);
     procedure SetName(const Value: String);
+    function GetTypes: TStrings;
+    procedure SetTypes(const Value: TStrings);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
   published
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
-    //Types
+    property Types: TStrings read GetTypes write SetTypes;
     property ExtraDiskSpaceRequired: Integer read FExtraDiskSpaceRequired write SetExtraDiskSpaceRequired;
     property Flags: TJDISComponentFlags read FFlags write SetFlags;
   end;
@@ -768,6 +773,7 @@ type
   TJDISTasks = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISTaskFlag = (istfCheckAbleAlone, istfCheckedOnce, istfDontInheritCheck,
@@ -800,6 +806,7 @@ type
   TJDISDirs = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISDirAttrib = (isdaReadOnly, isdaHidden, isdaSystem, isdaNotContentIndexed);
@@ -832,6 +839,7 @@ type
   TJDISFiles = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISFile = class(TCollectionItem)
@@ -1002,6 +1010,7 @@ type
   TJDISIcons = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISIconFlag = (isifCloseOnExit, isifCreateOnlyIfFileExists, isifDontCloseOnExit,
@@ -1052,6 +1061,7 @@ type
   TJDISInis = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISIniFlag = (isinfCreateKeyIfDoesntExist, isinfUninsDeleteEntry,
@@ -1086,6 +1096,7 @@ type
   TJDISInstallDeletes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISInstallDeleteType = (isdtFiles, isdtFilesAndOrDirs, isdtDirIfEmpty);
@@ -1109,6 +1120,7 @@ type
   TJDISLanguages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISLanguage = class(TCollectionItem)
@@ -1139,6 +1151,7 @@ type
   TJDISMessages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISMessage = class(TCollectionItem)
@@ -1160,6 +1173,7 @@ type
   TJDISCustomMessages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISCustomMessage = class(TCollectionItem)
@@ -1208,6 +1222,7 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript);
     destructor Destroy; override;
+    procedure AddToScript(AStrings: TStrings);
   published
     property LanguageName: String read FLanguageName write SetLanguageName;
     property LanguageID: String read FLanguageID write SetLanguageID;
@@ -1229,6 +1244,7 @@ type
   TJDISRegistry = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISRegRoot = (isrrCurrentUser, isrrLocalMachine, isrrClassesRoot,
@@ -1274,6 +1290,7 @@ type
   TJDISRuns = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISRunFlag = (isrnf32bit, isrnf64bit, isrnfHideWizard, isrnfNoWait,
@@ -1321,6 +1338,7 @@ type
   TJDISUninstallDeletes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISUninstallDeleteType = (isudtFiles, isudtFilesAndOrDirs, isudtDirIfEmpty);
@@ -1344,6 +1362,7 @@ type
   TJDISUninstallRuns = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    procedure AddToScript(AStrings: TStrings);
   end;
 
   TJDISUninstallRunFlag = (isurf32bit, isurf64bit, isurfHideWizard,
@@ -1467,6 +1486,29 @@ begin
   FSetup.AddToScript(AStrings);
 
   //Languages
+  FLanguages.AddToScript(AStrings);
+
+  //Types
+  FTypes.AddToScript(AStrings);
+
+  //Components
+  FComponents.AddToScript(AStrings);
+
+  //Files
+  FFiles.AddToScript(AStrings);
+
+  //Icons
+  FIcons.AddToScript(AStrings);
+
+  //Run
+  FRun.AddToScript(AStrings);
+
+  //Tasks
+  FTasks.AddToScript(AStrings);
+
+
+
+
 
 
 
@@ -2745,6 +2787,28 @@ end;
 
 { TJDISTypes }
 
+procedure TJDISTypes.AddToScript(AStrings: TStrings);
+var
+  X: Integer;
+  I: TJDISType;
+  T: String;
+begin
+  if Count > 0 then begin
+    AStrings.Append('');
+    AStrings.Append('[Types]');
+    for X := 0 to Count-1 do begin
+      I:= TJDISType(Items[X]);
+      T:= 'Name: "'+I.Name+'"; Description: "'+I.Description+'"';
+      if I.Flags <> [] then begin
+        T:= T + '; Flags: ';
+        if TJDISTypeFlag.istfIsCustom in I.Flags then
+          T:= T + 'iscustom ';
+      end;
+      AStrings.Append(T);
+    end;
+  end;
+end;
+
 constructor TJDISTypes.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISType);
@@ -2781,6 +2845,46 @@ end;
 
 { TJDISComponents }
 
+procedure TJDISComponents.AddToScript(AStrings: TStrings);
+var
+  X, Y: Integer;
+  I: TJDISComponent;
+  T: String;
+begin
+  if Count > 0 then begin
+    AStrings.Append('');
+    AStrings.Append('[Components]');
+    for X := 0 to Count-1 do begin
+      I:= TJDISComponent(Items[X]);
+      T:= 'Name: "'+I.Name+'"; Description: "'+I.Description+'"';
+      if I.FTypes.Count > 0 then begin
+        T:= T + '; Types:';
+        for Y := 0 to I.FTypes.Count-1 do begin
+          T:= T + ' ' + I.FTypes[Y];
+        end;
+      end;
+      if I.Flags <> [] then begin
+        T:= T + '; Flags:';
+
+        if TJDISComponentFlag.iscfCheckAbleAlone in I.Flags then
+          T:= T + ' checkablealone';
+        if TJDISComponentFlag.iscfDontInheritCheck in I.Flags then
+          T:= T + ' dontinheritcheck';
+        if TJDISComponentFlag.iscfExclusive in I.Flags then
+          T:= T + ' exclusive';
+        if TJDISComponentFlag.iscfFixed in I.Flags then
+          T:= T + ' fixed';
+        if TJDISComponentFlag.iscfRestart in I.Flags then
+          T:= T + ' restart';
+        if TJDISComponentFlag.iscfDisableNounInstallWarning in I.Flags then
+          T:= T + ' disablenouninstallwarning';
+
+      end;
+      AStrings.Append(T);
+    end;
+  end;
+end;
+
 constructor TJDISComponents.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISComponent);
@@ -2791,13 +2895,18 @@ end;
 constructor TJDISComponent.Create(Collection: TCollection);
 begin
   inherited;
-
+  FTypes:= TStringList.Create;
 end;
 
 destructor TJDISComponent.Destroy;
 begin
-
+  FreeAndNil(FTypes);
   inherited;
+end;
+
+function TJDISComponent.GetTypes: TStrings;
+begin
+  Result:= TStrings(FTypes);
 end;
 
 procedure TJDISComponent.SetDescription(const Value: String);
@@ -2820,7 +2929,17 @@ begin
   FName := Value;
 end;
 
+procedure TJDISComponent.SetTypes(const Value: TStrings);
+begin
+  FTypes.Assign(Value);
+end;
+
 { TJDISTasks }
+
+procedure TJDISTasks.AddToScript(AStrings: TStrings);
+begin
+
+end;
 
 constructor TJDISTasks.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -2863,6 +2982,11 @@ end;
 
 { TJDISDirs }
 
+procedure TJDISDirs.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISDirs.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISDir);
@@ -2898,6 +3022,11 @@ begin
 end;
 
 { TJDISFiles }
+
+procedure TJDISFiles.AddToScript(AStrings: TStrings);
+begin
+
+end;
 
 constructor TJDISFiles.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3163,6 +3292,11 @@ end;
 
 { TJDISIcons }
 
+procedure TJDISIcons.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISIcons.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISIcon);
@@ -3234,6 +3368,11 @@ end;
 
 { TJDISInis }
 
+procedure TJDISInis.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISInis.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISIni);
@@ -3280,6 +3419,11 @@ end;
 
 { TJDISInstallDeletes }
 
+procedure TJDISInstallDeletes.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISInstallDeletes.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISInstallDelete);
@@ -3310,6 +3454,29 @@ begin
 end;
 
 { TJDISLanguages }
+
+procedure TJDISLanguages.AddToScript(AStrings: TStrings);
+var
+  X: Integer;
+  I: TJDISLanguage;
+  T: String;
+begin
+  if Count > 0 then begin
+    AStrings.Append('');
+    AStrings.Append('[Languages]');
+    for X := 0 to Count-1 do begin
+      I:= TJDISLanguage(Items[X]);
+      T:= 'Name: "'+I.Name+'"; MessagesFile: "'+I.MessagesFile+'"';
+      if I.LicenseFile <> '' then
+        T:= T + '; LicenseFile: "'+I.LicenseFile+'"';
+      if I.InfoBeforeFile <> '' then
+        T:= T + '; InfoBeforeFile: "'+I.InfoBeforeFile+'"';
+      if I.InfoAfterFile <> '' then
+        T:= T + '; InfoAfterFile: "'+I.InfoAfterFile+'"';
+      AStrings.Append(T);
+    end;
+  end;
+end;
 
 constructor TJDISLanguages.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3357,6 +3524,11 @@ end;
 
 { TJDISMessages }
 
+procedure TJDISMessages.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISMessages.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISMessage);
@@ -3388,6 +3560,11 @@ end;
 
 { TJDISCustomMessages }
 
+procedure TJDISCustomMessages.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISCustomMessages.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISCustomMessage);
@@ -3418,6 +3595,11 @@ begin
 end;
 
 { TJDISLangOptions }
+
+procedure TJDISLangOptions.AddToScript(AStrings: TStrings);
+begin
+
+end;
 
 constructor TJDISLangOptions.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3492,6 +3674,11 @@ end;
 
 { TJDISRegistry }
 
+procedure TJDISRegistry.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISRegistry.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISRegistryItem);
@@ -3542,6 +3729,11 @@ begin
 end;
 
 { TJDISRuns }
+
+procedure TJDISRuns.AddToScript(AStrings: TStrings);
+begin
+
+end;
 
 constructor TJDISRuns.Create(AOwner: TJDInnoSetupScript);
 begin
@@ -3604,6 +3796,11 @@ end;
 
 { TJDISUninstallDeletes }
 
+procedure TJDISUninstallDeletes.AddToScript(AStrings: TStrings);
+begin
+
+end;
+
 constructor TJDISUninstallDeletes.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISUninstallDelete);
@@ -3634,6 +3831,11 @@ begin
 end;
 
 { TJDISUninstallRuns }
+
+procedure TJDISUninstallRuns.AddToScript(AStrings: TStrings);
+begin
+
+end;
 
 constructor TJDISUninstallRuns.Create(AOwner: TJDInnoSetupScript);
 begin

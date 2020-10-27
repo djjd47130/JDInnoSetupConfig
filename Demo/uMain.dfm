@@ -64,6 +64,7 @@ object Form1: TForm1
       '  DoSomething;'
       'end;')
     Setup.Compiler.Compression = iscLzma
+    Setup.Compiler.CompressionVer = 0
     Setup.Compiler.OutputBaseFilename = 'MySetup'
     Setup.Compiler.OutputDir = '.\'
     Setup.Compiler.SolidCompression = bdTrue
@@ -103,8 +104,19 @@ object Form1: TForm1
       item
         Name = 'critical'
         Description = 'Critical Files'
+        Types.Strings = (
+          'full'
+          'basic')
         ExtraDiskSpaceRequired = 0
         Flags = [iscfFixed]
+      end
+      item
+        Name = 'additional'
+        Description = 'Additional Files'
+        Types.Strings = (
+          'full')
+        ExtraDiskSpaceRequired = 0
+        Flags = []
       end>
     Tasks = <>
     Dirs = <
@@ -161,7 +173,11 @@ object Form1: TForm1
     Icons = <>
     Ini = <>
     InstallDelete = <>
-    Languages = <>
+    Languages = <
+      item
+        Name = 'english'
+        MessagesFile = 'compiler:Default.isl'
+      end>
     Messages = <>
     CustomMessages = <>
     LangOptions.LanguageCodePage = 0
