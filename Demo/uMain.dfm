@@ -88,8 +88,8 @@ object Form1: TForm1
     Setup.Installer.DirExistsWarning = isbaDefault
     Setup.Installer.DisableDirPage = isbaDefault
     Setup.Installer.DisableProgramGroupPage = isbaDefault
+    Setup.Installer.PrivilegesRequiredOverridesAllowed = []
     Setup.Installer.TimeStampsInUTC = bdDefault
-    Setup.Installer.UninstallLogMode = isulDefault
     Setup.Cosmetic.WizardStyle = iswsModern
     Types = <
       item

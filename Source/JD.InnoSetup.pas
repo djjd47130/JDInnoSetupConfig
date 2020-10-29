@@ -396,6 +396,13 @@ type
 
   TJDISUninstallLogMode = (isulDefault, isulAppend, isulNew, isulOverwrite);
 
+  TJDISTouchDateTimeType = (isttDefault, isttCurrent, isttNone, isttCustom);
+
+  TJDISPrivilegesReq = (isprDefault, isprAdmin, isprLowest);
+
+  TJDISPrivilegesReqOverride = (ispoCommandLine, ispoDialog);
+  TJDISPrivilegesReqOverrides = set of TJDISPrivilegesReqOverride;
+
   TJDISSetupInstaller = class(TPersistent)
   private
     FOwner: TJDISSetup;
@@ -478,6 +485,13 @@ type
     FCreateUninstallRegKey: TBoolDefExpression;
     FLanguageDetectionMethod: TJDISLanguageDetectMethod;
     FUninstallLogMode: TJDISUninstallLogMode;
+    FTouchDateValue: TDate;
+    FTouchDate: TJDISTouchDateTimeType;
+    FTouchTimeValue: TTime;
+    FTouchTime: TJDISTouchDateTimeType;
+    FUninstallable: TBoolDefExpression;
+    FPrivilegesRequiredOverridesAllowed: TJDISPrivilegesReqOverrides;
+    FPrivilegesRequired: TJDISPrivilegesReq;
     procedure SetAllowCancelDuringInstall(const Value: TBoolDef);
     procedure SetAllowNetworkDrive(const Value: TBoolDef);
     procedure SetAllowNoIcons(const Value: TBoolDef);
@@ -558,6 +572,14 @@ type
     procedure SetLanguageDetectionMethod(
       const Value: TJDISLanguageDetectMethod);
     procedure SetUninstallLogMode(const Value: TJDISUninstallLogMode);
+    procedure SetTouchDate(const Value: TJDISTouchDateTimeType);
+    procedure SetTouchDateValue(const Value: TDate);
+    procedure SetTouchTime(const Value: TJDISTouchDateTimeType);
+    procedure SetTouchTimeValue(const Value: TTime);
+    procedure SetUninstallable(const Value: TBoolDefExpression);
+    procedure SetPrivilegesRequired(const Value: TJDISPrivilegesReq);
+    procedure SetPrivilegesRequiredOverridesAllowed(
+      const Value: TJDISPrivilegesReqOverrides);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
@@ -636,8 +658,10 @@ type
     property MinVersion: String read FMinVersion write SetMinVersion;
     property OnlyBelowVersion: String read FOnlyBelowVersion write SetOnlyBelowVersion;
     property Password: String read FPassword write SetPassword;
-    //property PrivilegesRequired
-    //property PrivilegesRequiredOverridesAllowed
+    property PrivilegesRequired: TJDISPrivilegesReq
+      read FPrivilegesRequired write SetPrivilegesRequired default TJDISPrivilegesReq.isprDefault;
+    property PrivilegesRequiredOverridesAllowed: TJDISPrivilegesReqOverrides
+      read FPrivilegesRequiredOverridesAllowed write SetPrivilegesRequiredOverridesAllowed;
     property RestartApplications: TBoolDef
       read FRestartApplications write SetRestartApplications default TBoolDef.bdDefault;
     property RestartIfNeededByRun: TBoolDef
@@ -650,9 +674,15 @@ type
     property TimeStampRounding: Integer
       read FTimeStampRounding write SetTimeStampRounding default 2;
     property TimeStampsInUTC: TBoolDef read FTimeStampsInUTC write SetTimeStampsInUTC;
-    //property TouchDate
-    //property TouchTime
-    //property Uninstallable
+    property TouchDate: TJDISTouchDateTimeType
+      read FTouchDate write SetTouchDate default TJDISTouchDateTimeType.isttDefault;
+    property TouchDateValue: TDate
+      read FTouchDateValue write SetTouchDateValue;
+    property TouchTime: TJDISTouchDateTimeType
+      read FTouchTime write SetTouchTime default TJDISTouchDateTimeType.isttDefault;
+    property TouchTimeValue: TTime
+      read FTouchTimeValue write SetTouchTimeValue;
+    property Uninstallable: TBoolDefExpression read FUninstallable write SetUninstallable;
     property UninstallDisplayIcon: String
       read FUninstallDisplayIcon write SetUninstallDisplayIcon;
     property UninstallDisplayName: String
@@ -2332,11 +2362,10 @@ begin
   FChangesAssociations:= TBoolDefExpression.Create;
   FChangesEnvironment:= TBoolDefExpression.Create;
   FCreateUninstallRegKey:= TBoolDefExpression.Create;
+  FUninstallable:= TBoolDefExpression.Create;
 
   //TODO: Set defaults...
-
-  Self.FTimeStampRounding:= 2;
-
+  FTimeStampRounding:= 2;
 
 
 end;
@@ -2344,6 +2373,7 @@ end;
 destructor TJDISSetupInstaller.Destroy;
 begin
 
+  FreeAndNil(FUninstallable);
   FreeAndNil(FCreateUninstallRegKey);
   FreeAndNil(FChangesEnvironment);
   FreeAndNil(FChangesAssociations);
@@ -2548,9 +2578,20 @@ begin
 
   AST('Password', Self.FPassword);
 
-  //PrivilegesRequired
+  case Self.FPrivilegesRequired of
+    isprDefault:  ;
+    isprAdmin:    AST('PrivilegesRequired', 'admin');
+    isprLowest:   AST('PrivilegesRequired', 'lowest');
+  end;
 
-  //PrivilegesRequiredOverridesAllowed
+  if Self.FPrivilegesRequiredOverridesAllowed <> [] then begin
+    T:= '';
+    if TJDISPrivilegesReqOverride.ispoCommandLine in FPrivilegesRequiredOverridesAllowed then
+      T:= T + 'commandline ';
+    if TJDISPrivilegesReqOverride.ispoDialog in FPrivilegesRequiredOverridesAllowed then
+      T:= T + 'dialog ';
+    AST('PrivilegesRequiredOverridesAllowed', T);
+  end;
 
   ABD('RestartApplications', Self.FRestartApplications);
 
@@ -2573,21 +2614,36 @@ begin
 
   ABD('TimeStampsInUTC', Self.FTimeStampsInUTC);
 
-  //TouchDate
+  case FTouchDate of
+    isttDefault:  ;
+    isttCurrent:  AST('TouchDate', 'current');
+    isttNone:     AST('TouchDate', 'none');
+    isttCustom:   AST('TouchDate', DateToStr(FTouchDateValue));
+  end;
 
-  //TouchTime
+  case FTouchTime of
+    isttDefault:  ;
+    isttCurrent:  AST('TouchTime', 'current');
+    isttNone:     AST('TouchTime', 'none');
+    isttCustom:   AST('TouchTime', TimeToStr(FTouchTimeValue));
+  end;
 
-  //Uninstallable
+  case FUninstallable.FValue of
+    bdeDefault:     ;
+    bdeFalse:       AST('Uninstallable', 'no');
+    bdeTrue:        AST('Uninstallable', 'yes');
+    bdeExpression:  AST('Uninstallable', FUninstallable.FExpression);
+  end;
 
-  //UninstallDisplayIcon
+  AST('UninstallDisplayIcon', FUninstallDisplayIcon);
 
-  //UninstallDisplayName
+  AST('UninstallDisplayName', FUninstallDisplayName);
 
-  //UninstallDisplaySize
+  if FUninstallDisplaySize <> 0 then
+    AST('UninstallDisplaySize', IntToStr(FUninstallDisplaySize));
 
-  //UninstallFilesDir
+  AST('UninstallFilesDir', FUninstallFilesDir);
 
-  //UninstallLogMode
   case Self.FUninstallLogMode of
     isulDefault:    ;
     isulAppend:     AST('UninstallLogMode', 'append');
@@ -2595,9 +2651,17 @@ begin
     isulOverwrite:  AST('UninstallLogMode', 'overwrite');
   end;
 
-  //UninstallRestartComputer
+  case Self.FUninstallRestartComputer of
+    bdDefault:  ;
+    bdFalse:    AST('UninstallRestartComputer', 'no');
+    bdTrue:     AST('UninstallRestartComputer', 'yes');
+  end;
 
-  //UpdateUninstallLogAppName
+  case Self.FUpdateUninstallLogAppName of
+    bdDefault:  ;
+    bdFalse:    AST('UpdateUninstallLogAppName', 'no');
+    bdTrue:     AST('UpdateUninstallLogAppName', 'yes');
+  end;
 
   ABD('UsePreviousAppDir', Self.FUsePreviousAppDir);
 
@@ -2907,6 +2971,18 @@ begin
   FPassword := Value;
 end;
 
+procedure TJDISSetupInstaller.SetPrivilegesRequired(
+  const Value: TJDISPrivilegesReq);
+begin
+  FPrivilegesRequired := Value;
+end;
+
+procedure TJDISSetupInstaller.SetPrivilegesRequiredOverridesAllowed(
+  const Value: TJDISPrivilegesReqOverrides);
+begin
+  FPrivilegesRequiredOverridesAllowed := Value;
+end;
+
 procedure TJDISSetupInstaller.SetRestartApplications(const Value: TBoolDef);
 begin
   FRestartApplications := Value;
@@ -2943,6 +3019,33 @@ end;
 procedure TJDISSetupInstaller.SetTimeStampsInUTC(const Value: TBoolDef);
 begin
   FTimeStampsInUTC := Value;
+end;
+
+procedure TJDISSetupInstaller.SetTouchDate(const Value: TJDISTouchDateTimeType);
+begin
+  FTouchDate := Value;
+end;
+
+procedure TJDISSetupInstaller.SetTouchDateValue(const Value: TDate);
+begin
+  FTouchDateValue := Value;
+  FTouchDate:= isttCustom;
+end;
+
+procedure TJDISSetupInstaller.SetTouchTime(const Value: TJDISTouchDateTimeType);
+begin
+  FTouchTime := Value;
+end;
+
+procedure TJDISSetupInstaller.SetTouchTimeValue(const Value: TTime);
+begin
+  FTouchTimeValue := Value;
+  FTouchTime:= isttCustom;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallable(const Value: TBoolDefExpression);
+begin
+  FUninstallable.Assign(Value);
 end;
 
 procedure TJDISSetupInstaller.SetUninstallDisplayIcon(const Value: String);
@@ -3218,11 +3321,6 @@ end;
 
 { TJDISSetupObsolete }
 
-procedure TJDISSetupObsolete.AddToScript(AScript: TStrings);
-begin
-
-end;
-
 constructor TJDISSetupObsolete.Create(AOwner: TJDISSetup);
 begin
   FOwner:= AOwner;
@@ -3233,6 +3331,12 @@ destructor TJDISSetupObsolete.Destroy;
 begin
 
   inherited;
+end;
+
+procedure TJDISSetupObsolete.AddToScript(AScript: TStrings);
+begin
+  //TODO
+
 end;
 
 { TJDISTypes }
