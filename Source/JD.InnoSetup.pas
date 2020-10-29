@@ -394,6 +394,8 @@ type
 
   TJDISLanguageDetectMethod = (isldDefault, isldUILanguage, isldLocale, isldNone);
 
+  TJDISUninstallLogMode = (isulDefault, isulAppend, isulNew, isulOverwrite);
+
   TJDISSetupInstaller = class(TPersistent)
   private
     FOwner: TJDISSetup;
@@ -475,6 +477,7 @@ type
     FCloseApplications: TJDISBoolForce;
     FCreateUninstallRegKey: TBoolDefExpression;
     FLanguageDetectionMethod: TJDISLanguageDetectMethod;
+    FUninstallLogMode: TJDISUninstallLogMode;
     procedure SetAllowCancelDuringInstall(const Value: TBoolDef);
     procedure SetAllowNetworkDrive(const Value: TBoolDef);
     procedure SetAllowNoIcons(const Value: TBoolDef);
@@ -554,6 +557,7 @@ type
     procedure SetCloseApplications(const Value: TJDISBoolForce);
     procedure SetLanguageDetectionMethod(
       const Value: TJDISLanguageDetectMethod);
+    procedure SetUninstallLogMode(const Value: TJDISUninstallLogMode);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
@@ -657,7 +661,8 @@ type
       read FUninstallDisplaySize write SetUninstallDisplaySize default 0;
     property UninstallFilesDir: String
       read FUninstallFilesDir write SetUninstallFilesDir;
-    //property UninstallLogMode
+    property UninstallLogMode: TJDISUninstallLogMode
+      read FUninstallLogMode write SetUninstallLogMode default TJDISUninstallLogMode.isulDefault;
     property UninstallRestartComputer: TBoolDef
       read FUninstallRestartComputer write SetUninstallRestartComputer default TBoolDef.bdDefault;
     property UpdateUninstallLogAppName: TBoolDef
@@ -915,7 +920,6 @@ type
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
     property GroupDescription: String read FGroupDescription write SetGroupDescription;
-    //Components
     property Flags: TJDISTaskFlags read FFlags write SetFlags;
   end;
 
@@ -1394,12 +1398,14 @@ type
     FRoot: TJDISRegRoot;
     FSubkey: String;
     FFlags: TJDISRegFlags;
+    FPermissions: TJDISPermissions;
     procedure SetFlags(const Value: TJDISRegFlags);
     procedure SetRoot(const Value: TJDISRegRoot);
     procedure SetSubkey(const Value: String);
     procedure SetValueData(const Value: String);
     procedure SetValueName(const Value: String);
     procedure SetValueType(const Value: TJDISRegType);
+    procedure SetPermissions(const Value: TJDISPermissions);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
@@ -1410,7 +1416,7 @@ type
     property ValueType: TJDISRegType read FValueType write SetValueType;
     property ValueName: String read FValueName write SetValueName;
     property ValueData: String read FValueData write SetValueData;
-    //Permissions
+    property Permissions: TJDISPermissions read FPermissions write SetPermissions;
     property Flags: TJDISRegFlags read FFlags write SetFlags;
   end;
 
@@ -2582,6 +2588,12 @@ begin
   //UninstallFilesDir
 
   //UninstallLogMode
+  case Self.FUninstallLogMode of
+    isulDefault:    ;
+    isulAppend:     AST('UninstallLogMode', 'append');
+    isulNew:        AST('UninstallLogMode', 'new');
+    isulOverwrite:  AST('UninstallLogMode', 'overwrite');
+  end;
 
   //UninstallRestartComputer
 
@@ -2951,6 +2963,12 @@ end;
 procedure TJDISSetupInstaller.SetUninstallFilesDir(const Value: String);
 begin
   FUninstallFilesDir := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallLogMode(
+  const Value: TJDISUninstallLogMode);
+begin
+  FUninstallLogMode := Value;
 end;
 
 procedure TJDISSetupInstaller.SetUninstallRestartComputer(const Value: TBoolDef);
@@ -3655,8 +3673,6 @@ function TJDISFileFlags.GetFlagText: String;
     end;
   end;
 begin
-  //TODO: Return all enabled flags in space separated string...
-
   A(Self.Is32bit, '32bit');
   A(Self.Is64bit, '64bit');
   A(Self.AllowUnsafeFiles, 'AllowUnsafeFiles');
@@ -3922,8 +3938,49 @@ begin
 end;
 
 function TJDISIcon.GetFullText: String;
+var
+  T: String;
 begin
-
+  Result:= 'Name: "'+FName+'"; ';
+  Result:= Result + 'Filename: "'+FFilename+'"';
+  if FParameters <> '' then
+    Result:= Result + '; Parameters: "'+FParameters+'"';
+  if FWorkingDir <> '' then
+    Result:= Result + '; WorkingDir: "'+FWorkingDir+'"';
+  if FHotKey <> '' then
+    Result:= Result + '; HotKey: "'+FHotKey+'"';
+  if FComment <> '' then
+    Result:= Result + '; Comment: "'+FComment+'"';
+  if FIconFilename <> '' then
+    Result:= Result + '; IconFilename: "'+FIconFilename+'"';
+  if FIconIndex <> 0 then
+    Result:= Result + '; IconIndex: '+IntToStr(FIconIndex);
+  if FAppUserModelID <> '' then
+    Result:= Result + '; AppUserModelID: "'+FAppUserModelID+'"';
+  if FFlags <> [] then begin
+    T:= '';
+    if TJDISIconFlag.isifCloseOnExit in FFlags then
+      T:= T + 'closeonexit ';
+    if TJDISIconFlag.isifCreateOnlyIfFileExists in FFlags then
+      T:= T + 'createonlyiffileexists ';
+    if TJDISIconFlag.isifDontCloseOnExit in FFlags then
+      T:= T + 'dontcloseonexit ';
+    if TJDISIconFlag.isifExcludeFromShowInNewInstall in FFlags then
+      T:= T + 'excludefromshowinnewinstall ';
+    if TJDISIconFlag.isifFolderShortcut in FFlags then
+      T:= T + 'foldershortcut ';
+    if TJDISIconFlag.isifPreventPinning in FFlags then
+      T:= T + 'preventpinning ';
+    if TJDISIconFlag.isifRunMaximized in FFlags then
+      T:= T + 'runmaximized ';
+    if TJDISIconFlag.isifRunMinimized in FFlags then
+      T:= T + 'runminimized ';
+    if TJDISIconFlag.isifUninsNeverUninstall in FFlags then
+      T:= T + 'uninsneveruninstall ';
+    if TJDISIconFlag.isifUseAppPaths in FFlags then
+      T:= T + 'useapppaths ';
+    Result:= Result + '; Flags: '+T;
+  end;
 end;
 
 procedure TJDISIcon.SetAppUserModelID(const Value: String);
@@ -3998,8 +4055,27 @@ begin
 end;
 
 function TJDISIni.GetFullText: String;
+var
+  T: String;
 begin
-
+  Result:= 'Filename: "'+FFilename+'"';
+  Result:= Result + '; Section: "'+FSection+'"';
+  if FKey <> '' then
+    Result:= Result + '; Key: "'+FKey+'"';
+  if FString <> '' then
+    Result:= Result + '; String: "'+FString+'"';
+  if FFlags <> [] then begin
+    T:= '';
+    if TJDISIniFlag.isinfCreateKeyIfDoesntExist in FFlags then
+      T:= T + 'createkeyifdoesntexist ';
+    if TJDISIniFlag.isinfUninsDeleteEntry in FFlags then
+      T:= T + 'uninsdeleteentry ';
+    if TJDISIniFlag.isinfUninsDeleteSection in FFlags then
+      T:= T + 'uninsdeletesection ';
+    if TJDISIniFlag.isinfUninsDeleteSectionIfEmpty in FFlags then
+      T:= T + 'uninsdeletesectionifempty ';
+    Result:= Result + '; Flags: '+T;
+  end;
 end;
 
 procedure TJDISIni.SetFilename(const Value: String);
@@ -4050,7 +4126,12 @@ end;
 
 function TJDISInstallDelete.GetFullText: String;
 begin
-
+  case Self.FType of
+    isdtFiles:          Result:= 'Type: files';
+    isdtFilesAndOrDirs: Result:= 'Type: filesandordirs';
+    isdtDirIfEmpty:     Result:= 'Type: dirifempty';
+  end;
+  Result:= Result + '; Name: "'+FName+'"';
 end;
 
 procedure TJDISInstallDelete.SetName(const Value: String);
@@ -4146,7 +4227,7 @@ end;
 
 function TJDISMessage.GetFullText: String;
 begin
-
+  Result:= Self.FName+'='+Self.FValue;
 end;
 
 procedure TJDISMessage.SetName(const Value: String);
@@ -4182,7 +4263,7 @@ end;
 
 function TJDISCustomMessage.GetFullText: String;
 begin
-
+  Result:= Self.FName+'='+Self.FValue;
 end;
 
 procedure TJDISCustomMessage.SetName(const Value: String);
@@ -4343,23 +4424,78 @@ end;
 constructor TJDISRegistryItem.Create(Collection: TCollection);
 begin
   inherited;
-
+  FPermissions:= TJDISPermissions.Create(Self);
 end;
 
 destructor TJDISRegistryItem.Destroy;
 begin
-
+  FreeAndNil(FPermissions);
   inherited;
 end;
 
 function TJDISRegistryItem.GetFullText: String;
+var
+  T: String;
 begin
-
+  case Self.FRoot of
+    isrrCurrentUser:      Result:= 'HKCU';
+    isrrLocalMachine:     Result:= 'HKLM';
+    isrrClassesRoot:      Result:= 'HKCR';
+    isrrUsers:            Result:= 'HKU';
+    isrrCurrentConfig:    Result:= 'HKCC';
+    isrrAutoUserMachine:  Result:= 'HKA';
+  end;
+  Result:= Result + '; Subkey: "'+FSubkey+'"';
+  case Self.FValueType of
+    isrtNone:     Result:= Result + '; ValueType: none';
+    isrtString:   Result:= Result + '; ValueType: string';
+    isrtExpandSz: Result:= Result + '; ValueType: expandsz';
+    isrtMultiSz:  Result:= Result + '; ValueType: multisz';
+    isrtDword:    Result:= Result + '; ValueType: dword';
+    isrtQword:    Result:= Result + '; ValueType: qword';
+    isrtBinary:   Result:= Result + '; ValueType: binary';
+  end;
+  if FValueName <> '' then
+    Result:= Result + '; ValueName: "'+FValueName+'"';
+  if FValueData <> '' then
+    Result:= Result + '; ValueData: "'+FValueData+'"';
+  if FPermissions.Count > 0 then begin
+    Result:= Result + '; Permissions: '+FPermissions.GetFullText;
+  end;
+  if FFlags <> [] then begin
+    T:= '';
+    if TJDISRegFlag.isrfCreateValueIfDoesntExist in FFlags then
+      Result:= Result + 'createvalueifdoesntexist ';
+    if TJDISRegFlag.isrfDeleteKey in FFlags then
+      Result:= Result + 'deletekey ';
+    if TJDISRegFlag.isrfDeleteValue in FFlags then
+      Result:= Result + 'deletevalue ';
+    if TJDISRegFlag.isrfDontCreateKey in FFlags then
+      Result:= Result + 'dontcreatekey ';
+    if TJDISRegFlag.isrfNoError in FFlags then
+      Result:= Result + 'noerror ';
+    if TJDISRegFlag.isrfPreserveStringType in FFlags then
+      Result:= Result + 'preservestringtype ';
+    if TJDISRegFlag.isrfUninsClearValue in FFlags then
+      Result:= Result + 'uninsclearvalue ';
+    if TJDISRegFlag.isrfUninsDeleteKey in FFlags then
+      Result:= Result + 'uninsdeletekey ';
+    if TJDISRegFlag.isrfUninsDeleteKeyIfEmpty in FFlags then
+      Result:= Result + 'uninsdeletekeyifempty ';
+    if TJDISRegFlag.isrfUninsDeleteValue in FFlags then
+      Result:= Result + 'uninsdeletevalue ';
+    Result:= Result + '; Flags: '+T;
+  end;
 end;
 
 procedure TJDISRegistryItem.SetFlags(const Value: TJDISRegFlags);
 begin
   FFlags := Value;
+end;
+
+procedure TJDISRegistryItem.SetPermissions(const Value: TJDISPermissions);
+begin
+  FPermissions.Assign(Value);
 end;
 
 procedure TJDISRegistryItem.SetRoot(const Value: TJDISRegRoot);
@@ -4409,8 +4545,60 @@ begin
 end;
 
 function TJDISRun.GetFullText: String;
+var
+  T: String;
 begin
-
+  Result:= 'Filename: "'+FFilename+'"';
+  if FDescription <> '' then
+    Result:= Result + '; Description: "'+FDescription+'"';
+  if FParameters <> '' then
+    Result:= Result + '; Parameters: "'+FParameters+'"';
+  if FWorkingDir <> '' then
+    Result:= Result + '; WorkingDir: "'+FWorkingDir+'"';
+  if FStatusMsg <> '' then
+    Result:= Result + '; StatusMsg: "'+FStatusMsg+'"';
+  if FRunOnceID <> '' then
+    Result:= Result + '; RunOnceId: "'+FRunOnceId+'"';
+  if FVerb <> '' then
+    Result:= Result + '; Verb: "'+FVerb+'"';
+  if FFlags <> [] then begin
+    T:= '';
+    if TJDISRunFlag.isrnf32bit in FFlags then
+      Result:= Result + '32bit ';
+    if TJDISRunFlag.isrnf64bit in FFlags then
+      Result:= Result + '64bit ';
+    if TJDISRunFlag.isrnfHideWizard in FFlags then
+      Result:= Result + 'hidewizard ';
+    if TJDISRunFlag.isrnfNoWait in FFlags then
+      Result:= Result + 'nowait ';
+    if TJDISRunFlag.isrnfPostInstall in FFlags then
+      Result:= Result + 'postinstall ';
+    if TJDISRunFlag.isrnfRunAsCurrentUser in FFlags then
+      Result:= Result + 'runascurrentuser ';
+    if TJDISRunFlag.isrnfRunAsOriginalUser in FFlags then
+      Result:= Result + 'runasoriginaluser ';
+    if TJDISRunFlag.isrnfRunHidden in FFlags then
+      Result:= Result + 'runhidden ';
+    if TJDISRunFlag.isrnfRunMaximized in FFlags then
+      Result:= Result + 'runmaximized ';
+    if TJDISRunFlag.isrnfRunMinimized in FFlags then
+      Result:= Result + 'runminimized ';
+    if TJDISRunFlag.isrnfShellExec in FFlags then
+      Result:= Result + 'shellexec ';
+    if TJDISRunFlag.isrnfSkipIfDoesntExist in FFlags then
+      Result:= Result + 'skipifdoesntexist ';
+    if TJDISRunFlag.isrnfSkipIfNotSilent in FFlags then
+      Result:= Result + 'skipifnotsilent ';
+    if TJDISRunFlag.isrnfSkipIfSilent in FFlags then
+      Result:= Result + 'skipifsilent ';
+    if TJDISRunFlag.isrnfUnchecked in FFlags then
+      Result:= Result + 'unchecked ';
+    if TJDISRunFlag.isrnfWaitUntilIdle in FFlags then
+      Result:= Result + 'waituntilidle ';
+    if TJDISRunFlag.isrnfWaitUntilTerminated in FFlags then
+      Result:= Result + 'waituntilterminated ';
+    Result:= Result + '; Flags: '+T;
+  end;
 end;
 
 procedure TJDISRun.SetDescription(const Value: String);
@@ -4476,7 +4664,12 @@ end;
 
 function TJDISUninstallDelete.GetFullText: String;
 begin
-
+  case Self.FType of
+    isdtFiles:          Result:= 'Type: files';
+    isdtFilesAndOrDirs: Result:= 'Type: filesandordirs';
+    isdtDirIfEmpty:     Result:= 'Type: dirifempty';
+  end;
+  Result:= Result + '; Name: "'+FName+'"';
 end;
 
 procedure TJDISUninstallDelete.SetName(const Value: String);
@@ -4511,8 +4704,60 @@ begin
 end;
 
 function TJDISUninstallRun.GetFullText: String;
+var
+  T: String;
 begin
-
+  Result:= 'Filename: "'+FFilename+'"';
+  if FDescription <> '' then
+    Result:= Result + '; Description: "'+FDescription+'"';
+  if FParameters <> '' then
+    Result:= Result + '; Parameters: "'+FParameters+'"';
+  if FWorkingDir <> '' then
+    Result:= Result + '; WorkingDir: "'+FWorkingDir+'"';
+  if FStatusMsg <> '' then
+    Result:= Result + '; StatusMsg: "'+FStatusMsg+'"';
+  if FRunOnceID <> '' then
+    Result:= Result + '; RunOnceId: "'+FRunOnceId+'"';
+  if FVerb <> '' then
+    Result:= Result + '; Verb: "'+FVerb+'"';
+  if FFlags <> [] then begin
+    T:= '';
+    if TJDISUninstallRunFlag.isurf32bit in FFlags then
+      Result:= Result + '32bit ';
+    if TJDISUninstallRunFlag.isurf64bit in FFlags then
+      Result:= Result + '64bit ';
+    if TJDISUninstallRunFlag.isurfHideWizard in FFlags then
+      Result:= Result + 'hidewizard ';
+    if TJDISUninstallRunFlag.isurfNoWait in FFlags then
+      Result:= Result + 'nowait ';
+    if TJDISUninstallRunFlag.isurfPostInstall in FFlags then
+      Result:= Result + 'postinstall ';
+    if TJDISUninstallRunFlag.isurfRunAsCurrentUser in FFlags then
+      Result:= Result + 'runascurrentuser ';
+    if TJDISUninstallRunFlag.isurfRunAsOriginalUser in FFlags then
+      Result:= Result + 'runasoriginaluser ';
+    if TJDISUninstallRunFlag.isurfRunHidden in FFlags then
+      Result:= Result + 'runhidden ';
+    if TJDISUninstallRunFlag.isurfRunMaximized in FFlags then
+      Result:= Result + 'runmaximized ';
+    if TJDISUninstallRunFlag.isurfRunMinimized in FFlags then
+      Result:= Result + 'runminimized ';
+    if TJDISUninstallRunFlag.isurfShellExec in FFlags then
+      Result:= Result + 'shellexec ';
+    if TJDISUninstallRunFlag.isurfSkipIfDoesntExist in FFlags then
+      Result:= Result + 'skipifdoesntexist ';
+    if TJDISUninstallRunFlag.isurfSkipIfNotSilent in FFlags then
+      Result:= Result + 'skipifnotsilent ';
+    if TJDISUninstallRunFlag.isurfSkipIfSilent in FFlags then
+      Result:= Result + 'skipifsilent ';
+    if TJDISUninstallRunFlag.isurfUnchecked in FFlags then
+      Result:= Result + 'unchecked ';
+    if TJDISUninstallRunFlag.isurfWaitUntilIdle in FFlags then
+      Result:= Result + 'waituntilidle ';
+    if TJDISUninstallRunFlag.isurfWaitUntilTerminated in FFlags then
+      Result:= Result + 'waituntilterminated ';
+    Result:= Result + '; Flags: '+T;
+  end;
 end;
 
 procedure TJDISUninstallRun.SetDescription(const Value: String);
