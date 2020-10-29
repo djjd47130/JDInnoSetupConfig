@@ -14,15 +14,19 @@ unit JD.InnoSetup;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Generics.Collections,
-  JD.InnoSetup.Utils;
+  System.Classes, System.SysUtils, System.Generics.Collections;
 
 type
   TJDInnoSetupScript = class;
   TJDISBaseCollection = class;
+  TJDISBaseCollectionItem = class;
+  TJDISPermission = class;
+  TJDISPermissions = class;
   TJDISDefines = class;
   TJDISDefine = class;
   TJDISSetup = class;
+  TJDISSetupCompression = class;
+  TJDISSetupSignature = class;
   TJDISSetupCompiler = class;
   TJDISSetupInstaller = class;
   TJDISSetupCosmetic = class;
@@ -247,7 +251,7 @@ type
     property Compiler: TJDISSetupCompiler read FCompiler write SetCompiler;
     property Installer: TJDISSetupInstaller read FInstaller write SetInstaller;
     property Cosmetic: TJDISSetupCosmetic read FCosmetic write SetCosmetic;
-    property Obsolete: TJDISSetupObsolete read FObsolete write SetObsolete;
+    //property Obsolete: TJDISSetupObsolete read FObsolete write SetObsolete;
   end;
 
   TJDISCompression = (iscDefault, iscZip, iscZipVer, iscBzip, iscBzipVer, iscLzma,
@@ -260,19 +264,102 @@ type
     isicLzma2, isicLzma2Fast, isicLzma2Normal, isicLzma2Max, isicLzma2Ultra,
     isicLzma2Ultra64, isicNone);
 
+  TJDISCompressMatchFinder = (iscmfDefault, iscmfHashChain, iscmfBinaryTree);
+
+  TJDISCompressSeparateProcess = (iscspDefault, iscspYes, iscspNo, iscspX86);
+
+  TJDISSetupCompression = class(TPersistent)
+  private
+    FOwner: TJDISSetupCompiler;
+    FCompressionVer: Integer;
+    FCompression: TJDISCompression;
+    FSolidCompression: TBoolDef;
+    FCompressionThreads: Integer;
+    FInternalCompressLevel: TJDISInternalCompression;
+    FLZMAAlgorithm: Integer;
+    FLZMADictionarySize: Int64;
+    FLZMANumFastBytes: Integer;
+    FLZMABlockSize: Int64;
+    FLZMANumBlockThreads: Integer;
+    FLZMAUseSeparateProcess: TJDISCompressSeparateProcess;
+    FLZMAMatchFinder: TJDISCompressMatchFinder;
+    procedure SetLZMAAlgorithm(const Value: Integer);
+    procedure SetLZMABlockSize(const Value: Int64);
+    procedure SetLZMADictionarySize(const Value: Int64);
+    procedure SetLZMANumBlockThreads(const Value: Integer);
+    procedure SetLZMANumFastBytes(const Value: Integer);
+    function IsLZMAAlgorithmStored: Boolean;
+    function IsLZMADisctionarySizeStored: Boolean;
+    function IsLZMABlockSizeStored: Boolean;
+    function IsLZMANumFastBytesStored: Boolean;
+    procedure SetLZMAUseSeparateProcess(
+      const Value: TJDISCompressSeparateProcess);
+    procedure SetLZMAMatchFinder(const Value: TJDISCompressMatchFinder);
+    function IsLZMAMatchFinderStored: Boolean;
+  public
+    constructor Create(AOwner: TJDISSetupCompiler);
+    destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
+    procedure SetCompression(const Value: TJDISCompression);
+    procedure SetCompressionVer(const Value: Integer);
+    procedure SetCompressionThreads(const Value: Integer);
+    procedure SetInternalCompressLevel(const Value: TJDISInternalCompression);
+    procedure SetSolidCompression(const Value: TBoolDef);
+  published
+    property Compression: TJDISCompression
+      read FCompression write SetCompression default TJDISCompression.iscLzma2Max;
+    property CompressionVer: Integer
+      read FCompressionVer write SetCompressionVer default 1;
+    property CompressionThreads: Integer
+      read FCompressionThreads write SetCompressionThreads default 0;
+    property InternalCompressLevel: TJDISInternalCompression
+      read FInternalCompressLevel write SetInternalCompressLevel default TJDISInternalCompression.isicNormal;
+    property LZMAAlgorithm: Integer
+      read FLZMAAlgorithm write SetLZMAAlgorithm stored IsLZMAAlgorithmStored;
+    property LZMABlockSize: Int64
+      read FLZMABlockSize write SetLZMABlockSize stored IsLZMABlockSizeStored;
+    property LZMADictionarySize: Int64
+      read FLZMADictionarySize write SetLZMADictionarySize stored IsLZMADisctionarySizeStored;
+    property LZMAMatchFinder: TJDISCompressMatchFinder
+      read FLZMAMatchFinder write SetLZMAMatchFinder stored IsLZMAMatchFinderStored;
+    property LZMANumBlockThreads: Integer
+      read FLZMANumBlockThreads write SetLZMANumBlockThreads default 1;
+    property LZMANumFastBytes: Integer
+      read FLZMANumFastBytes write SetLZMANumFastBytes stored IsLZMANumFastBytesStored;
+    property LZMAUseSeparateProcess: TJDISCompressSeparateProcess
+      read FLZMAUseSeparateProcess write SetLZMAUseSeparateProcess default TJDISCompressSeparateProcess.iscspDefault;
+    property SolidCompression: TBoolDef
+      read FSolidCompression write SetSolidCompression default TBoolDef.bdDefault;
+  end;
+
+  TJDISSetupSignature = class(TPersistent)
+  private
+    FOwner: TJDISSetupCompiler;
+  public
+    constructor Create(AOwner: TJDISSetupCompiler);
+    destructor Destroy; override;
+    procedure AddToScript(AScript: TStrings);
+    //TODO
+    //property SignedUninstaller
+    //property SignedUninstallerDir
+    //property SignTool
+    //property SignToolMinimumTimeBetween
+    //property SignToolRetryCount
+    //property SignToolRetryDelay
+    //property SignToolRunMinimized
+  end;
+
   TJDISSetupCompiler = class(TPersistent)
   private
     FOwner: TJDISSetup;
-    FCompressionVer: Integer;
-    FCompression: TJDISCompression;
+    FSignature: TJDISSetupSignature;
+    FCompression: TJDISSetupCompression;
     FASLRCompatible: TBoolDef;
-    FCompressionThreads: Integer;
     FDEPCompatible: TBoolDef;
     FDiskClusterSize: Integer;
     FDiskSliceSize: Int64;
     FEncryption: TBoolDef;
     FDiskSpanning: TBoolDef;
-    FInternalCompressLevel: TJDISInternalCompression;
     FMergeDuplicateFiles: TBoolDef;
     FOutput: TBoolDef;
     FOutputBaseFilename: String;
@@ -280,7 +367,6 @@ type
     FOutputDir: String;
     FReserveBytes: Int64;
     FSlicesPerDisk: Integer;
-    FSolidCompression: TBoolDef;
     FSourceDir: String;
     FTerminalServicesAware: TBoolDef;
     FUsedUserAreasWarning: TBoolDef;
@@ -295,15 +381,11 @@ type
     FVersionInfoProductName: String;
     FVersionInfoCompany: String;
     procedure SetASLRCompatible(const Value: TBoolDef);
-    procedure SetCompression(const Value: TJDISCompression);
-    procedure SetCompressionVer(const Value: Integer);
-    procedure SetCompressionThreads(const Value: Integer);
     procedure SetDEPCompatible(const Value: TBoolDef);
     procedure SetDiskClusterSize(const Value: Integer);
     procedure SetDiskSliceSize(const Value: Int64);
     procedure SetDiskSpanning(const Value: TBoolDef);
     procedure SetEncryption(const Value: TBoolDef);
-    procedure SetInternalCompressLevel(const Value: TJDISInternalCompression);
     procedure SetMergeDuplicateFiles(const Value: TBoolDef);
     procedure SetOutput(const Value: TBoolDef);
     procedure SetOutputBaseFilename(const Value: String);
@@ -311,7 +393,6 @@ type
     procedure SetOutputManifestFile(const Value: String);
     procedure SetReserveBytes(const Value: Int64);
     procedure SetSlicesPerDisk(const Value: Integer);
-    procedure SetSolidCompression(const Value: TBoolDef);
     procedure SetSourceDir(const Value: String);
     procedure SetTerminalServicesAware(const Value: TBoolDef);
     procedure SetUsedUserAreasWarning(const Value: TBoolDef);
@@ -325,29 +406,20 @@ type
     procedure SetVersionInfoProductVersion(const Value: String);
     procedure SetVersionInfoTextVersion(const Value: String);
     procedure SetVersionInfoVersion(const Value: String);
+    procedure SetCompression(const Value: TJDISSetupCompression);
+    procedure SetSignature(const Value: TJDISSetupSignature);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
     procedure AddToScript(AScript: TStrings);
   published
     property ASLRCompatible: TBoolDef read FASLRCompatible write SetASLRCompatible default TBoolDef.bdDefault;
-    property Compression: TJDISCompression read FCompression write SetCompression default TJDISCompression.iscLzma2Max;
-    property CompressionVer: Integer read FCompressionVer write SetCompressionVer default 1;
-    property CompressionThreads: Integer read FCompressionThreads write SetCompressionThreads default 0;
+    property Compression: TJDISSetupCompression read FCompression write SetCompression;
     property DEPCompatible: TBoolDef read FDEPCompatible write SetDEPCompatible default TBoolDef.bdDefault;
     property DiskClusterSize: Integer read FDiskClusterSize write SetDiskClusterSize default 512;
     property DiskSliceSize: Int64 read FDiskSliceSize write SetDiskSliceSize default 2100000000;
     property DiskSpanning: TBoolDef read FDiskSpanning write SetDiskSpanning default TBoolDef.bdDefault;
     property Encryption: TBoolDef read FEncryption write SetEncryption default TBoolDef.bdDefault;
-    property InternalCompressLevel: TJDISInternalCompression
-      read FInternalCompressLevel write SetInternalCompressLevel default TJDISInternalCompression.isicNormal;
-    //property LZMAAlgorithm
-    //property LZMABlockSize
-    //property LZMADictionarySize
-    //property LZMAMatchFinder
-    //property LZMANumBlockThreads
-    //property LZMANumFastBytes
-    //property LZMAUseSeparateProcess
     property MergeDuplicateFiles: TBoolDef
       read FMergeDuplicateFiles write SetMergeDuplicateFiles default TBoolDef.bdDefault;
     property Output: TBoolDef read FOutput write SetOutput default TBoolDef.bdDefault;
@@ -355,16 +427,8 @@ type
     property OutputDir: String read FOutputDir write SetOutputDir;
     property OutputManifestFile: String read FOutputManifestFile write SetOutputManifestFile;
     property ReserveBytes: Int64 read FReserveBytes write SetReserveBytes default 0;
-    //property SignedUninstaller
-    //property SignedUninstallerDir
-    //property SignTool
-    //property SignToolMinimumTimeBetween
-    //property SignToolRetryCount
-    //property SignToolRetryDelay
-    //property SignToolRunMinimized
+    property Signature: TJDISSetupSignature read FSignature write SetSignature;
     property SlicesPerDisk: Integer read FSlicesPerDisk write SetSlicesPerDisk default 1;
-    property SolidCompression: TBoolDef
-      read FSolidCompression write SetSolidCompression default TBoolDef.bdDefault;
     property SourceDir: String read FSourceDir write SetSourceDir;
     property TerminalServicesAware: TBoolDef
       read FTerminalServicesAware write SetTerminalServicesAware default TBoolDef.bdDefault;
@@ -841,6 +905,7 @@ type
     destructor Destroy; override;
     procedure AddToScript(AScript: TStrings);
   published
+    //TODO
     //property AlwaysCreateUninstallIcon
     //property DisableAppendDir
     //property DontMergeDuplicateFiles
@@ -1571,7 +1636,21 @@ type
 
 
 
+function GetSpacedList(AStrings: TStrings): String;
+
 implementation
+
+function GetSpacedList(AStrings: TStrings): String;
+var
+  X: Integer;
+begin
+  Result:= '';
+  for X := 0 to AStrings.Count-1 do begin
+    if Result <> '' then
+      Result:= Result + ' ';
+    Result:= Result + AStrings[X];
+  end;
+end;
 
 { TBoolDefExpression }
 
@@ -1722,72 +1801,45 @@ procedure TJDInnoSetupScript.GetScript(AStrings: TStrings);
 begin
   AStrings.Clear;
 
-  //Header
   A('; Script generated by the JD Inno Setup Script Component.');
+  A('; For more information, visit https://github.com/djjd47130/JDInnoSetupConfig');
 
-  //Defines
   FDefines.AddToScript('', AStrings);
 
-  //Setup
   FSetup.AddToScript(AStrings);
 
-  //Languages
   FLanguages.AddToScript('Languages', AStrings);
 
-  //Types
   FTypes.AddToScript('Types', AStrings);
 
-  //Components
   FComponents.AddToScript('Components', AStrings);
 
-  //Files
   FFiles.AddToScript('Files', AStrings);
 
-  //Icons
   FIcons.AddToScript('Icons', AStrings);
 
-  //Tasks
   FTasks.AddToScript('Tasks', AStrings);
 
-  //Dirs
   FDirs.AddToScript('Dirs', AStrings);
 
-  //Ini
   FIni.AddToScript('INI', AStrings);
 
-  //InstallDelete
   FInstallDelete.AddToScript('InstallDelete', AStrings);
 
-  //Messages
   FMessages.AddToScript('Messages', AStrings);
 
-  //CustomMessages
   FCustomMessages.AddToScript('CustomMessages', AStrings);
 
-  //LangOptions
   FLangOptions.AddToScript(AStrings);
 
-  //Registry
   FRegistry.AddToScript('Registry', AStrings);
 
-  //Run
   FRun.AddToScript('Run', AStrings);
 
-  //UninstallDelete
   FUninstallDelete.AddToScript('UninstallDelete', AStrings);
 
-  //UninstallRun
   FUninstallRun.AddToScript('UninstallRun', AStrings);
 
-
-
-
-
-
-
-
-
-  //Code
   if Trim(Self.FCode.Text) <> '' then begin
     AStrings.Append('');
     AStrings.Append('[Code]');
@@ -2042,28 +2094,21 @@ begin
   FObsolete.Assign(Value);
 end;
 
-{ TJDISSetupCompiler }
+{ TJDISSetupCompression }
 
-constructor TJDISSetupCompiler.Create(AOwner: TJDISSetup);
+constructor TJDISSetupCompression.Create(AOwner: TJDISSetupCompiler);
 begin
   FOwner:= AOwner;
 
-  //TODO: Set defaults...
-  Self.FDiskClusterSize:= 512;
-  Self.FDiskSliceSize:= 2100000000;
-  Self.FSlicesPerDisk:= 1;
-
-
-
 end;
 
-destructor TJDISSetupCompiler.Destroy;
+destructor TJDISSetupCompression.Destroy;
 begin
 
   inherited;
 end;
 
-procedure TJDISSetupCompiler.AddToScript(AScript: TStrings);
+procedure TJDISSetupCompression.AddToScript(AScript: TStrings);
   procedure A(const S: String);
   begin
     AScript.Append(S);
@@ -2086,8 +2131,6 @@ procedure TJDISSetupCompiler.AddToScript(AScript: TStrings);
       AP(AName, AValue);
   end;
 begin
-
-  ABD('ASLRCompatible', FASLRCompatible);
 
   case Self.FCompression of
     iscDefault:       ;
@@ -2114,20 +2157,6 @@ begin
     AP('CompressionThreads', IntToStr(FCompressionThreads));
   end;
 
-  ABD('DEPCompatible', FDEPCompatible);
-
-  if Self.FDiskClusterSize <> 512 then begin
-    AP('DiskClusterSize', IntToStr(FDiskClusterSize));
-  end;
-
-  if Self.FDiskSliceSize <> 2100000000 then begin
-    AP('DiskSliceSize', IntToStr(FDiskSliceSize));
-  end;
-
-  ABD('DiskSpanning', FDiskSpanning);
-
-  ABD('Encryption', FEncryption);
-
   case Self.FInternalCompressLevel of
     isicNormal:       ;
     isicZip:          AP('InternalCompressLevel', 'zip');
@@ -2149,6 +2178,210 @@ begin
     isicNone:         AP('InternalCompressLevel', 'none');
   end;
 
+  ABD('SolidCompression', FSolidCompression);
+
+  //LZMAAlgorithm
+  //TODO: Need a clever way to re-use default specification...
+
+  //LZMABlockSize
+
+  //LZMADictionarySize
+
+  //LZMAMatchFinder
+
+  //LZMANumBlockThreads
+
+  //LZMANumFastBytes
+
+  //LZMAUseSeparateProcess
+
+
+
+end;
+
+function TJDISSetupCompression.IsLZMAAlgorithmStored: Boolean;
+begin
+  //TODO
+  Result:= True;
+end;
+
+function TJDISSetupCompression.IsLZMABlockSizeStored: Boolean;
+begin
+  //TODO
+  Result:= True;
+end;
+
+function TJDISSetupCompression.IsLZMADisctionarySizeStored: Boolean;
+begin
+  //TODO
+  Result:= True;
+end;
+
+function TJDISSetupCompression.IsLZMAMatchFinderStored: Boolean;
+begin
+  //TODO
+  Result:= True;
+end;
+
+function TJDISSetupCompression.IsLZMANumFastBytesStored: Boolean;
+begin
+  //TODO
+  Result:= True;
+end;
+
+procedure TJDISSetupCompression.SetCompression(const Value: TJDISCompression);
+begin
+  FCompression:= Value;
+end;
+
+procedure TJDISSetupCompression.SetCompressionThreads(const Value: Integer);
+begin
+  FCompressionThreads:= Value;
+end;
+
+procedure TJDISSetupCompression.SetCompressionVer(const Value: Integer);
+begin
+  FCompressionVer:= Value;
+end;
+
+procedure TJDISSetupCompression.SetInternalCompressLevel(
+  const Value: TJDISInternalCompression);
+begin
+  FInternalCompressLevel:= Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMAAlgorithm(const Value: Integer);
+begin
+  FLZMAAlgorithm := Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMABlockSize(const Value: Int64);
+begin
+  FLZMABlockSize := Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMADictionarySize(const Value: Int64);
+begin
+  FLZMADictionarySize := Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMAMatchFinder(
+  const Value: TJDISCompressMatchFinder);
+begin
+  FLZMAMatchFinder := Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMANumBlockThreads(const Value: Integer);
+begin
+  FLZMANumBlockThreads := Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMANumFastBytes(const Value: Integer);
+begin
+  FLZMANumFastBytes := Value;
+end;
+
+procedure TJDISSetupCompression.SetLZMAUseSeparateProcess(
+  const Value: TJDISCompressSeparateProcess);
+begin
+  FLZMAUseSeparateProcess := Value;
+end;
+
+procedure TJDISSetupCompression.SetSolidCompression(const Value: TBoolDef);
+begin
+  FSolidCompression:= Value;
+end;
+
+{ TJDISSetupSignature }
+
+constructor TJDISSetupSignature.Create(AOwner: TJDISSetupCompiler);
+begin
+  FOwner:= AOwner;
+
+end;
+
+destructor TJDISSetupSignature.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TJDISSetupSignature.AddToScript(AScript: TStrings);
+begin
+  //TODO
+
+end;
+
+{ TJDISSetupCompiler }
+
+constructor TJDISSetupCompiler.Create(AOwner: TJDISSetup);
+begin
+  FOwner:= AOwner;
+  FCompression:= TJDISSetupCompression.Create(Self);
+  FSignature:= TJDISSetupSignature.Create(Self);
+
+  //TODO: Set defaults...
+  Self.FDiskClusterSize:= 512;
+  Self.FDiskSliceSize:= 2100000000;
+  Self.FSlicesPerDisk:= 1;
+
+end;
+
+destructor TJDISSetupCompiler.Destroy;
+begin
+
+  FreeAndNil(FSignature);
+  FreeAndNil(FCompression);
+  inherited;
+end;
+
+procedure TJDISSetupCompiler.AddToScript(AScript: TStrings);
+  procedure A(const S: String);
+  begin
+    AScript.Append(S);
+  end;
+  procedure AP(const N, V: String);
+  begin
+    A(N+'='+V);
+  end;
+  procedure ABD(const AName: String; const AValue: TBoolDef);
+  begin
+    case AValue of
+      bdDefault:  ;
+      bdFalse:    AP(AName, 'no');
+      bdTrue:     AP(AName, 'yes');
+    end;
+  end;
+  procedure AST(const AName: String; const AValue: String);
+  begin
+    if AValue <> '' then
+      AP(AName, AValue);
+  end;
+begin
+  Self.FCompression.AddToScript(AScript);
+
+  Self.FSignature.AddToScript(AScript);
+
+
+
+
+
+  ABD('ASLRCompatible', FASLRCompatible);
+
+  ABD('DEPCompatible', FDEPCompatible);
+
+  if Self.FDiskClusterSize <> 512 then begin
+    AP('DiskClusterSize', IntToStr(FDiskClusterSize));
+  end;
+
+  if Self.FDiskSliceSize <> 2100000000 then begin
+    AP('DiskSliceSize', IntToStr(FDiskSliceSize));
+  end;
+
+  ABD('DiskSpanning', FDiskSpanning);
+
+  ABD('Encryption', FEncryption);
+
   ABD('MergeDuplicateFiles', FMergeDuplicateFiles);
 
   ABD('Output', FOutput);
@@ -2166,8 +2399,6 @@ begin
   if Self.FSlicesPerDisk <> 1 then begin
     AP('SlicesPerDisk', IntToStr(FSlicesPerDisk));
   end;
-
-  ABD('SolidCompression', FSolidCompression);
 
   AST('SourceDir', FSourceDir);
 
@@ -2199,20 +2430,9 @@ procedure TJDISSetupCompiler.SetASLRCompatible(const Value: TBoolDef);
 begin
   FASLRCompatible := Value;
 end;
-
-procedure TJDISSetupCompiler.SetCompression(const Value: TJDISCompression);
+procedure TJDISSetupCompiler.SetCompression(const Value: TJDISSetupCompression);
 begin
-  FCompression := Value;
-end;
-
-procedure TJDISSetupCompiler.SetCompressionThreads(const Value: Integer);
-begin
-  FCompressionThreads := Value;
-end;
-
-procedure TJDISSetupCompiler.SetCompressionVer(const Value: Integer);
-begin
-  FCompressionVer := Value;
+  FCompression.Assign(Value);
 end;
 
 procedure TJDISSetupCompiler.SetDEPCompatible(const Value: TBoolDef);
@@ -2238,12 +2458,6 @@ end;
 procedure TJDISSetupCompiler.SetEncryption(const Value: TBoolDef);
 begin
   FEncryption := Value;
-end;
-
-procedure TJDISSetupCompiler.SetInternalCompressLevel(
-  const Value: TJDISInternalCompression);
-begin
-  FInternalCompressLevel := Value;
 end;
 
 procedure TJDISSetupCompiler.SetMergeDuplicateFiles(const Value: TBoolDef);
@@ -2276,14 +2490,14 @@ begin
   FReserveBytes := Value;
 end;
 
+procedure TJDISSetupCompiler.SetSignature(const Value: TJDISSetupSignature);
+begin
+  FSignature.Assign(Value);
+end;
+
 procedure TJDISSetupCompiler.SetSlicesPerDisk(const Value: Integer);
 begin
   FSlicesPerDisk := Value;
-end;
-
-procedure TJDISSetupCompiler.SetSolidCompression(const Value: TBoolDef);
-begin
-  FSolidCompression := Value;
 end;
 
 procedure TJDISSetupCompiler.SetSourceDir(const Value: String);
@@ -4405,7 +4619,6 @@ function TJDISLangOptions.IsAllDefault: Boolean;
       Result:= (AValue = ADefault);
   end;
 begin
-  //Return whether or not all properties are at their defaults...
   Result:= True;
   ChkStr(FLanguageName, '');
   ChkStr(FLanguageID, '');

@@ -68,11 +68,17 @@ object Form1: TForm1
       'begin'
       '  DoSomething;'
       'end;')
-    Setup.Compiler.Compression = iscLzma
-    Setup.Compiler.CompressionVer = 0
+    Setup.Compiler.Compression.Compression = iscLzma
+    Setup.Compiler.Compression.CompressionVer = 0
+    Setup.Compiler.Compression.LZMAAlgorithm = 0
+    Setup.Compiler.Compression.LZMABlockSize = 0
+    Setup.Compiler.Compression.LZMADictionarySize = 0
+    Setup.Compiler.Compression.LZMAMatchFinder = iscmfDefault
+    Setup.Compiler.Compression.LZMANumBlockThreads = 0
+    Setup.Compiler.Compression.LZMANumFastBytes = 0
+    Setup.Compiler.Compression.SolidCompression = bdTrue
     Setup.Compiler.OutputBaseFilename = 'MySetup'
     Setup.Compiler.OutputDir = '.\'
-    Setup.Compiler.SolidCompression = bdTrue
     Setup.Installer.AppId = '{{61571CEE-9CE0-4104-A2BB-B1B7AF19DFE2}'
     Setup.Installer.AppName = '{#MyAppName}'
     Setup.Installer.AppPublisher = '{#MyAppPublisher}'
