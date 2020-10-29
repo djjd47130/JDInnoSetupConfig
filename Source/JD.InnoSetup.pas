@@ -62,6 +62,10 @@ type
 
   TBoolDef = (bdDefault, bdFalse, bdTrue);
 
+  TJDISAttrib = (isaReadOnly, isaHidden, isaSystem, isaNotContentIndexed);
+  TJDISAttribs = set of TJDISAttrib;
+
+
 
   TBoolDefExp = (bdeDefault, bdeFalse, bdeTrue, bdeExpression);
   TBoolDefExpression = class(TPersistent)
@@ -154,7 +158,7 @@ type
     FOwner: TJDInnoSetupScript;
   public
     constructor Create(AOwner: TJDInnoSetupScript;
-      ItemClass: TCollectionItemClass);
+      ItemClass: TCollectionItemClass); reintroduce;
     procedure AddToScript(const ASectionName: String; AScript: TStrings); virtual;
   end;
 
@@ -168,6 +172,36 @@ type
   published
 
   end;
+
+
+
+
+
+  TJDISPermissions = class(TOwnedCollection)
+  public
+    constructor Create(AOwner: TPersistent); reintroduce;
+    function GetFullText: String;
+  end;
+
+  TJDISPermissionAccessType = (ispaFull, ispaModify, ispaReadExec);
+
+  TJDISPermission = class(TCollectionItem)
+  private
+    FAccessType: TJDISPermissionAccessType;
+    FIdentifier: String;
+    procedure SetAccessType(const Value: TJDISPermissionAccessType);
+    procedure SetIdentifier(const Value: String);
+  protected
+    function GetDisplayName: String; override;
+  public
+    constructor Create(Collection: TCollection); override;
+    destructor Destroy; override;
+    function GetFullText: String; virtual;
+  published
+    property AccessType: TJDISPermissionAccessType read FAccessType write SetAccessType;
+    property Identifier: String read FIdentifier write SetIdentifier;
+  end;
+
 
 
 
@@ -861,6 +895,7 @@ type
 
   TJDISTask = class(TJDISBaseCollectionItem)
   private
+    FComponents: TStringList;
     FName: String;
     FGroupDescription: String;
     FDescription: String;
@@ -869,11 +904,14 @@ type
     procedure SetFlags(const Value: TJDISTaskFlags);
     procedure SetGroupDescription(const Value: String);
     procedure SetName(const Value: String);
+    function GetComponents: TStrings;
+    procedure SetComponents(const Value: TStrings);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
   published
+    property Components: TStrings read GetComponents write SetComponents;
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
     property GroupDescription: String read FGroupDescription write SetGroupDescription;
@@ -888,9 +926,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISDirAttrib = (isdaReadOnly, isdaHidden, isdaSystem, isdaNotContentIndexed);
-  TJDISDirAttribs = set of TJDISDirAttrib;
-
   TJDISDirFlag = (isdfDeleteAfterInstall, isdfSetNTFSCompression,
     isdfUninsAlwaysUninstall, isdfUninsNeverUninstall, isdfUnsetNTFSCompression);
   TJDISDirFlags = set of TJDISDirFlag;
@@ -898,19 +933,21 @@ type
   TJDISDir = class(TJDISBaseCollectionItem)
   private
     FName: String;
-    FAttribs: TJDISDirAttribs;
+    FAttribs: TJDISAttribs;
     FFlags: TJDISDirFlags;
-    procedure SetAttribs(const Value: TJDISDirAttribs);
+    FPermissions: TJDISPermissions;
+    procedure SetAttribs(const Value: TJDISAttribs);
     procedure SetFlags(const Value: TJDISDirFlags);
     procedure SetName(const Value: String);
+    procedure SetPermissions(const Value: TJDISPermissions);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
   published
     property Name: String read FName write SetName;
-    property Attribs: TJDISDirAttribs read FAttribs write SetAttribs;
-    //Permissions
+    property Attribs: TJDISAttribs read FAttribs write SetAttribs;
+    property Permissions: TJDISPermissions read FPermissions write SetPermissions;
     property Flags: TJDISDirFlags read FFlags write SetFlags;
   end;
 
@@ -932,6 +969,8 @@ type
     FComponents: TStringList;
     FFlags: TJDISFileFlags;
     FFontInstall: String;
+    FAttribs: TJDISAttribs;
+    FPermissions: TJDISPermissions;
     procedure SetDestDir(const Value: String);
     procedure SetDestName(const Value: String);
     procedure SetExcludes(const Value: String);
@@ -942,6 +981,8 @@ type
     function GetComponents: TStrings;
     procedure SetComponents(const Value: TStrings);
     procedure SetFontInstall(const Value: String);
+    procedure SetAttribs(const Value: TJDISAttribs);
+    procedure SetPermissions(const Value: TJDISPermissions);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
@@ -953,8 +994,8 @@ type
     property Excludes: String read FExcludes write SetExcludes;
     property ExternalSize: Int64 read FExternalSize write SetExternalSize;
     //CopyMode: Obsolete
-    //Attribs
-    //Permissions
+    property Attribs: TJDISAttribs read FAttribs write SetAttribs;
+    property Permissions: TJDISPermissions read FPermissions write SetPermissions;
     property FontInstall: String read FFontInstall write SetFontInstall;
     property StrongAssemblyName: String read FStrongAssemblyName write SetStrongAssemblyName;
     property Components: TStrings read GetComponents write SetComponents;
@@ -1291,7 +1332,7 @@ type
     FTitleFontSize: Integer;
     FWelcomeFontSize: Integer;
     FDialogFontName: String;
-    FRightToLeft: Boolean;
+    FRightToLeft: TBoolDef;
     FTitleFontName: String;
     FWelcomeFontName: String;
     procedure SetCopyrightFontName(const Value: String);
@@ -1301,7 +1342,7 @@ type
     procedure SetLanguageCodePage(const Value: Integer);
     procedure SetLanguageID(const Value: String);
     procedure SetLanguageName(const Value: String);
-    procedure SetRightToLeft(const Value: Boolean);
+    procedure SetRightToLeft(const Value: TBoolDef);
     procedure SetTitleFontName(const Value: String);
     procedure SetTitleFontSize(const Value: Integer);
     procedure SetWelcomeFontName(const Value: String);
@@ -1310,19 +1351,20 @@ type
     constructor Create(AOwner: TJDInnoSetupScript);
     destructor Destroy; override;
     procedure AddToScript(AStrings: TStrings);
+    function IsAllDefault: Boolean;
   published
     property LanguageName: String read FLanguageName write SetLanguageName;
     property LanguageID: String read FLanguageID write SetLanguageID;
-    property LanguageCodePage: Integer read FLanguageCodePage write SetLanguageCodePage;
+    property LanguageCodePage: Integer read FLanguageCodePage write SetLanguageCodePage default 0;
     property DialogFontName: String read FDialogFontName write SetDialogFontName;
-    property DialogFontSize: Integer read FDialogFontSize write SetDialogFontSize;
+    property DialogFontSize: Integer read FDialogFontSize write SetDialogFontSize default 0;
     property WelcomeFontName: String read FWelcomeFontName write SetWelcomeFontName;
-    property WelcomeFontSize: Integer read FWelcomeFontSize write SetWelcomeFontSize;
+    property WelcomeFontSize: Integer read FWelcomeFontSize write SetWelcomeFontSize default 0;
     property TitleFontName: String read FTitleFontName write SetTitleFontName;
-    property TitleFontSize: Integer read FTitleFontSize write SetTitleFontSize;
+    property TitleFontSize: Integer read FTitleFontSize write SetTitleFontSize default 0;
     property CopyrightFontName: String read FCopyrightFontName write SetCopyrightFontName;
-    property CopyrightFontSize: Integer read FCopyrightFontSize write SetCopyrightFontSize;
-    property RightToLeft: Boolean read FRightToLeft write SetRightToLeft;
+    property CopyrightFontSize: Integer read FCopyrightFontSize write SetCopyrightFontSize default 0;
+    property RightToLeft: TBoolDef read FRightToLeft write SetRightToLeft default TBoolDef.bdDefault;
   end;
 
 
@@ -1519,6 +1561,66 @@ begin
   FValue := Value;
 end;
 
+{ TJDISPermissions }
+
+constructor TJDISPermissions.Create(AOwner: TPersistent);
+begin
+  inherited Create(AOwner, TJDISPermission);
+end;
+
+function TJDISPermissions.GetFullText: String;
+var
+  X: Integer;
+  P: TJDISPermission;
+begin
+  Result:= '';
+  for X := 0 to Count-1 do begin
+    P:= TJDISPermission(Items[X]);
+    if Result <> '' then
+      Result:= Result + ' ';
+    Result:= Result + P.GetFullText;
+  end;
+end;
+
+{ TJDISPermission }
+
+constructor TJDISPermission.Create(Collection: TCollection);
+begin
+  inherited;
+
+end;
+
+destructor TJDISPermission.Destroy;
+begin
+
+  inherited;
+end;
+
+function TJDISPermission.GetDisplayName: String;
+begin
+  Result:= GetFullText;
+end;
+
+function TJDISPermission.GetFullText: String;
+begin
+  Result:= FIdentifier+'-';
+  case Self.FAccessType of
+    ispaFull:     Result:= Result + 'full';
+    ispaModify:   Result:= Result + 'modify';
+    ispaReadExec: Result:= Result + 'readexec';
+  end;
+end;
+
+procedure TJDISPermission.SetAccessType(const Value: TJDISPermissionAccessType);
+begin
+  FAccessType := Value;
+end;
+
+procedure TJDISPermission.SetIdentifier(const Value: String);
+begin
+  FIdentifier := Value;
+end;
+
 { TJDInnoSetupScript }
 
 constructor TJDInnoSetupScript.Create(AOwner: TComponent);
@@ -1608,15 +1710,38 @@ begin
   //Icons
   FIcons.AddToScript('Icons', AStrings);
 
-  //Run
-  FRun.AddToScript('Run', AStrings);
-
   //Tasks
   FTasks.AddToScript('Tasks', AStrings);
 
+  //Dirs
+  FDirs.AddToScript('Dirs', AStrings);
 
+  //Ini
+  FIni.AddToScript('INI', AStrings);
 
+  //InstallDelete
+  FInstallDelete.AddToScript('InstallDelete', AStrings);
 
+  //Messages
+  FMessages.AddToScript('Messages', AStrings);
+
+  //CustomMessages
+  FCustomMessages.AddToScript('CustomMessages', AStrings);
+
+  //LangOptions
+  FLangOptions.AddToScript(AStrings);
+
+  //Registry
+  FRegistry.AddToScript('Registry', AStrings);
+
+  //Run
+  FRun.AddToScript('Run', AStrings);
+
+  //UninstallDelete
+  FUninstallDelete.AddToScript('UninstallDelete', AStrings);
+
+  //UninstallRun
+  FUninstallRun.AddToScript('UninstallRun', AStrings);
 
 
 
@@ -3231,18 +3356,50 @@ end;
 constructor TJDISTask.Create(Collection: TCollection);
 begin
   inherited;
-
+  FComponents:= TStringList.Create;
 end;
 
 destructor TJDISTask.Destroy;
 begin
-
+  FreeAndNil(FComponents);
   inherited;
 end;
 
-function TJDISTask.GetFullText: String;
+function TJDISTask.GetComponents: TStrings;
 begin
+  Result:= TStrings(FComponents);
+end;
 
+function TJDISTask.GetFullText: String;
+var
+  T: String;
+begin
+  Result:= 'Name: '+FName+'; Description: "'+FDescription+'"';
+  if FGroupDescription <> '' then
+    Result:= Result + '; GroupDescription: '+FGroupDescription;
+  if FComponents.Count > 0 then begin
+    Result:= Result + '; Components: '+GetSpacedList(FComponents);
+  end;
+  if FFlags <> [] then begin
+    if TJDISTaskFlag.istfCheckAbleAlone in FFlags then
+      T:= T + 'checkablealone ';
+    if TJDISTaskFlag.istfCheckedOnce in FFlags then
+      T:= T + 'checkedonce ';
+    if TJDISTaskFlag.istfDontInheritCheck in FFlags then
+      T:= T + 'dontinheritcheck ';
+    if TJDISTaskFlag.istfExclusive in FFlags then
+      T:= T + 'exclusive ';
+    if TJDISTaskFlag.istfRestart in FFlags then
+      T:= T + 'restart ';
+    if TJDISTaskFlag.istfUnchecked in FFlags then
+      T:= T + 'unchecked ';
+    Result:= Result + '; Flags: '+T;
+  end;
+end;
+
+procedure TJDISTask.SetComponents(const Value: TStrings);
+begin
+  FComponents.Assign(Value);
 end;
 
 procedure TJDISTask.SetDescription(const Value: String);
@@ -3277,21 +3434,55 @@ end;
 constructor TJDISDir.Create(Collection: TCollection);
 begin
   inherited;
-
+  FPermissions:= TJDISPermissions.Create(Self);
 end;
 
 destructor TJDISDir.Destroy;
 begin
-
+  FreeAndNil(FPermissions);
   inherited;
 end;
 
 function TJDISDir.GetFullText: String;
+var
+  T: String;
 begin
+  Result:= 'Name: "'+FName+'"';
+  if FAttribs <> [] then begin
+    T:= '';
+    if TJDISAttrib.isaReadOnly in FAttribs then
+      T:= T + 'readonly ';
+    if TJDISAttrib.isaHidden in FAttribs then
+      T:= T + 'hidden ';
+    if TJDISAttrib.isaSystem in FAttribs then
+      T:= T + 'system ';
+    if TJDISAttrib.isaNotContentIndexed in FAttribs then
+      T:= T + 'notcontentindexed ';
+    Result:= Result + '; Attribs: '+T;
+  end;
+
+  if FPermissions.Count > 0 then begin
+    Result:= Result + '; Permissions: '+FPermissions.GetFullText;
+  end;
+
+  if FFlags <> [] then begin
+    T:= '';
+    if TJDISDirFlag.isdfDeleteAfterInstall in FFlags then
+      T:= T + 'deleteafterinstall ';
+    if TJDISDirFlag.isdfSetNTFSCompression in FFlags then
+      T:= T + 'setntfscompression ';
+    if TJDISDirFlag.isdfUninsAlwaysUninstall in FFlags then
+      T:= T + 'uninsalwaysuninstall ';
+    if TJDISDirFlag.isdfUninsNeverUninstall in FFlags then
+      T:= T + 'uninsneveruninstall ';
+    if TJDISDirFlag.isdfUnsetNTFSCompression in FFlags then
+      T:= T + 'unsetntfscompression ';
+    Result:= Result + '; Flags: '+T;
+  end;
 
 end;
 
-procedure TJDISDir.SetAttribs(const Value: TJDISDirAttribs);
+procedure TJDISDir.SetAttribs(const Value: TJDISAttribs);
 begin
   FAttribs := Value;
 end;
@@ -3304,6 +3495,11 @@ end;
 procedure TJDISDir.SetName(const Value: String);
 begin
   FName := Value;
+end;
+
+procedure TJDISDir.SetPermissions(const Value: TJDISPermissions);
+begin
+  FPermissions.Assign(Value);
 end;
 
 { TJDISFiles }
@@ -3320,10 +3516,12 @@ begin
   inherited;
   FComponents:= TStringList.Create;
   FFlags:= TJDISFileFlags.Create(Self);
+  FPermissions:= TJDISPermissions.Create(Self);
 end;
 
 destructor TJDISFile.Destroy;
 begin
+  FreeAndNil(FPermissions);
   FFlags.Free;
   FComponents.Free;
   inherited;
@@ -3336,7 +3534,7 @@ end;
 
 function TJDISFile.GetFullText: String;
 var
-  T: String;
+  T, T2: String;
   procedure AT(const N, V: String; const Q: Boolean);
   begin
     if V <> '' then begin
@@ -3357,14 +3555,36 @@ begin
   AT('Excludes', FExcludes, True);
   if FExternalSize <> 0 then
     AT('ExternalSize', IntToStr(FExternalSize), False);
-  //CopyMode
-  //Attribs
-  //Permissions
+
+  //CopyMode (Obsolete)
+
+  if FAttribs <> [] then begin
+    T2:= '';
+    if TJDISAttrib.isaReadOnly in FAttribs then
+      T2:= T2 + 'readonly ';
+    if TJDISAttrib.isaHidden in FAttribs then
+      T2:= T2 + 'hidden ';
+    if TJDISAttrib.isaSystem in FAttribs then
+      T2:= T2 + 'system ';
+    if TJDISAttrib.isaNotContentIndexed in FAttribs then
+      T2:= T2 + 'notcontentindexed ';
+    AT('Attribs', T2, False);
+  end;
+
+  if FPermissions.Count > 0 then begin
+    AT('Permissions', FPermissions.GetFullText, False);
+  end;
+
   AT('FontInstall', FFontInstall, True);
   AT('StrongAssemblyName', FStrongAssemblyName, True);
   AT('Components', GetSpacedList(FComponents), False);
   AT('Flags', FFlags.GetFlagText, False);
   Result:= T;
+end;
+
+procedure TJDISFile.SetAttribs(const Value: TJDISAttribs);
+begin
+  FAttribs := Value;
 end;
 
 procedure TJDISFile.SetComponents(const Value: TStrings);
@@ -3400,6 +3620,11 @@ end;
 procedure TJDISFile.SetFontInstall(const Value: String);
 begin
   FFontInstall := Value;
+end;
+
+procedure TJDISFile.SetPermissions(const Value: TJDISPermissions);
+begin
+  FPermissions.Assign(Value);
 end;
 
 procedure TJDISFile.SetSource(const Value: String);
@@ -3972,11 +4197,6 @@ end;
 
 { TJDISLangOptions }
 
-procedure TJDISLangOptions.AddToScript(AStrings: TStrings);
-begin
-
-end;
-
 constructor TJDISLangOptions.Create(AOwner: TJDInnoSetupScript);
 begin
   FOwner:= AOwner;
@@ -3986,6 +4206,69 @@ destructor TJDISLangOptions.Destroy;
 begin
 
   inherited;
+end;
+
+function TJDISLangOptions.IsAllDefault: Boolean;
+  procedure ChkStr(AValue: String; ADefault: String);
+  begin
+    if Result then
+      Result:= (AValue = ADefault);
+  end;
+  procedure ChkInt(AValue: Integer; ADefault: Integer);
+  begin
+    if Result then
+      Result:= (AValue = ADefault);
+  end;
+begin
+  //Return whether or not all properties are at their defaults...
+  Result:= True;
+  ChkStr(FLanguageName, '');
+  ChkStr(FLanguageID, '');
+  ChkInt(FLanguageCodePage, 0);
+  ChkStr(FDialogFontName, '');
+  ChkInt(FDialogFontSize, 0);
+  ChkStr(FWelcomeFontName, '');
+  ChkInt(FWelcomeFontSize, 0);
+  ChkStr(FTitleFontName, '');
+  ChkInt(FTitleFontSize, 0);
+  ChkStr(FCopyrightFontName, '');
+  ChkInt(FCopyrightFontSize, 0);
+  if Result then
+    Result:= Self.FRightToLeft = TBoolDef.bdDefault;
+end;
+
+procedure TJDISLangOptions.AddToScript(AStrings: TStrings);
+  procedure AStr(const AName: String; const AValue: String);
+  begin
+    if AValue <> '' then
+      AStrings.Append(AName+'='+AValue);
+  end;
+  procedure AInt(const AName: String; const AValue: Integer);
+  begin
+    if AValue <> 0 then
+      AStrings.Append(AName+'='+IntToStr(AValue));
+  end;
+begin
+  if not IsAllDefault then begin
+    AStrings.Append('');
+    AStrings.Append('[LangOptions]');
+    AStr('LanguageName', Self.LanguageName);
+    AStr('LanguageID', Self.LanguageID);
+    AInt('LanguageCodePage', Self.LanguageCodePage);
+    AStr('DialogFontName', Self.DialogFontName);
+    AInt('DialogFontSize', Self.DialogFontSize);
+    AStr('WelcomeFontName', Self.WelcomeFontName);
+    AInt('WelcomeFontSize', Self.WelcomeFontSize);
+    AStr('TitleFontName', Self.TitleFontName);
+    AInt('TitleFontSize', Self.TitleFontSize);
+    AStr('CopyrightFontName', Self.CopyrightFontName);
+    AInt('CopyrightFontSize', Self.CopyrightFontSize);
+    case Self.FRightToLeft of
+      bdDefault:  ;
+      bdFalse:    AStr('RightToLeft', 'no');
+      bdTrue:     AStr('RightToLeft', 'yes');
+    end;
+  end;
 end;
 
 procedure TJDISLangOptions.SetCopyrightFontName(const Value: String);
@@ -4023,7 +4306,7 @@ begin
   FLanguageName := Value;
 end;
 
-procedure TJDISLangOptions.SetRightToLeft(const Value: Boolean);
+procedure TJDISLangOptions.SetRightToLeft(const Value: TBoolDef);
 begin
   FRightToLeft := Value;
 end;

@@ -126,16 +126,70 @@ object Form1: TForm1
         Flags = []
       end>
     Tasks = <>
-    Dirs = <
-      item
-        Attribs = []
-        Flags = []
-      end>
+    Dirs = <>
     Files = <
       item
         Source = 'MyProg.exe'
         DestDir = '{app}'
         ExternalSize = 0
+        Attribs = [isaReadOnly, isaHidden]
+        Permissions = <>
+        Components.Strings = (
+          'critical')
+        Flags.Is32bit = False
+        Flags.Is64bit = False
+        Flags.AllowUnsafeFiles = False
+        Flags.CompareTimestamp = False
+        Flags.ConfirmOverwrite = False
+        Flags.CreateAllSubdirs = False
+        Flags.DeleteAfterInstall = False
+        Flags.DontCopy = False
+        Flags.DontVerifyChecksum = False
+        Flags.External = True
+        Flags.FontIsntTrueType = False
+        Flags.GacInstall = False
+        Flags.IgnoreVersion = True
+        Flags.IsReadme = False
+        Flags.NoCompression = False
+        Flags.NoEncryption = False
+        Flags.NoRegError = False
+        Flags.OnlyIfDestFileExists = False
+        Flags.OnlyIfDoesntExists = False
+        Flags.OverwriteReadOnly = False
+        Flags.PromptIfOlder = False
+        Flags.RecurseSubdirs = False
+        Flags.RegServer = False
+        Flags.RegTypeLib = False
+        Flags.ReplaceSameVersion = False
+        Flags.RestartReplace = False
+        Flags.SetNTFSCompression = False
+        Flags.SharedFile = False
+        Flags.Sign = False
+        Flags.SignOnce = False
+        Flags.SkipIfSourceDoesntExist = False
+        Flags.SolidBreak = False
+        Flags.SortFileByExtension = False
+        Flags.SortFileByName = False
+        Flags.Touch = False
+        Flags.UninsNoSharedFilePrompt = False
+        Flags.UninsRemoveReadOnly = False
+        Flags.UninsRestartDelete = False
+        Flags.UninsNeverUninstall = False
+        Flags.UnsetNTFSCompression = False
+      end
+      item
+        Source = 'MyProgConfig.ini'
+        DestDir = '{app}'
+        ExternalSize = 0
+        Attribs = []
+        Permissions = <
+          item
+            AccessType = ispaModify
+            Identifier = 'users'
+          end>
+        Components.Strings = (
+          'critical'
+          'additional')
         Flags.Is32bit = False
         Flags.Is64bit = False
         Flags.AllowUnsafeFiles = False
@@ -187,12 +241,7 @@ object Form1: TForm1
       end>
     Messages = <>
     CustomMessages = <>
-    LangOptions.LanguageCodePage = 0
-    LangOptions.DialogFontSize = 0
-    LangOptions.WelcomeFontSize = 0
-    LangOptions.TitleFontSize = 0
-    LangOptions.CopyrightFontSize = 0
-    LangOptions.RightToLeft = False
+    LangOptions.RightToLeft = bdFalse
     Registry = <>
     Run = <>
     UninstallDelete = <>
