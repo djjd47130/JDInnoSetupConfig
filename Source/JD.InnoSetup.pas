@@ -14,14 +14,13 @@ unit JD.InnoSetup;
 interface
 
 uses
-  System.Classes, System.SysUtils, System.Generics.Collections;
+  System.Classes, System.SysUtils, System.Generics.Collections,
+  JD.InnoSetup.Common, JD.InnoSetup.Defaults;
 
 type
   TJDInnoSetupScript = class;
   TJDISBaseCollection = class;
   TJDISBaseCollectionItem = class;
-  TJDISPermission = class;
-  TJDISPermissions = class;
   TJDISDefines = class;
   TJDISDefine = class;
   TJDISSetup = class;
@@ -63,29 +62,6 @@ type
   TJDISUninstallDelete = class;
   TJDISUninstallRuns = class;
   TJDISUninstallRun = class;
-
-  TBoolDef = (bdDefault, bdFalse, bdTrue);
-
-  TJDISAttrib = (isaReadOnly, isaHidden, isaSystem, isaNotContentIndexed);
-  TJDISAttribs = set of TJDISAttrib;
-
-
-
-  TBoolDefExp = (bdeDefault, bdeFalse, bdeTrue, bdeExpression);
-
-  TBoolDefExpression = class(TPersistent)
-  private
-    FExpression: String;
-    FValue: TBoolDefExp;
-    procedure SetExpression(const Value: String);
-    procedure SetValue(const Value: TBoolDefExp);
-  public
-    constructor Create;
-    destructor Destroy; override;
-  published
-    property Value: TBoolDefExp read FValue write SetValue default TBoolDefExp.bdeDefault;
-    property Expression: String read FExpression write SetExpression;
-  end;
 
 
 
@@ -185,33 +161,6 @@ type
 
 
 
-  TJDISPermissions = class(TOwnedCollection)
-  public
-    constructor Create(AOwner: TPersistent); reintroduce;
-    function GetFullText: String;
-  end;
-
-  TJDISPermissionAccessType = (ispaFull, ispaModify, ispaReadExec);
-
-  TJDISPermission = class(TCollectionItem)
-  private
-    FAccessType: TJDISPermissionAccessType;
-    FIdentifier: String;
-    procedure SetAccessType(const Value: TJDISPermissionAccessType);
-    procedure SetIdentifier(const Value: String);
-  protected
-    function GetDisplayName: String; override;
-  public
-    constructor Create(Collection: TCollection); override;
-    destructor Destroy; override;
-    function GetFullText: String; virtual;
-  published
-    property AccessType: TJDISPermissionAccessType read FAccessType write SetAccessType;
-    property Identifier: String read FIdentifier write SetIdentifier;
-  end;
-
-
-
 
 
   TJDISDefines = class(TJDISBaseCollection)
@@ -243,11 +192,11 @@ type
     FCompiler: TJDISSetupCompiler;
     FInstaller: TJDISSetupInstaller;
     FCosmetic: TJDISSetupCosmetic;
-    FObsolete: TJDISSetupObsolete;
+    //FObsolete: TJDISSetupObsolete;
     procedure SetCompiler(const Value: TJDISSetupCompiler);
     procedure SetCosmetic(const Value: TJDISSetupCosmetic);
     procedure SetInstaller(const Value: TJDISSetupInstaller);
-    procedure SetObsolete(const Value: TJDISSetupObsolete);
+    //procedure SetObsolete(const Value: TJDISSetupObsolete);
   public
     constructor Create(AOwner: TJDInnoSetupScript);
     destructor Destroy; override;
@@ -258,20 +207,6 @@ type
     property Cosmetic: TJDISSetupCosmetic read FCosmetic write SetCosmetic;
     //property Obsolete: TJDISSetupObsolete read FObsolete write SetObsolete;
   end;
-
-  TJDISCompression = (iscDefault, iscZip, iscZipVer, iscBzip, iscBzipVer, iscLzma,
-    iscLzmaFast, iscLzmaNormal, iscLzmaMax, iscLzmaUltra, iscLzmaUltra64,
-    iscLzma2, iscLzma2Fast, iscLzma2Normal, iscLzma2Max, iscLzma2Ultra,
-    iscLzma2Ultra64, iscNone);
-
-  TJDISInternalCompression = (isicNormal, isicZip, isicZipVer, isicBzip, isicBzipVer, isicLzma,
-    isicLzmaFast, isicLzmaNormal, isicLzmaMax, isicLzmaUltra, isicLzmaUltra64,
-    isicLzma2, isicLzma2Fast, isicLzma2Normal, isicLzma2Max, isicLzma2Ultra,
-    isicLzma2Ultra64, isicNone);
-
-  TJDISCompressMatchFinder = (iscmfDefault, iscmfHashChain, iscmfBinaryTree);
-
-  TJDISCompressSeparateProcess = (iscspDefault, iscspYes, iscspNo, iscspX86);
 
   TJDISSetupCompression = class(TPersistent)
   private
@@ -312,13 +247,13 @@ type
     procedure SetSolidCompression(const Value: TBoolDef);
   published
     property Compression: TJDISCompression
-      read FCompression write SetCompression default TJDISCompression.iscLzma2Max;
+      read FCompression write SetCompression default DEF_COMPRESSION;
     property CompressionVer: Integer
-      read FCompressionVer write SetCompressionVer default 1;
+      read FCompressionVer write SetCompressionVer default DEF_COMPRESSION_VER;
     property CompressionThreads: Integer
-      read FCompressionThreads write SetCompressionThreads default 0;
+      read FCompressionThreads write SetCompressionThreads default DEF_COMPRESSION_THREADS;
     property InternalCompressLevel: TJDISInternalCompression
-      read FInternalCompressLevel write SetInternalCompressLevel default TJDISInternalCompression.isicNormal;
+      read FInternalCompressLevel write SetInternalCompressLevel default DEF_INTERNAL_COMPRESS_LEVEL;
     property LZMAAlgorithm: Integer
       read FLZMAAlgorithm write SetLZMAAlgorithm stored IsLZMAAlgorithmStored;
     property LZMABlockSize: Int64
@@ -328,13 +263,13 @@ type
     property LZMAMatchFinder: TJDISCompressMatchFinder
       read FLZMAMatchFinder write SetLZMAMatchFinder stored IsLZMAMatchFinderStored;
     property LZMANumBlockThreads: Integer
-      read FLZMANumBlockThreads write SetLZMANumBlockThreads default 1;
+      read FLZMANumBlockThreads write SetLZMANumBlockThreads default DEF_LZMA_BLOCK_THREADS;
     property LZMANumFastBytes: Integer
       read FLZMANumFastBytes write SetLZMANumFastBytes stored IsLZMANumFastBytesStored;
     property LZMAUseSeparateProcess: TJDISCompressSeparateProcess
-      read FLZMAUseSeparateProcess write SetLZMAUseSeparateProcess default TJDISCompressSeparateProcess.iscspDefault;
+      read FLZMAUseSeparateProcess write SetLZMAUseSeparateProcess default DEF_LZMA_USE_SEPARATE_PROCESS;
     property SolidCompression: TBoolDef
-      read FSolidCompression write SetSolidCompression default TBoolDef.bdDefault;
+      read FSolidCompression write SetSolidCompression default DEF_SOLID_COMPRESSION;
   end;
 
   TJDISSetupSignature = class(TPersistent)
@@ -359,6 +294,7 @@ type
     constructor Create(AOwner: TJDISSetupCompiler);
     destructor Destroy; override;
     procedure AddToScript(AScript: TStrings);
+  published
     property SignedUninstaller: TBoolDef
       read FSignedUninstaller write SetSignedUninstaller stored IsSignedUninstallerStored;
     property SignedUninstallerDir: String
@@ -366,13 +302,13 @@ type
     property SignTool: String
       read FSignTool write SetSignTool;
     property SignToolMinimumTimeBetween: Integer
-      read FSignToolMinimumTimeBetween write SetSignToolMinimumTimeBetween default 0;
+      read FSignToolMinimumTimeBetween write SetSignToolMinimumTimeBetween default DEF_SIGN_TOOL_MIN_TIME_BETWEEN;
     property SignToolRetryCount: Integer
-      read FSignToolRetryCount write SetSignToolRetryCount default 2;
+      read FSignToolRetryCount write SetSignToolRetryCount default DEF_SIGN_TOOL_RETRY_COUNT;
     property SignToolRetryDelay: Integer
-      read FSignToolRetryDelay write SetSignToolRetryDelay default 500;
+      read FSignToolRetryDelay write SetSignToolRetryDelay default DEF_SIGN_TOOL_RETRY_DELAY;
     property SignToolRunMinimized: TBoolDef
-      read FSignToolRunMinimized write SetSignToolRunMinimized default TBoolDef.bdDefault;
+      read FSignToolRunMinimized write SetSignToolRunMinimized default DEF_SIGN_TOOL_RUN_MINIMIZED;
   end;
 
   TJDISSetupCompiler = class(TPersistent)
@@ -439,59 +375,63 @@ type
     destructor Destroy; override;
     procedure AddToScript(AScript: TStrings);
   published
-    property ASLRCompatible: TBoolDef read FASLRCompatible write SetASLRCompatible default TBoolDef.bdDefault;
-    property Compression: TJDISSetupCompression read FCompression write SetCompression;
-    property DEPCompatible: TBoolDef read FDEPCompatible write SetDEPCompatible default TBoolDef.bdDefault;
-    property DiskClusterSize: Integer read FDiskClusterSize write SetDiskClusterSize default 512;
-    property DiskSliceSize: Int64 read FDiskSliceSize write SetDiskSliceSize default 2100000000;
-    property DiskSpanning: TBoolDef read FDiskSpanning write SetDiskSpanning default TBoolDef.bdDefault;
-    property Encryption: TBoolDef read FEncryption write SetEncryption default TBoolDef.bdDefault;
+    property ASLRCompatible: TBoolDef
+      read FASLRCompatible write SetASLRCompatible default DEF_ASLR_COMPATIBLE;
+    property Compression: TJDISSetupCompression
+      read FCompression write SetCompression;
+    property DEPCompatible: TBoolDef
+      read FDEPCompatible write SetDEPCompatible default DEF_DEP_COMPATIBLE;
+    property DiskClusterSize: Integer
+      read FDiskClusterSize write SetDiskClusterSize default DEF_DISK_CLUSTER_SIZE;
+    property DiskSliceSize: Int64
+      read FDiskSliceSize write SetDiskSliceSize default DEF_DISK_SLICE_SIZE;
+    property DiskSpanning: TBoolDef
+      read FDiskSpanning write SetDiskSpanning default DEF_DISK_SPANNING;
+    property Encryption: TBoolDef
+      read FEncryption write SetEncryption default DEF_ENCRYPTION;
     property MergeDuplicateFiles: TBoolDef
-      read FMergeDuplicateFiles write SetMergeDuplicateFiles default TBoolDef.bdDefault;
-    property Output: TBoolDef read FOutput write SetOutput default TBoolDef.bdDefault;
-    property OutputBaseFilename: String read FOutputBaseFilename write SetOutputBaseFilename;
-    property OutputDir: String read FOutputDir write SetOutputDir;
-    property OutputManifestFile: String read FOutputManifestFile write SetOutputManifestFile;
-    property ReserveBytes: Int64 read FReserveBytes write SetReserveBytes default 0;
-    property Signature: TJDISSetupSignature read FSignature write SetSignature;
-    property SlicesPerDisk: Integer read FSlicesPerDisk write SetSlicesPerDisk default 1;
-    property SourceDir: String read FSourceDir write SetSourceDir;
+      read FMergeDuplicateFiles write SetMergeDuplicateFiles default DEF_MERGE_DUPLICATE_FILES;
+    property Output: TBoolDef
+      read FOutput write SetOutput default DEF_OUTPUT;
+    property OutputBaseFilename: String
+      read FOutputBaseFilename write SetOutputBaseFilename;
+    property OutputDir: String
+      read FOutputDir write SetOutputDir;
+    property OutputManifestFile: String
+      read FOutputManifestFile write SetOutputManifestFile;
+    property ReserveBytes: Int64
+      read FReserveBytes write SetReserveBytes default DEF_RESERVE_BYTES;
+    property Signature: TJDISSetupSignature
+      read FSignature write SetSignature;
+    property SlicesPerDisk: Integer
+      read FSlicesPerDisk write SetSlicesPerDisk default DEF_SLICES_PER_DISK;
+    property SourceDir: String
+      read FSourceDir write SetSourceDir;
     property TerminalServicesAware: TBoolDef
-      read FTerminalServicesAware write SetTerminalServicesAware default TBoolDef.bdDefault;
+      read FTerminalServicesAware write SetTerminalServicesAware default DEF_TERMINAL_SERVICES_AWARE;
     property UsedUserAreasWarning: TBoolDef
-      read FUsedUserAreasWarning write SetUsedUserAreasWarning default TBoolDef.bdDefault;
-    property UseSetupLdr: TBoolDef read FUseSetupLdr write SetUseSetupLdr default TBoolDef.bdDefault;
-    property VersionInfoCompany: String read FVersionInfoCompany write SetVersionInfoCompany;
-    property VersionInfoCopyright: String read FVersionInfoCopyright write SetVersionInfoCopyright;
-    property VersionInfoDescription: String read FVersionInfoDescription write SetVersionInfoDescription;
-    property VersionInfoOriginalFileName: String read FVersionInfoOriginalFileName write SetVersionInfoOriginalFileName;
-    property VersionInfoProductName: String read FVersionInfoProductName write SetVersionInfoProductName;
-    property VersionInfoProductTextVersion: String read FVersionInfoProductTextVersion write SetVersionInfoProductTextVersion;
-    property VersionInfoProductVersion: String read FVersionInfoProductVersion write SetVersionInfoProductVersion;
-    property VersionInfoTextVersion: String read FVersionInfoTextVersion write SetVersionInfoTextVersion;
-    property VersionInfoVersion: String read FVersionInfoVersion write SetVersionInfoVersion;
+      read FUsedUserAreasWarning write SetUsedUserAreasWarning default DEF_USED_USER_AREA_WARNING;
+    property UseSetupLdr: TBoolDef
+      read FUseSetupLdr write SetUseSetupLdr default DEF_USE_SETUP_LDR;
+    property VersionInfoCompany: String
+      read FVersionInfoCompany write SetVersionInfoCompany;
+    property VersionInfoCopyright: String
+      read FVersionInfoCopyright write SetVersionInfoCopyright;
+    property VersionInfoDescription: String
+      read FVersionInfoDescription write SetVersionInfoDescription;
+    property VersionInfoOriginalFileName: String
+      read FVersionInfoOriginalFileName write SetVersionInfoOriginalFileName;
+    property VersionInfoProductName: String
+      read FVersionInfoProductName write SetVersionInfoProductName;
+    property VersionInfoProductTextVersion: String
+      read FVersionInfoProductTextVersion write SetVersionInfoProductTextVersion;
+    property VersionInfoProductVersion: String
+      read FVersionInfoProductVersion write SetVersionInfoProductVersion;
+    property VersionInfoTextVersion: String
+      read FVersionInfoTextVersion write SetVersionInfoTextVersion;
+    property VersionInfoVersion: String
+      read FVersionInfoVersion write SetVersionInfoVersion;
   end;
-
-  TJDISArchitecture = (isaDefault, isaX86, isaX64, isaArm64, isaIa64);
-  TJDISArchitectures = set of TJDISArchitecture;
-
-  TJDISArchitecture64 = (isa64Default, isa64X64, isa64Arm64, isa64Ia64);
-  TJDISArchitectures64 = set of TJDISArchitecture64;
-
-  TJDISBoolForce = (isbfDefault, isbfFalse, isbfTrue, isbfForce);
-
-  TBoolDefAuto = (isbaDefault, isbaFalse, isbaTrue, isbaAuto);
-
-  TJDISLanguageDetectMethod = (isldDefault, isldUILanguage, isldLocale, isldNone);
-
-  TJDISUninstallLogMode = (isulDefault, isulAppend, isulNew, isulOverwrite);
-
-  TJDISTouchDateTimeType = (isttDefault, isttCurrent, isttNone, isttCustom);
-
-  TJDISPrivilegesReq = (isprDefault, isprAdmin, isprLowest);
-
-  TJDISPrivilegesReqOverride = (ispoCommandLine, ispoDialog);
-  TJDISPrivilegesReqOverrides = set of TJDISPrivilegesReqOverride;
 
   TJDISSetupInstaller = class(TPersistent)
   private
@@ -670,35 +610,36 @@ type
     procedure SetPrivilegesRequired(const Value: TJDISPrivilegesReq);
     procedure SetPrivilegesRequiredOverridesAllowed(
       const Value: TJDISPrivilegesReqOverrides);
+    procedure SetUninstallRegKey(const Value: TBoolDefExpression);
   public
     constructor Create(AOwner: TJDISSetup);
     destructor Destroy; override;
     procedure AddToScript(AScript: TStrings);
   published
     property AllowCancelDuringInstall: TBoolDef
-      read FAllowCancelDuringInstall write SetAllowCancelDuringInstall default TBoolDef.bdDefault;
+      read FAllowCancelDuringInstall write SetAllowCancelDuringInstall default DEF_ALLOW_CANCEL_DURING_INSTALL;
     property AllowNetworkDrive: TBoolDef
-      read FAllowNetworkDrive write SetAllowNetworkDrive default TBoolDef.bdDefault;
+      read FAllowNetworkDrive write SetAllowNetworkDrive default DEF_ALLOW_NETWORK_DRIVE;
     property AllowNoIcons: TBoolDef
-      read FAllowNoIcons write SetAllowNoIcons default TBoolDef.bdDefault;
+      read FAllowNoIcons write SetAllowNoIcons default DEF_ALLOW_NO_ICONS;
     property AllowRootDirectory: TBoolDef
-      read FAllowRootDirectory write SetAllowRootDirectory default TBoolDef.bdDefault;
+      read FAllowRootDirectory write SetAllowRootDirectory default DEF_ALLOW_ROOT_DIRECTORY;
     property AllowUNCPath: TBoolDef
-      read FAllowUNCPath write SetAllowUNCPath default TBoolDef.bdDefault;
+      read FAllowUNCPath write SetAllowUNCPath default DEF_ALLOW_UNC_PATH;
     property AlwaysRestart: TBoolDef
-      read FAlwaysRestart write SetAlwaysRestart default TBoolDef.bdDefault;
+      read FAlwaysRestart write SetAlwaysRestart default DEF_ALWAYS_RESTART;
     property AlwaysShowComponentsList: TBoolDef
-      read FAlwaysShowComponentsList write SetAlwaysShowComponentsList default TBoolDef.bdDefault;
+      read FAlwaysShowComponentsList write SetAlwaysShowComponentsList default DEF_ALWAYS_SHOW_COMP_LIST;
     property AlwaysShowDirOnReadyPage: TBoolDef
-      read FAlwaysShowDirOnReadyPage write SetAlwaysShowDirOnReadyPage default TBoolDef.bdDefault;
+      read FAlwaysShowDirOnReadyPage write SetAlwaysShowDirOnReadyPage default DEF_ALWAYS_SHOW_DIR_ON_READY_PAGE;
     property AlwaysShowGroupOnReadyPage: TBoolDef
-      read FAlwaysShowGroupOnReadyPage write SetAlwaysShowGroupOnReadyPage default TBoolDef.bdDefault;
+      read FAlwaysShowGroupOnReadyPage write SetAlwaysShowGroupOnReadyPage default DEF_ALWAYS_SHOW_GROUP_ON_READY_PAGE;
     property AlwaysUsePersonalGroup: TBoolDef
-      read FAlwaysUsePersonalGroup write SetAlwaysUsePersonalGroup default TBoolDef.bdDefault;
+      read FAlwaysUsePersonalGroup write SetAlwaysUsePersonalGroup default DEF_ALWAYS_USE_PERSONAL_GROUP;
     property AppendDefaultDirName: TBoolDef
-      read FAppendDefaultDirName write SetAppendDefaultDirName default TBoolDef.bdDefault;
+      read FAppendDefaultDirName write SetAppendDefaultDirName default DEF_APPEND_DEFAULT_DIR_NAME;
     property AppendDefaultGroupName: TBoolDef
-      read FAppendDefaultGroupName write SetAppendDefaultGroupName default TBoolDef.bdDefault;
+      read FAppendDefaultGroupName write SetAppendDefaultGroupName default DEF_APPEND_DEFAULT_GROUP_NAME;
     property AppComments: String read FAppComments write SetAppComments;
     property AppContact: String read FAppContact write SetAppContact;
     property AppId: String read FAppId write SetAppId;
@@ -717,37 +658,64 @@ type
       read FArchitecturesAllowed write SetArchitecturesAllowed;
     property ArchitecturesInstallIn64BitMode: TJDISArchitectures64
       read FArchitecturesInstallIn64BitMode write SetArchitecturesInstallIn64BitMode;
-    property ChangesAssociations: TBoolDefExpression read FChangesAssociations write SetChangesAssociations;
-    property ChangesEnvironment: TBoolDefExpression read FChangesEnvironment write SetChangesEnvironment;
-    property CloseApplications: TJDISBoolForce read FCloseApplications write SetCloseApplications default TJDISBoolForce.isbfDefault;
-    property CloseApplicationsFilter: String read FCloseApplicationsFilter write SetCloseApplicationsFilter;
-    property CreateAppDir: TBoolDef read FCreateAppDir write SetCreateAppDir default TBoolDef.bdDefault;
-    property CreateUninstallRegKey: TBoolDefExpression read FCreateUninstallRegKey;
-    property DefaultDialogFontName: String read FDefaultDialogFontName write SetDefaultDialogFontName;
-    property DefaultDirName: String read FDefaultDirName write SetDefaultDirName;
-    property DefaultGroupName: String read FDefaultGroupName write SetDefaultGroupName;
-    property DefaultUserInfoName: String read FDefaultUserInfoName write SetDefaultUserInfoName;
-    property DefaultUserInfoOrg: String read FDefaultUserInfoOrg write SetDefaultUserInfoOrg;
-    property DefaultUserInfoSerial: String read FDefaultUserInfoSerial write SetDefaultUserInfoSerial;
-    property DirExistsWarning: TBoolDefAuto read FDirExistsWarning write SetDirExistsWarning;
-    property DisableDirPage: TBoolDefAuto read FDisableDirPage write SetDisableDirPage;
-    property DisableFinishedPage: TBoolDef read FDisableFinishedPage write SetDisableFinishedPage default TBoolDef.bdDefault;
-    property DisableProgramGroupPage: TBoolDefAuto read FDisableProgramGroupPage write SetDisableProgramGroupPage;
-    property DisableReadyMemo: TBoolDef read FDisableReadyMemo write SetDisableReadyMemo default TBoolDef.bdDefault;
-    property DisableReadyPage: TBoolDef read FDisableReadyPage write SetDisableReadyPage default TBoolDef.bdDefault;
-    property DisableStartupPrompt: TBoolDef read FDisableStartupPrompt write SetDisableStartupPrompt default TBoolDef.bdDefault;
-    property DisableWelcomePage: TBoolDef read FDisableWelcomePage write SetDisableWelcomePage default TBoolDef.bdDefault;
+    property ChangesAssociations: TBoolDefExpression
+      read FChangesAssociations write SetChangesAssociations;
+    property ChangesEnvironment: TBoolDefExpression
+      read FChangesEnvironment write SetChangesEnvironment;
+    property CloseApplications: TJDISBoolForce
+      read FCloseApplications write SetCloseApplications default TJDISBoolForce.isbfDefault;
+    property CloseApplicationsFilter: String
+      read FCloseApplicationsFilter write SetCloseApplicationsFilter;
+    property CreateAppDir: TBoolDef
+      read FCreateAppDir write SetCreateAppDir default TBoolDef.bdDefault;
+    property CreateUninstallRegKey: TBoolDefExpression
+      read FCreateUninstallRegKey write SetUninstallRegKey;
+    property DefaultDialogFontName: String
+      read FDefaultDialogFontName write SetDefaultDialogFontName;
+    property DefaultDirName: String
+      read FDefaultDirName write SetDefaultDirName;
+    property DefaultGroupName: String
+      read FDefaultGroupName write SetDefaultGroupName;
+    property DefaultUserInfoName: String
+      read FDefaultUserInfoName write SetDefaultUserInfoName;
+    property DefaultUserInfoOrg: String
+      read FDefaultUserInfoOrg write SetDefaultUserInfoOrg;
+    property DefaultUserInfoSerial: String
+      read FDefaultUserInfoSerial write SetDefaultUserInfoSerial;
+    property DirExistsWarning: TBoolDefAuto
+      read FDirExistsWarning write SetDirExistsWarning;
+    property DisableDirPage: TBoolDefAuto
+      read FDisableDirPage write SetDisableDirPage;
+    property DisableFinishedPage: TBoolDef
+      read FDisableFinishedPage write SetDisableFinishedPage default TBoolDef.bdDefault;
+    property DisableProgramGroupPage: TBoolDefAuto
+      read FDisableProgramGroupPage write SetDisableProgramGroupPage;
+    property DisableReadyMemo: TBoolDef
+      read FDisableReadyMemo write SetDisableReadyMemo default TBoolDef.bdDefault;
+    property DisableReadyPage: TBoolDef
+      read FDisableReadyPage write SetDisableReadyPage default TBoolDef.bdDefault;
+    property DisableStartupPrompt: TBoolDef
+      read FDisableStartupPrompt write SetDisableStartupPrompt default TBoolDef.bdDefault;
+    property DisableWelcomePage: TBoolDef
+      read FDisableWelcomePage write SetDisableWelcomePage default TBoolDef.bdDefault;
     property EnableDirDoesntExistWarning: TBoolDef
       read FEnableDirDoesntExistWarning write SetEnableDirDoesntExistWarning default TBoolDef.bdDefault;
-    property ExtraDiskSpaceRequired: Int64 read FExtraDiskSpaceRequired write SetExtraDiskSpaceRequired default 0;
-    property InfoAfterFile: String read FInfoAfterFile write SetInfoAfterFile;
-    property InfoBeforeFile: String read FInfoBeforeFile write SetInfoBeforeFile;
+    property ExtraDiskSpaceRequired: Int64
+      read FExtraDiskSpaceRequired write SetExtraDiskSpaceRequired default 0;
+    property InfoAfterFile: String
+      read FInfoAfterFile write SetInfoAfterFile;
+    property InfoBeforeFile: String
+      read FInfoBeforeFile write SetInfoBeforeFile;
     property LanguageDetectionMethod: TJDISLanguageDetectMethod
       read FLanguageDetectionMethod write SetLanguageDetectionMethod default TJDISLanguageDetectMethod.isldDefault;
-    property LicenseFile: String read FLicenseFile write SetLicenseFile;
-    property MinVersion: String read FMinVersion write SetMinVersion;
-    property OnlyBelowVersion: String read FOnlyBelowVersion write SetOnlyBelowVersion;
-    property Password: String read FPassword write SetPassword;
+    property LicenseFile: String
+      read FLicenseFile write SetLicenseFile;
+    property MinVersion: String
+      read FMinVersion write SetMinVersion;
+    property OnlyBelowVersion: String
+      read FOnlyBelowVersion write SetOnlyBelowVersion;
+    property Password: String
+      read FPassword write SetPassword;
     property PrivilegesRequired: TJDISPrivilegesReq
       read FPrivilegesRequired write SetPrivilegesRequired default TJDISPrivilegesReq.isprDefault;
     property PrivilegesRequiredOverridesAllowed: TJDISPrivilegesReqOverrides
@@ -758,12 +726,14 @@ type
       read FRestartIfNeededByRun write SetRestartIfNeededByRun default TBoolDef.bdDefault;
     property SetupLogging: TBoolDef
       read FSetupLogging write SetSetupLogging default TBoolDef.bdDefault;
-    property SetupMutex: String read FSetupMutex write SetSetupMutex;
+    property SetupMutex: String
+      read FSetupMutex write SetSetupMutex;
     property ShowLanguageDialog: TBoolDefAuto
       read FShowLanguageDialog write SetShowLanguageDialog default TBoolDefAuto.isbaDefault;
     property TimeStampRounding: Integer
       read FTimeStampRounding write SetTimeStampRounding default 2;
-    property TimeStampsInUTC: TBoolDef read FTimeStampsInUTC write SetTimeStampsInUTC;
+    property TimeStampsInUTC: TBoolDef
+      read FTimeStampsInUTC write SetTimeStampsInUTC;
     property TouchDate: TJDISTouchDateTimeType
       read FTouchDate write SetTouchDate default TJDISTouchDateTimeType.isttDefault;
     property TouchDateValue: TDate
@@ -772,7 +742,8 @@ type
       read FTouchTime write SetTouchTime default TJDISTouchDateTimeType.isttDefault;
     property TouchTimeValue: TTime
       read FTouchTimeValue write SetTouchTimeValue;
-    property Uninstallable: TBoolDefExpression read FUninstallable write SetUninstallable;
+    property Uninstallable: TBoolDefExpression
+      read FUninstallable write SetUninstallable;
     property UninstallDisplayIcon: String
       read FUninstallDisplayIcon write SetUninstallDisplayIcon;
     property UninstallDisplayName: String
@@ -804,12 +775,6 @@ type
     property UserInfoPage: TBoolDef
       read FUserInfoPage write SetUserInfoPage default TBoolDef.bdDefault;
   end;
-
-  TJDISBackColorDir = (iscdTopToBottom, iscdLeftToRight);
-
-  TJDISWizardStyle = (iswsClassic, iswsModern);
-
-  TJDISWizardImageAlphaFormat = (isafNone, isafDefined, isafPreMultiplied);
 
   TJDISSetupWizardSize = class(TPersistent)
   private
@@ -952,9 +917,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISTypeFlag = (istfIsCustom);
-  TJDISTypeFlags = set of TJDISTypeFlag;
-
   TJDISType = class(TJDISBaseCollectionItem)
   private
     FName: String;
@@ -981,10 +943,6 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
-
-  TJDISComponentFlag = (iscfCheckAbleAlone, iscfDontInheritCheck, iscfExclusive,
-    iscfFixed, iscfRestart, iscfDisableNounInstallWarning);
-  TJDISComponentFlags = set of TJDISComponentFlag;
 
   TJDISComponent = class(TJDISBaseCollectionItem)
   private
@@ -1020,10 +978,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISTaskFlag = (istfCheckAbleAlone, istfCheckedOnce, istfDontInheritCheck,
-    istfExclusive, istfRestart, istfUnchecked);
-  TJDISTaskFlags = set of TJDISTaskFlag;
-
   TJDISTask = class(TJDISBaseCollectionItem)
   private
     FComponents: TStringList;
@@ -1057,10 +1011,6 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
-
-  TJDISDirFlag = (isdfDeleteAfterInstall, isdfSetNTFSCompression,
-    isdfUninsAlwaysUninstall, isdfUninsNeverUninstall, isdfUnsetNTFSCompression);
-  TJDISDirFlags = set of TJDISDirFlag;
 
   TJDISDir = class(TJDISBaseCollectionItem)
   private
@@ -1276,11 +1226,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISIconFlag = (isifCloseOnExit, isifCreateOnlyIfFileExists, isifDontCloseOnExit,
-    isifExcludeFromShowInNewInstall, isifFolderShortcut, isifPreventPinning,
-    isifRunMaximized, isifRunMinimized, isifUninsNeverUninstall, isifUseAppPaths);
-  TJDISIconFlags = set of TJDISIconFlag;
-
   TJDISIcon = class(TJDISBaseCollectionItem)
   private
     FFilename: String;
@@ -1329,10 +1274,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISIniFlag = (isinfCreateKeyIfDoesntExist, isinfUninsDeleteEntry,
-    isinfUninsDeleteSection, isinfUninsDeleteSectionIfEmpty);
-  TJDISIniFlags = set of TJDISIniFlag;
-
   TJDISIni = class(TJDISBaseCollectionItem)
   private
     FKey: String;
@@ -1365,8 +1306,6 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
-
-  TJDISInstallDeleteType = (isdtFiles, isdtFilesAndOrDirs, isdtDirIfEmpty);
 
   TJDISInstallDelete = class(TJDISBaseCollectionItem)
   private
@@ -1524,17 +1463,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISRegRoot = (isrrCurrentUser, isrrLocalMachine, isrrClassesRoot,
-    isrrUsers, isrrCurrentConfig, isrrAutoUserMachine);
-
-  TJDISRegType = (isrtNone, isrtString, isrtExpandSz, isrtMultiSz,
-    isrtDword, isrtQword, isrtBinary);
-
-  TJDISRegFlag = (isrfCreateValueIfDoesntExist, isrfDeleteKey, isrfDeleteValue,
-    isrfDontCreateKey, isrfNoError, isrfPreserveStringType, isrfUninsClearValue,
-    isrfUninsDeleteKey, isrfUninsDeleteKeyIfEmpty, isrfUninsDeleteValue);
-  TJDISRegFlags = set of TJDISRegFlag;
-
   TJDISRegistryItem = class(TJDISBaseCollectionItem)
   private
     FValueType: TJDISRegType;
@@ -1573,13 +1501,6 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
-
-  TJDISRunFlag = (isrnf32bit, isrnf64bit, isrnfHideWizard, isrnfNoWait,
-    isrnfPostInstall, isrnfRunAsCurrentUser, isrnfRunAsOriginalUser,
-    isrnfRunHidden, isrnfRunMaximized, isrnfRunMinimized, isrnfShellExec,
-    isrnfSkipIfDoesntExist, isrnfSkipIfNotSilent, isrnfSkipIfSilent,
-    isrnfUnchecked, isrnfWaitUntilIdle, isrnfWaitUntilTerminated);
-  TJDISRunFlags = set of TJDISRunFlag;
 
   TJDISRun = class(TJDISBaseCollectionItem)
   private
@@ -1623,8 +1544,6 @@ type
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
 
-  TJDISUninstallDeleteType = (isudtFiles, isudtFilesAndOrDirs, isudtDirIfEmpty);
-
   TJDISUninstallDelete = class(TJDISBaseCollectionItem)
   private
     FName: String;
@@ -1648,13 +1567,6 @@ type
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
   end;
-
-  TJDISUninstallRunFlag = (isurf32bit, isurf64bit, isurfHideWizard,
-    isurfNoWait, isurfPostInstall, isurfRunAsCurrentUser, isurfRunAsOriginalUser,
-    isurfRunHidden, isurfRunMaximized, isurfRunMinimized, isurfShellExec,
-    isurfSkipIfDoesntExist, isurfSkipIfNotSilent, isurfSkipIfSilent,
-    isurfUnchecked, isurfWaitUntilIdle, isurfWaitUntilTerminated);
-  TJDISUninstallRunFlags = set of TJDISUninstallRunFlag;
 
   TJDISUninstallRun = class(TJDISBaseCollectionItem)
   private
@@ -1691,105 +1603,7 @@ type
 
 
 
-function GetSpacedList(AStrings: TStrings): String;
-
 implementation
-
-function GetSpacedList(AStrings: TStrings): String;
-var
-  X: Integer;
-begin
-  Result:= '';
-  for X := 0 to AStrings.Count-1 do begin
-    if Result <> '' then
-      Result:= Result + ' ';
-    Result:= Result + AStrings[X];
-  end;
-end;
-
-{ TBoolDefExpression }
-
-constructor TBoolDefExpression.Create;
-begin
-
-end;
-
-destructor TBoolDefExpression.Destroy;
-begin
-
-  inherited;
-end;
-
-procedure TBoolDefExpression.SetExpression(const Value: String);
-begin
-  FExpression := Value;
-  FValue:= bdeExpression;
-end;
-
-procedure TBoolDefExpression.SetValue(const Value: TBoolDefExp);
-begin
-  FValue := Value;
-end;
-
-{ TJDISPermissions }
-
-constructor TJDISPermissions.Create(AOwner: TPersistent);
-begin
-  inherited Create(AOwner, TJDISPermission);
-end;
-
-function TJDISPermissions.GetFullText: String;
-var
-  X: Integer;
-  P: TJDISPermission;
-begin
-  Result:= '';
-  for X := 0 to Count-1 do begin
-    P:= TJDISPermission(Items[X]);
-    if Result <> '' then
-      Result:= Result + ' ';
-    Result:= Result + P.GetFullText;
-  end;
-end;
-
-{ TJDISPermission }
-
-constructor TJDISPermission.Create(Collection: TCollection);
-begin
-  inherited;
-
-end;
-
-destructor TJDISPermission.Destroy;
-begin
-
-  inherited;
-end;
-
-function TJDISPermission.GetDisplayName: String;
-begin
-  Result:= GetFullText;
-end;
-
-function TJDISPermission.GetFullText: String;
-begin
-  Result:= FIdentifier+'-';
-  case Self.FAccessType of
-    ispaFull:     Result:= Result + 'full';
-    ispaModify:   Result:= Result + 'modify';
-    ispaReadExec: Result:= Result + 'readexec';
-  end;
-end;
-
-procedure TJDISPermission.SetAccessType(const Value: TJDISPermissionAccessType);
-begin
-  FAccessType := Value;
-end;
-
-procedure TJDISPermission.SetIdentifier(const Value: String);
-begin
-  FIdentifier := Value;
-end;
 
 { TJDInnoSetupScript }
 
@@ -2107,12 +1921,12 @@ begin
   FCompiler:= TJDISSetupCompiler.Create(Self);
   FInstaller:= TJDISSetupInstaller.Create(Self);
   FCosmetic:= TJDISSetupCosmetic.Create(Self);
-  FObsolete:= TJDISSetupObsolete.Create(Self);
+  //FObsolete:= TJDISSetupObsolete.Create(Self);
 end;
 
 destructor TJDISSetup.Destroy;
 begin
-  FObsolete.Free;
+  //FObsolete.Free;
   FCosmetic.Free;
   FInstaller.Free;
   FCompiler.Free;
@@ -2126,7 +1940,7 @@ begin
   FCompiler.AddToScript(AScript);
   FInstaller.AddToScript(AScript);
   FCosmetic.AddToScript(AScript);
-  FObsolete.AddToScript(AScript);
+  //FObsolete.AddToScript(AScript);
 end;
 
 procedure TJDISSetup.SetCompiler(const Value: TJDISSetupCompiler);
@@ -2144,10 +1958,12 @@ begin
   FInstaller.Assign(Value);
 end;
 
+{
 procedure TJDISSetup.SetObsolete(const Value: TJDISSetupObsolete);
 begin
   FObsolete.Assign(Value);
 end;
+}
 
 { TJDISSetupCompression }
 
@@ -2819,18 +2635,18 @@ begin
   if T <> '' then
     AP('ArchitecturesInstallIn64BitMode', T);
 
-  case FChangesAssociations.FValue of
+  case FChangesAssociations.Value of
     bdeDefault:     ;
     bdeFalse:       AST('ChangesAssociations', 'no');
     bdeTrue:        AST('ChangesAssociations', 'yes');
-    bdeExpression:  AST('ChangesAssociations', FChangesAssociations.FExpression);
+    bdeExpression:  AST('ChangesAssociations', FChangesAssociations.Expression);
   end;
 
-  case FChangesEnvironment.FValue of
+  case FChangesEnvironment.Value of
     bdeDefault:     ;
     bdeFalse:       AST('ChangesEnvironment', 'no');
     bdeTrue:        AST('ChangesEnvironment', 'yes');
-    bdeExpression:  AST('ChangesEnvironment', FChangesEnvironment.FExpression);
+    bdeExpression:  AST('ChangesEnvironment', FChangesEnvironment.Expression);
   end;
 
   case Self.FCloseApplications of
@@ -2844,11 +2660,11 @@ begin
 
   ABD('CreateAppDir', Self.FCreateAppDir);
 
-  case FCreateUninstallRegKey.FValue of
+  case FCreateUninstallRegKey.Value of
     bdeDefault:     ;
     bdeFalse:       AST('CreateUninstallRegKey', 'no');
     bdeTrue:        AST('CreateUninstallRegKey', 'yes');
-    bdeExpression:  AST('CreateUninstallRegKey', FCreateUninstallRegKey.FExpression);
+    bdeExpression:  AST('CreateUninstallRegKey', FCreateUninstallRegKey.Expression);
   end;
 
   AST('DefaultDialogFontName', Self.FDefaultDialogFontName);
@@ -2969,11 +2785,11 @@ begin
     isttCustom:   AST('TouchTime', TimeToStr(FTouchTimeValue));
   end;
 
-  case FUninstallable.FValue of
+  case FUninstallable.Value of
     bdeDefault:     ;
     bdeFalse:       AST('Uninstallable', 'no');
     bdeTrue:        AST('Uninstallable', 'yes');
-    bdeExpression:  AST('Uninstallable', FUninstallable.FExpression);
+    bdeExpression:  AST('Uninstallable', FUninstallable.Expression);
   end;
 
   AST('UninstallDisplayIcon', FUninstallDisplayIcon);
@@ -3413,6 +3229,12 @@ procedure TJDISSetupInstaller.SetUninstallLogMode(
   const Value: TJDISUninstallLogMode);
 begin
   FUninstallLogMode := Value;
+end;
+
+procedure TJDISSetupInstaller.SetUninstallRegKey(
+  const Value: TBoolDefExpression);
+begin
+  FCreateUninstallRegKey.Assign(Value);
 end;
 
 procedure TJDISSetupInstaller.SetUninstallRestartComputer(const Value: TBoolDef);
