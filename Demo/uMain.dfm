@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'JD Inno Setup Script Demo'
-  ClientHeight = 544
-  ClientWidth = 787
+  ClientHeight = 458
+  ClientWidth = 838
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -17,8 +17,8 @@ object Form1: TForm1
   object txtScript: TMemo
     Left = 0
     Top = 39
-    Width = 787
-    Height = 505
+    Width = 838
+    Height = 419
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET

@@ -72,6 +72,7 @@ type
 
 
   TBoolDefExp = (bdeDefault, bdeFalse, bdeTrue, bdeExpression);
+
   TBoolDefExpression = class(TPersistent)
   private
     FExpression: String;
@@ -85,6 +86,8 @@ type
     property Value: TBoolDefExp read FValue write SetValue default TBoolDefExp.bdeDefault;
     property Expression: String read FExpression write SetExpression;
   end;
+
+
 
 
   TJDInnoSetupScript = class(TComponent)
@@ -154,6 +157,7 @@ type
     property UninstallDelete: TJDISUninstallDeletes read FUninstallDelete write SetUninstallDelete;
     property UninstallRun: TJDISUninstallRuns read FUninstallRun write SetUninstallRun;
   end;
+
 
 
 
@@ -229,6 +233,7 @@ type
     property Name: String read FName write SetName;
     property Value: String read FValue write SetValue;
   end;
+
 
 
 
@@ -335,18 +340,39 @@ type
   TJDISSetupSignature = class(TPersistent)
   private
     FOwner: TJDISSetupCompiler;
+    FSignToolRetryCount: Integer;
+    FSignToolRunMinimized: TBoolDef;
+    FSignToolMinimumTimeBetween: Integer;
+    FSignTool: String;
+    FSignedUninstaller: TBoolDef;
+    FSignToolRetryDelay: Integer;
+    FSignedUninstallerDir: String;
+    procedure SetSignedUninstaller(const Value: TBoolDef);
+    procedure SetSignedUninstallerDir(const Value: String);
+    procedure SetSignTool(const Value: String);
+    procedure SetSignToolMinimumTimeBetween(const Value: Integer);
+    procedure SetSignToolRetryCount(const Value: Integer);
+    procedure SetSignToolRetryDelay(const Value: Integer);
+    procedure SetSignToolRunMinimized(const Value: TBoolDef);
+    function IsSignedUninstallerStored: Boolean;
   public
     constructor Create(AOwner: TJDISSetupCompiler);
     destructor Destroy; override;
     procedure AddToScript(AScript: TStrings);
-    //TODO
-    //property SignedUninstaller
-    //property SignedUninstallerDir
-    //property SignTool
-    //property SignToolMinimumTimeBetween
-    //property SignToolRetryCount
-    //property SignToolRetryDelay
-    //property SignToolRunMinimized
+    property SignedUninstaller: TBoolDef
+      read FSignedUninstaller write SetSignedUninstaller stored IsSignedUninstallerStored;
+    property SignedUninstallerDir: String
+      read FSignedUninstallerDir write SetSignedUninstallerDir;
+    property SignTool: String
+      read FSignTool write SetSignTool;
+    property SignToolMinimumTimeBetween: Integer
+      read FSignToolMinimumTimeBetween write SetSignToolMinimumTimeBetween default 0;
+    property SignToolRetryCount: Integer
+      read FSignToolRetryCount write SetSignToolRetryCount default 2;
+    property SignToolRetryDelay: Integer
+      read FSignToolRetryDelay write SetSignToolRetryDelay default 500;
+    property SignToolRunMinimized: TBoolDef
+      read FSignToolRunMinimized write SetSignToolRunMinimized default TBoolDef.bdDefault;
   end;
 
   TJDISSetupCompiler = class(TPersistent)
@@ -920,6 +946,7 @@ type
 
 
 
+
   TJDISTypes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -945,6 +972,8 @@ type
     property Description: String read FDescription write SetDescription;
     property Flags: TJDISTypeFlags read FFlags write SetFlags;
   end;
+
+
 
 
 
@@ -984,6 +1013,8 @@ type
 
 
 
+
+
   TJDISTasks = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1020,6 +1051,8 @@ type
 
 
 
+
+
   TJDISDirs = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1049,6 +1082,8 @@ type
     property Permissions: TJDISPermissions read FPermissions write SetPermissions;
     property Flags: TJDISDirFlags read FFlags write SetFlags;
   end;
+
+
 
 
 
@@ -1234,6 +1269,8 @@ type
 
 
 
+
+
   TJDISIcons = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1285,6 +1322,8 @@ type
 
 
 
+
+
   TJDISInis = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1320,6 +1359,8 @@ type
 
 
 
+
+
   TJDISInstallDeletes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1341,6 +1382,8 @@ type
     property &Type: TJDISInstallDeleteType read FType write SetType;
     property Name: String read FName write SetName;
   end;
+
+
 
 
 
@@ -1375,6 +1418,8 @@ type
 
 
 
+
+
   TJDISMessages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1397,6 +1442,8 @@ type
 
 
 
+
+
   TJDISCustomMessages = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1416,6 +1463,8 @@ type
     property Name: String read FName write SetName;
     property Value: String read FValue write SetValue;
   end;
+
+
 
 
 
@@ -1469,6 +1518,7 @@ type
 
 
 
+
   TJDISRegistry = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1514,6 +1564,8 @@ type
     property Permissions: TJDISPermissions read FPermissions write SetPermissions;
     property Flags: TJDISRegFlags read FFlags write SetFlags;
   end;
+
+
 
 
 
@@ -1565,6 +1617,7 @@ type
 
 
 
+
   TJDISUninstallDeletes = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -1586,6 +1639,8 @@ type
     property &Type: TJDISInstallDeleteType read FType write SetType;
     property Name: String read FName write SetName;
   end;
+
+
 
 
 
@@ -2297,6 +2352,8 @@ end;
 constructor TJDISSetupSignature.Create(AOwner: TJDISSetupCompiler);
 begin
   FOwner:= AOwner;
+  FSignToolRetryCount:= 2;
+  FSignToolRetryDelay:= 500;
 
 end;
 
@@ -2308,8 +2365,78 @@ end;
 
 procedure TJDISSetupSignature.AddToScript(AScript: TStrings);
 begin
-  //TODO
 
+  case FSignedUninstaller of
+    bdDefault:  ;
+    bdFalse:    AScript.Append('SignedUninstaller=no');
+    bdTrue:     AScript.Append('SignedUninstaller=yes');
+  end;
+
+  if FSignedUninstallerDir <> '' then
+    AScript.Append('SignedUninstallerDir='+FSignedUninstallerDir);
+
+  if FSignTool <> '' then
+    AScript.Append('SignTool='+FSignTool);
+
+  if FSignToolMinimumTimeBetween <> 0 then
+    AScript.Append('SignToolMinimumTimeBetween='+IntToStr(FSignToolMinimumTimeBetween));
+
+  if FSignToolRetryCount <> 2 then
+    AScript.Append('SignToolRetryCount='+IntToStr(FSignToolRetryCount));
+
+  if FSignToolRetryDelay <> 500 then
+    AScript.Append('SignToolRetryDelay'+IntToStr(FSignToolRetryDelay));
+
+  case FSignToolRunMinimized of
+    bdDefault:  ;
+    bdFalse:    AScript.Append('SignToolRunMinimized=no');
+    bdTrue:     AScript.Append('SignToolRunMinimized=yes');
+  end;
+
+
+
+end;
+
+function TJDISSetupSignature.IsSignedUninstallerStored: Boolean;
+begin
+  Result:= (Self.FSignedUninstaller <> TBoolDef.bdDefault) or
+    (Self.FSignTool <> '');
+end;
+
+procedure TJDISSetupSignature.SetSignedUninstaller(const Value: TBoolDef);
+begin
+  FSignedUninstaller := Value;
+end;
+
+procedure TJDISSetupSignature.SetSignedUninstallerDir(const Value: String);
+begin
+  FSignedUninstallerDir := Value;
+end;
+
+procedure TJDISSetupSignature.SetSignTool(const Value: String);
+begin
+  FSignTool := Value;
+end;
+
+procedure TJDISSetupSignature.SetSignToolMinimumTimeBetween(
+  const Value: Integer);
+begin
+  FSignToolMinimumTimeBetween := Value;
+end;
+
+procedure TJDISSetupSignature.SetSignToolRetryCount(const Value: Integer);
+begin
+  FSignToolRetryCount := Value;
+end;
+
+procedure TJDISSetupSignature.SetSignToolRetryDelay(const Value: Integer);
+begin
+  FSignToolRetryDelay := Value;
+end;
+
+procedure TJDISSetupSignature.SetSignToolRunMinimized(const Value: TBoolDef);
+begin
+  FSignToolRunMinimized := Value;
 end;
 
 { TJDISSetupCompiler }
