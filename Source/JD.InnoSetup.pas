@@ -186,8 +186,6 @@ type
 
 
 
-
-
   TJDISDefines = class(TJDISBaseCollection)
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
@@ -213,6 +211,8 @@ type
 
   TJDISSetup = class(TPersistent)
   private
+    FXTextBefore: TStringList;
+    FXTextAfter: TStringList;
     FOwner: TJDInnoSetupScript;
     FCompiler: TJDISSetupCompiler;
     FInstaller: TJDISSetupInstaller;
@@ -222,6 +222,10 @@ type
     procedure SetCosmetic(const Value: TJDISSetupCosmetic);
     procedure SetInstaller(const Value: TJDISSetupInstaller);
     //procedure SetObsolete(const Value: TJDISSetupObsolete);
+    function GetXTextAfter: TStrings;
+    function GetXTextBefore: TStrings;
+    procedure SetXTextAfter(const Value: TStrings);
+    procedure SetXTextBefore(const Value: TStrings);
   public
     constructor Create(AOwner: TJDInnoSetupScript);
     destructor Destroy; override;
@@ -231,6 +235,8 @@ type
     property Installer: TJDISSetupInstaller read FInstaller write SetInstaller;
     property Cosmetic: TJDISSetupCosmetic read FCosmetic write SetCosmetic;
     //property Obsolete: TJDISSetupObsolete read FObsolete write SetObsolete;
+    property XTextBefore: TStrings read GetXTextBefore write SetXTextBefore;
+    property XTextAfter: TStrings read GetXTextAfter write SetXTextAfter;
   end;
 
   TJDISSetupCompression = class(TPersistent)
@@ -1253,6 +1259,7 @@ type
 
   TJDISIcon = class(TJDISBaseCollectionItem)
   private
+    FComponents: TStringList;
     FFilename: String;
     FName: String;
     FIconIndex: Integer;
@@ -1273,11 +1280,14 @@ type
     procedure SetName(const Value: String);
     procedure SetParameters(const Value: String);
     procedure SetWorkingDir(const Value: String);
+    function GetComponents: TStrings;
+    procedure SetComponents(const Value: TStrings);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
   published
+    property Components: TStrings read GetComponents write SetComponents;
     property Name: String read FName write SetName;
     property Filename: String read FFilename write SetFilename;
     property Parameters: String read FParameters write SetParameters;
@@ -1434,6 +1444,8 @@ type
 
   TJDISLangOptions = class(TPersistent)
   private
+    FXTextBefore: TStringList;
+    FXTextAfter: TStringList;
     FOwner: TJDInnoSetupScript;
     FCopyrightFontSize: Integer;
     FLanguageName: String;
@@ -1459,6 +1471,10 @@ type
     procedure SetTitleFontSize(const Value: Integer);
     procedure SetWelcomeFontName(const Value: String);
     procedure SetWelcomeFontSize(const Value: Integer);
+    function GetXTextAfter: TStrings;
+    function GetXTextBefore: TStrings;
+    procedure SetXTextAfter(const Value: TStrings);
+    procedure SetXTextBefore(const Value: TStrings);
   public
     constructor Create(AOwner: TJDInnoSetupScript);
     destructor Destroy; override;
@@ -1477,6 +1493,8 @@ type
     property CopyrightFontName: String read FCopyrightFontName write SetCopyrightFontName;
     property CopyrightFontSize: Integer read FCopyrightFontSize write SetCopyrightFontSize default 0;
     property RightToLeft: TBoolDef read FRightToLeft write SetRightToLeft default TBoolDef.bdDefault;
+    property XTextBefore: TStrings read GetXTextBefore write SetXTextBefore;
+    property XTextAfter: TStrings read GetXTextAfter write SetXTextAfter;
   end;
 
 
@@ -1529,6 +1547,7 @@ type
 
   TJDISRun = class(TJDISBaseCollectionItem)
   private
+    FComponents: TStringList;
     FFilename: String;
     FRunOnceId: String;
     FVerb: String;
@@ -1545,11 +1564,14 @@ type
     procedure SetStatusMsg(const Value: String);
     procedure SetVerb(const Value: String);
     procedure SetWorkingDir(const Value: String);
+    function GetComponents: TStrings;
+    procedure SetComponents(const Value: TStrings);
   public
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
   published
+    property Components: TStrings read GetComponents write SetComponents;
     property Filename: String read FFilename write SetFilename;
     property Description: String read FDescription write SetDescription;
     property Parameters: String read FParameters write SetParameters;
@@ -1625,7 +1647,6 @@ type
     property Verb: String read FVerb write SetVerb;
     property Flags: TJDISUninstallRunFlags read FFlags write SetFlags;
   end;
-
 
 
 implementation
@@ -1998,6 +2019,8 @@ end;
 constructor TJDISSetup.Create(AOwner: TJDInnoSetupScript);
 begin
   FOwner:= AOwner;
+  FXTextBefore:= TStringList.Create;
+  FXTextAfter:= TStringList.Create;
   FCompiler:= TJDISSetupCompiler.Create(Self);
   FInstaller:= TJDISSetupInstaller.Create(Self);
   FCosmetic:= TJDISSetupCosmetic.Create(Self);
@@ -2010,7 +2033,19 @@ begin
   FCosmetic.Free;
   FInstaller.Free;
   FCompiler.Free;
+  FXTextAfter.Free;
+  FXTextBefore.Free;
   inherited;
+end;
+
+function TJDISSetup.GetXTextAfter: TStrings;
+begin
+  Result:= TStrings(FXTextAfter);
+end;
+
+function TJDISSetup.GetXTextBefore: TStrings;
+begin
+  Result:= TStrings(FXTextBefore);
 end;
 
 procedure TJDISSetup.AddToScript(AScript: TStrings);
@@ -2036,6 +2071,16 @@ end;
 procedure TJDISSetup.SetInstaller(const Value: TJDISSetupInstaller);
 begin
   FInstaller.Assign(Value);
+end;
+
+procedure TJDISSetup.SetXTextAfter(const Value: TStrings);
+begin
+  FXTextAfter.Assign(Value);
+end;
+
+procedure TJDISSetup.SetXTextBefore(const Value: TStrings);
+begin
+  FXTextBefore.Assign(Value);
 end;
 
 {
@@ -4275,13 +4320,18 @@ end;
 constructor TJDISIcon.Create(Collection: TCollection);
 begin
   inherited;
-
+  FComponents:= TStringList.Create;
 end;
 
 destructor TJDISIcon.Destroy;
 begin
-
+  FreeAndNil(FComponents);
   inherited;
+end;
+
+function TJDISIcon.GetComponents: TStrings;
+begin
+  Result:= TStrings(FComponents);
 end;
 
 function TJDISIcon.GetFullText: String;
@@ -4304,6 +4354,8 @@ begin
     Result:= Result + '; IconIndex: '+IntToStr(FIconIndex);
   if FAppUserModelID <> '' then
     Result:= Result + '; AppUserModelID: "'+FAppUserModelID+'"';
+  if FComponents.Count > 0 then
+    Result:= Result + '; Components: '+GetSpacedList(FComponents);
   if FFlags <> [] then begin
     T:= '';
     if TJDISIconFlag.isifCloseOnExit in FFlags then
@@ -4338,6 +4390,11 @@ end;
 procedure TJDISIcon.SetComment(const Value: String);
 begin
   FComment := Value;
+end;
+
+procedure TJDISIcon.SetComponents(const Value: TStrings);
+begin
+  FComponents.Assign(Value);
 end;
 
 procedure TJDISIcon.SetFilename(const Value: String);
@@ -4628,12 +4685,25 @@ end;
 constructor TJDISLangOptions.Create(AOwner: TJDInnoSetupScript);
 begin
   FOwner:= AOwner;
+  FXTextBefore:= TStringList.Create;
+  FXTextAfter:= TStringList.Create;
 end;
 
 destructor TJDISLangOptions.Destroy;
 begin
-
+  FXTextAfter.Free;
+  FXTextBefore.Free;
   inherited;
+end;
+
+function TJDISLangOptions.GetXTextAfter: TStrings;
+begin
+  Result:= TStrings(FXTextAfter);
+end;
+
+function TJDISLangOptions.GetXTextBefore: TStrings;
+begin
+  Result:= TStrings(FXTextBefore);
 end;
 
 function TJDISLangOptions.IsAllDefault: Boolean;
@@ -4756,6 +4826,16 @@ end;
 procedure TJDISLangOptions.SetWelcomeFontSize(const Value: Integer);
 begin
   FWelcomeFontSize := Value;
+end;
+
+procedure TJDISLangOptions.SetXTextAfter(const Value: TStrings);
+begin
+  FXTextAfter.Assign(Value);
+end;
+
+procedure TJDISLangOptions.SetXTextBefore(const Value: TStrings);
+begin
+  FXTextBefore.Assign(Value);
 end;
 
 { TJDISRegistry }
@@ -4881,13 +4961,18 @@ end;
 constructor TJDISRun.Create(Collection: TCollection);
 begin
   inherited;
-
+  FComponents:= TStringList.Create;
 end;
 
 destructor TJDISRun.Destroy;
 begin
-
+  FreeAndNil(FComponents);
   inherited;
+end;
+
+function TJDISRun.GetComponents: TStrings;
+begin
+  Result:= TStrings(FComponents);
 end;
 
 function TJDISRun.GetFullText: String;
@@ -4907,44 +4992,51 @@ begin
     Result:= Result + '; RunOnceId: "'+FRunOnceId+'"';
   if FVerb <> '' then
     Result:= Result + '; Verb: "'+FVerb+'"';
+  if FComponents.Count > 0 then
+    Result:= Result + '; Components: '+GetSpacedList(FComponents);
   if FFlags <> [] then begin
     T:= '';
     if TJDISRunFlag.isrnf32bit in FFlags then
-      Result:= Result + '32bit ';
+      T:= T + '32bit ';
     if TJDISRunFlag.isrnf64bit in FFlags then
-      Result:= Result + '64bit ';
+      T:= T + '64bit ';
     if TJDISRunFlag.isrnfHideWizard in FFlags then
-      Result:= Result + 'hidewizard ';
+      T:= T + 'hidewizard ';
     if TJDISRunFlag.isrnfNoWait in FFlags then
-      Result:= Result + 'nowait ';
+      T:= T + 'nowait ';
     if TJDISRunFlag.isrnfPostInstall in FFlags then
-      Result:= Result + 'postinstall ';
+      T:= T + 'postinstall ';
     if TJDISRunFlag.isrnfRunAsCurrentUser in FFlags then
-      Result:= Result + 'runascurrentuser ';
+      T:= T + 'runascurrentuser ';
     if TJDISRunFlag.isrnfRunAsOriginalUser in FFlags then
-      Result:= Result + 'runasoriginaluser ';
+      T:= T + 'runasoriginaluser ';
     if TJDISRunFlag.isrnfRunHidden in FFlags then
-      Result:= Result + 'runhidden ';
+      T:= T + 'runhidden ';
     if TJDISRunFlag.isrnfRunMaximized in FFlags then
-      Result:= Result + 'runmaximized ';
+      T:= T + 'runmaximized ';
     if TJDISRunFlag.isrnfRunMinimized in FFlags then
-      Result:= Result + 'runminimized ';
+      T:= T + 'runminimized ';
     if TJDISRunFlag.isrnfShellExec in FFlags then
-      Result:= Result + 'shellexec ';
+      T:= T + 'shellexec ';
     if TJDISRunFlag.isrnfSkipIfDoesntExist in FFlags then
-      Result:= Result + 'skipifdoesntexist ';
+      T:= T + 'skipifdoesntexist ';
     if TJDISRunFlag.isrnfSkipIfNotSilent in FFlags then
-      Result:= Result + 'skipifnotsilent ';
+      T:= T + 'skipifnotsilent ';
     if TJDISRunFlag.isrnfSkipIfSilent in FFlags then
-      Result:= Result + 'skipifsilent ';
+      T:= T + 'skipifsilent ';
     if TJDISRunFlag.isrnfUnchecked in FFlags then
-      Result:= Result + 'unchecked ';
+      T:= T + 'unchecked ';
     if TJDISRunFlag.isrnfWaitUntilIdle in FFlags then
-      Result:= Result + 'waituntilidle ';
+      T:= T + 'waituntilidle ';
     if TJDISRunFlag.isrnfWaitUntilTerminated in FFlags then
-      Result:= Result + 'waituntilterminated ';
+      T:= T + 'waituntilterminated ';
     Result:= Result + '; Flags: '+T;
   end;
+end;
+
+procedure TJDISRun.SetComponents(const Value: TStrings);
+begin
+  FComponents.Assign(Value);
 end;
 
 procedure TJDISRun.SetDescription(const Value: String);
