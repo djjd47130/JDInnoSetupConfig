@@ -136,6 +136,10 @@ object Form1: TForm1
     Dirs = <>
     Files = <
       item
+        XTextBefore.Strings = (
+          'This is before.')
+        XTextAfter.Strings = (
+          'This is after.')
         Source = 'MyProg.exe'
         DestDir = '{app}'
         ExternalSize = 0

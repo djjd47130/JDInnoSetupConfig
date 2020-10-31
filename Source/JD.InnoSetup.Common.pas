@@ -6,8 +6,11 @@ uses
   System.Classes, System.SysUtils;
 
 type
+
   TBoolDefExpression = class;
+
   TJDISPermission = class;
+
   TJDISPermissions = class;
 
 
@@ -24,6 +27,9 @@ type
 
   TBoolDefExp = (bdeDefault, bdeFalse, bdeTrue, bdeExpression);
 
+  ///<summary>
+  ///  Represents either a boolean with a default option, or a boolean expression.
+  ///</summary>
   TBoolDefExpression = class(TPersistent)
   private
     FExpression: String;
@@ -41,6 +47,10 @@ type
 
 
 
+  ///<summary>
+  ///  Represents a collection of Windows permissions, associating either
+  ///  users or groups with an access level. Used for files, folders, and registry.
+  ///</summary>
   TJDISPermissions = class(TOwnedCollection)
   public
     constructor Create(AOwner: TPersistent); reintroduce;
@@ -49,6 +59,10 @@ type
 
   TJDISPermissionAccessType = (ispaFull, ispaModify, ispaReadExec);
 
+  ///<summary>
+  ///  Represents a single Windows permission. Associates either a user
+  ///  or a group with an access level. Used for files, folders, and registry.
+  ///</summary>
   TJDISPermission = class(TCollectionItem)
   private
     FAccessType: TJDISPermissionAccessType;

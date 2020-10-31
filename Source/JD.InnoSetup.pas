@@ -65,7 +65,15 @@ type
 
 
 
-
+  ///<summary>
+  ///  Encapsulates an entire Inno Setup script file. Provides properties
+  ///  to represent each script section, and a structure which can be
+  ///  easily modified in the Object Inspector.
+  ///</summary>
+  ///<remarks>
+  ///  Refer to the official Inno Setup documentation for help at
+  ///  https://jrsoftware.org/ishelp/
+  ///</remarks>
   TJDInnoSetupScript = class(TComponent)
   private
     FDefines: TJDISDefines;
@@ -140,13 +148,29 @@ type
   TJDISBaseCollection = class(TOwnedCollection)
   private
     FOwner: TJDInnoSetupScript;
+    FXTextBefore: TStringList;
+    FXTextAfter: TStringList;
+    function GetXTextAfter: TStrings;
+    function GetXTextBefore: TStrings;
+    procedure SetXTextAfter(const Value: TStrings);
+    procedure SetXTextBefore(const Value: TStrings);
   public
     constructor Create(AOwner: TJDInnoSetupScript;
       ItemClass: TCollectionItemClass); reintroduce;
+    destructor Destroy; override;
     procedure AddToScript(const ASectionName: String; AScript: TStrings); virtual;
+    property XTextBefore: TStrings read GetXTextBefore write SetXTextBefore;
+    property XTextAfter: TStrings read GetXTextAfter write SetXTextAfter;
   end;
 
   TJDISBaseCollectionItem = class(TCollectionItem)
+  private
+    FXTextBefore: TStringList;
+    FXTextAfter: TStringList;
+    function GetXTextAfter: TStrings;
+    function GetXTextBefore: TStrings;
+    procedure SetXTextAfter(const Value: TStrings);
+    procedure SetXTextBefore(const Value: TStrings);
   protected
     function GetDisplayName: String; override;
   public
@@ -154,7 +178,8 @@ type
     destructor Destroy; override;
     function GetFullText: String; virtual;
   published
-
+    property XTextBefore: TStrings read GetXTextBefore write SetXTextBefore;
+    property XTextAfter: TStrings read GetXTextAfter write SetXTextAfter;
   end;
 
 
@@ -1829,28 +1854,61 @@ end;
 
 { TJDISBaseCollection }
 
+constructor TJDISBaseCollection.Create(AOwner: TJDInnoSetupScript;
+  ItemClass: TCollectionItemClass);
+begin
+  inherited Create(AOwner, ItemClass);
+  FOwner:= AOwner;
+  FXTextBefore:= TStringList.Create;
+  FXTextAfter:= TStringList.Create;
+end;
+
+destructor TJDISBaseCollection.Destroy;
+begin
+  FreeAndNil(FXTextAfter);
+  FreeAndNil(FXTextBefore);
+  inherited;
+end;
+
 procedure TJDISBaseCollection.AddToScript(const ASectionName: String;
   AScript: TStrings);
 var
   X: Integer;
   I: TJDISBaseCollectionItem;
 begin
+  AScript.AddStrings(FXTextBefore);
   if Count > 0 then begin
     AScript.Append('');
     if ASectionName <> '' then
       AScript.Append('['+ASectionName+']');
     for X := 0 to Count-1 do begin
       I:= TJDISBaseCollectionItem(Items[X]);
+      AScript.AddStrings(I.FXTextBefore);
       AScript.Append(I.GetFullText);
+      AScript.AddStrings(I.FXTextAfter);
     end;
   end;
+  AScript.AddStrings(FXTextAfter);
 end;
 
-constructor TJDISBaseCollection.Create(AOwner: TJDInnoSetupScript;
-  ItemClass: TCollectionItemClass);
+function TJDISBaseCollection.GetXTextAfter: TStrings;
 begin
-  inherited Create(AOwner, ItemClass);
-  FOwner:= AOwner;
+  Result:= TStrings(FXTextAfter);
+end;
+
+function TJDISBaseCollection.GetXTextBefore: TStrings;
+begin
+  Result:= TStrings(FXTextBefore);
+end;
+
+procedure TJDISBaseCollection.SetXTextAfter(const Value: TStrings);
+begin
+  FXTextAfter.Assign(Value);
+end;
+
+procedure TJDISBaseCollection.SetXTextBefore(const Value: TStrings);
+begin
+  FXTextBefore.Assign(Value);
 end;
 
 { TJDISBaseCollectionItem }
@@ -1858,12 +1916,14 @@ end;
 constructor TJDISBaseCollectionItem.Create(Collection: TCollection);
 begin
   inherited Create(Collection);
-
+  FXTextBefore:= TStringList.Create;
+  FXTextAfter:= TStringList.Create;
 end;
 
 destructor TJDISBaseCollectionItem.Destroy;
 begin
-
+  FreeAndNil(FXTextAfter);
+  FreeAndNil(FXTextBefore);
   inherited;
 end;
 
@@ -1875,6 +1935,26 @@ end;
 function TJDISBaseCollectionItem.GetFullText: String;
 begin
   //Expected inherited to be responsible...
+end;
+
+function TJDISBaseCollectionItem.GetXTextAfter: TStrings;
+begin
+  Result:= TStrings(FXTextAfter);
+end;
+
+function TJDISBaseCollectionItem.GetXTextBefore: TStrings;
+begin
+  Result:= TStrings(FXTextBefore);
+end;
+
+procedure TJDISBaseCollectionItem.SetXTextAfter(const Value: TStrings);
+begin
+  FXTextAfter.Assign(Value);
+end;
+
+procedure TJDISBaseCollectionItem.SetXTextBefore(const Value: TStrings);
+begin
+  FXTextBefore.Assign(Value);
 end;
 
 { TJDISDefines }
