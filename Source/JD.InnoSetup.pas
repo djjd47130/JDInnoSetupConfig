@@ -1001,6 +1001,8 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function FlagsStr: String;
+    function TypesStr: String;
   published
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
@@ -3744,29 +3746,33 @@ begin
   inherited;
 end;
 
+function TJDISComponent.FlagsStr: String;
+begin
+  Result:= '';
+  if TJDISComponentFlag.iscfCheckAbleAlone in FFlags then
+    Result:= Result + ' checkablealone';
+  if TJDISComponentFlag.iscfDontInheritCheck in FFlags then
+    Result:= Result + ' dontinheritcheck';
+  if TJDISComponentFlag.iscfExclusive in FFlags then
+    Result:= Result + ' exclusive';
+  if TJDISComponentFlag.iscfFixed in FFlags then
+    Result:= Result + ' fixed';
+  if TJDISComponentFlag.iscfRestart in FFlags then
+    Result:= Result + ' restart';
+  if TJDISComponentFlag.iscfDisableNounInstallWarning in FFlags then
+    Result:= Result + ' disablenouninstallwarning';
+end;
+
 function TJDISComponent.GetFullText: String;
 var
   T: String;
 begin
   T:= 'Name: "'+FName+'"; Description: "'+FDescription+'"';
   if FTypes.Count > 0 then begin
-    T:= T + '; Types: ';
-    T:= T + GetSpacedList(FTypes);
+    T:= T + '; Types: '+TypesStr;
   end;
   if FFlags <> [] then begin
-    T:= T + '; Flags:';
-    if TJDISComponentFlag.iscfCheckAbleAlone in FFlags then
-      T:= T + ' checkablealone';
-    if TJDISComponentFlag.iscfDontInheritCheck in FFlags then
-      T:= T + ' dontinheritcheck';
-    if TJDISComponentFlag.iscfExclusive in FFlags then
-      T:= T + ' exclusive';
-    if TJDISComponentFlag.iscfFixed in FFlags then
-      T:= T + ' fixed';
-    if TJDISComponentFlag.iscfRestart in FFlags then
-      T:= T + ' restart';
-    if TJDISComponentFlag.iscfDisableNounInstallWarning in FFlags then
-      T:= T + ' disablenouninstallwarning';
+    T:= T + '; Flags: '+FlagsStr;
   end;
   Result:= T;
 end;
@@ -3799,6 +3805,11 @@ end;
 procedure TJDISComponent.SetTypes(const Value: TStrings);
 begin
   FTypes.Assign(Value);
+end;
+
+function TJDISComponent.TypesStr: String;
+begin
+  Result:= GetSpacedList(FTypes);
 end;
 
 { TJDISTasks }
