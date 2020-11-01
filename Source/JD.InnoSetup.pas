@@ -1037,6 +1037,7 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function FlagsStr: String;
   published
     property Components: TStrings read GetComponents write SetComponents;
     property Name: String read FName write SetName;
@@ -1113,6 +1114,7 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function AttribsStr: String;
   published
     property Source: String read FSource write SetSource;
     property DestDir: String read FDestDir write SetDestDir;
@@ -3833,14 +3835,29 @@ begin
   inherited;
 end;
 
+function TJDISTask.FlagsStr: String;
+begin
+  Result:= '';
+  if TJDISTaskFlag.istfCheckAbleAlone in FFlags then
+    Result:= Result + 'checkablealone ';
+  if TJDISTaskFlag.istfCheckedOnce in FFlags then
+    Result:= Result + 'checkedonce ';
+  if TJDISTaskFlag.istfDontInheritCheck in FFlags then
+    Result:= Result + 'dontinheritcheck ';
+  if TJDISTaskFlag.istfExclusive in FFlags then
+    Result:= Result + 'exclusive ';
+  if TJDISTaskFlag.istfRestart in FFlags then
+    Result:= Result + 'restart ';
+  if TJDISTaskFlag.istfUnchecked in FFlags then
+    Result:= Result + 'unchecked ';
+end;
+
 function TJDISTask.GetComponents: TStrings;
 begin
   Result:= TStrings(FComponents);
 end;
 
 function TJDISTask.GetFullText: String;
-var
-  T: String;
 begin
   Result:= 'Name: '+FName+'; Description: "'+FDescription+'"';
   if FGroupDescription <> '' then
@@ -3849,19 +3866,7 @@ begin
     Result:= Result + '; Components: '+GetSpacedList(FComponents);
   end;
   if FFlags <> [] then begin
-    if TJDISTaskFlag.istfCheckAbleAlone in FFlags then
-      T:= T + 'checkablealone ';
-    if TJDISTaskFlag.istfCheckedOnce in FFlags then
-      T:= T + 'checkedonce ';
-    if TJDISTaskFlag.istfDontInheritCheck in FFlags then
-      T:= T + 'dontinheritcheck ';
-    if TJDISTaskFlag.istfExclusive in FFlags then
-      T:= T + 'exclusive ';
-    if TJDISTaskFlag.istfRestart in FFlags then
-      T:= T + 'restart ';
-    if TJDISTaskFlag.istfUnchecked in FFlags then
-      T:= T + 'unchecked ';
-    Result:= Result + '; Flags: '+T;
+    Result:= Result + '; Flags: '+FlagsStr;
   end;
 end;
 
@@ -3979,6 +3984,19 @@ end;
 
 { TJDISFile }
 
+function TJDISFile.AttribsStr: String;
+begin
+  Result:= '';
+  if TJDISAttrib.isaReadOnly in FAttribs then
+    Result:= Result + 'readonly ';
+  if TJDISAttrib.isaHidden in FAttribs then
+    Result:= Result + 'hidden ';
+  if TJDISAttrib.isaSystem in FAttribs then
+    Result:= Result + 'system ';
+  if TJDISAttrib.isaNotContentIndexed in FAttribs then
+    Result:= Result + 'notcontentindexed ';
+end;
+
 constructor TJDISFile.Create(Collection: TCollection);
 begin
   inherited;
@@ -4002,7 +4020,7 @@ end;
 
 function TJDISFile.GetFullText: String;
 var
-  T, T2: String;
+  T: String;
   procedure AT(const N, V: String; const Q: Boolean);
   begin
     if V <> '' then begin
@@ -4027,16 +4045,7 @@ begin
   //CopyMode (Obsolete)
 
   if FAttribs <> [] then begin
-    T2:= '';
-    if TJDISAttrib.isaReadOnly in FAttribs then
-      T2:= T2 + 'readonly ';
-    if TJDISAttrib.isaHidden in FAttribs then
-      T2:= T2 + 'hidden ';
-    if TJDISAttrib.isaSystem in FAttribs then
-      T2:= T2 + 'system ';
-    if TJDISAttrib.isaNotContentIndexed in FAttribs then
-      T2:= T2 + 'notcontentindexed ';
-    AT('Attribs', T2, False);
+    AT('Attribs', AttribsStr, False);
   end;
 
   if FPermissions.Count > 0 then begin
