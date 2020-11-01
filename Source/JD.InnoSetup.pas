@@ -187,8 +187,16 @@ type
 
 
   TJDISDefines = class(TJDISBaseCollection)
+  private
+    function GetItem(Index: Integer): TJDISDefine;
+    procedure SetItem(Index: Integer; const Value: TJDISDefine);
   public
     constructor Create(AOwner: TJDInnoSetupScript); reintroduce;
+    function Add: TJDISDefine;
+    property Items[Index: Integer]: TJDISDefine
+      read GetItem write SetItem; default;
+    function GetExistsByName(const AName: String): Boolean;
+    function GetItemByName(const AName: String): TJDISDefine;
   end;
 
   TJDISDefine = class(TJDISBaseCollectionItem)
@@ -1206,46 +1214,46 @@ type
     constructor Create(AOwner: TJDISFile);
     function GetFlagText: String;
   published
-    property Is32bit: Boolean read FIs32bit write SetIs32bit;
-    property Is64bit: Boolean read FIs64bit write SetIs64bit;
-    property AllowUnsafeFiles: Boolean read FAllowUnsafeFiles write SetAllowUnsafeFiles;
-    property CompareTimestamp: Boolean read FCompareTimestamp write SetCompareTimestamp;
-    property ConfirmOverwrite: Boolean read FConfirmOverwrite write SetConfirmOverwrite;
-    property CreateAllSubdirs: Boolean read FCreateAllSubdirs write SetCreateAllSubdirs;
-    property DeleteAfterInstall: Boolean read FDeleteAfterInstall write SetDeleteAfterInstall;
-    property DontCopy: Boolean read FDontCopy write SetDontCopy;
-    property DontVerifyChecksum: Boolean read FDontVerifyChecksum write SetDontVerifyChecksum;
-    property External: Boolean read FExternal write SetExternal;
-    property FontIsntTrueType: Boolean read FFontIsntTrueType write SetFontIsntTrueType;
-    property GacInstall: Boolean read FGacInstall write SetGacInstall;
-    property IgnoreVersion: Boolean read FIgnoreVersion write SetIgnoreVersion;
-    property IsReadme: Boolean read FIsReadme write SetIsReadme;
-    property NoCompression: Boolean read FNoCompression write SetNoCompression;
-    property NoEncryption: Boolean read FNoEncryption write SetNoEncryption;
-    property NoRegError: Boolean read FNoRegError write SetNoRegError;
-    property OnlyIfDestFileExists: Boolean read FOnlyIfDestFileExists write SetOnlyIfDestFileExists;
-    property OnlyIfDoesntExists: Boolean read FOnlyIfDoesntExists write SetOnlyIfDoesntExists;
-    property OverwriteReadOnly: Boolean read FOverwriteReadOnly write SetOverwriteReadOnly;
-    property PromptIfOlder: Boolean read FPromptIfOlder write SetPromptIfOlder;
-    property RecurseSubdirs: Boolean read FRecurseSubdirs write SetRecurseSubdirs;
-    property RegServer: Boolean read FRegServer write SetRegServer;
-    property RegTypeLib: Boolean read FRegTypeLib write SetRegTypeLib;
-    property ReplaceSameVersion: Boolean read FReplaceSameVersion write SetReplaceSameVersion;
-    property RestartReplace: Boolean read FRestartReplace write SetRestartReplace;
-    property SetNTFSCompression: Boolean read FSetNTFSCompression write SetSetNTFSCompression;
-    property SharedFile: Boolean read FSharedFile write SetSharedFile;
-    property Sign: Boolean read FSign write SetSign;
-    property SignOnce: Boolean read FSignOnce write SetSignOnce;
-    property SkipIfSourceDoesntExist: Boolean read FSkipIfSourceDoesntExist write SetSkipIfSourceDoesntExist;
-    property SolidBreak: Boolean read FSolidBreak write SetSolidBreak;
-    property SortFileByExtension: Boolean read FSortFileByExtension write SetSortFileByExtension;
-    property SortFileByName: Boolean read FSortFileByName write SetSortFileByName;
-    property Touch: Boolean read FTouch write SetTouch;
-    property UninsNoSharedFilePrompt: Boolean read FUninsNoSharedFilePrompt write SetUninsNoSharedFilePrompt;
-    property UninsRemoveReadOnly: Boolean read FUninsRemoveReadOnly write SetUninsRemoveReadOnly;
-    property UninsRestartDelete: Boolean read FUninsRestartDelete write SetUninsRestartDelete;
-    property UninsNeverUninstall: Boolean read FUninsNeverUninstall write SetUninsNeverUninstall;
-    property UnsetNTFSCompression: Boolean read FUnsetNTFSCompression write SetUnsetNTFSCompression;
+    property Is32bit: Boolean read FIs32bit write SetIs32bit default False;
+    property Is64bit: Boolean read FIs64bit write SetIs64bit default False;
+    property AllowUnsafeFiles: Boolean read FAllowUnsafeFiles write SetAllowUnsafeFiles default False;
+    property CompareTimestamp: Boolean read FCompareTimestamp write SetCompareTimestamp default False;
+    property ConfirmOverwrite: Boolean read FConfirmOverwrite write SetConfirmOverwrite default False;
+    property CreateAllSubdirs: Boolean read FCreateAllSubdirs write SetCreateAllSubdirs default False;
+    property DeleteAfterInstall: Boolean read FDeleteAfterInstall write SetDeleteAfterInstall default False;
+    property DontCopy: Boolean read FDontCopy write SetDontCopy default False;
+    property DontVerifyChecksum: Boolean read FDontVerifyChecksum write SetDontVerifyChecksum default False;
+    property External: Boolean read FExternal write SetExternal default False;
+    property FontIsntTrueType: Boolean read FFontIsntTrueType write SetFontIsntTrueType default False;
+    property GacInstall: Boolean read FGacInstall write SetGacInstall default False;
+    property IgnoreVersion: Boolean read FIgnoreVersion write SetIgnoreVersion default False;
+    property IsReadme: Boolean read FIsReadme write SetIsReadme default False;
+    property NoCompression: Boolean read FNoCompression write SetNoCompression default False;
+    property NoEncryption: Boolean read FNoEncryption write SetNoEncryption default False;
+    property NoRegError: Boolean read FNoRegError write SetNoRegError default False;
+    property OnlyIfDestFileExists: Boolean read FOnlyIfDestFileExists write SetOnlyIfDestFileExists default False;
+    property OnlyIfDoesntExists: Boolean read FOnlyIfDoesntExists write SetOnlyIfDoesntExists default False;
+    property OverwriteReadOnly: Boolean read FOverwriteReadOnly write SetOverwriteReadOnly default False;
+    property PromptIfOlder: Boolean read FPromptIfOlder write SetPromptIfOlder default False;
+    property RecurseSubdirs: Boolean read FRecurseSubdirs write SetRecurseSubdirs default False;
+    property RegServer: Boolean read FRegServer write SetRegServer default False;
+    property RegTypeLib: Boolean read FRegTypeLib write SetRegTypeLib default False;
+    property ReplaceSameVersion: Boolean read FReplaceSameVersion write SetReplaceSameVersion default False;
+    property RestartReplace: Boolean read FRestartReplace write SetRestartReplace default False;
+    property SetNTFSCompression: Boolean read FSetNTFSCompression write SetSetNTFSCompression default False;
+    property SharedFile: Boolean read FSharedFile write SetSharedFile default False;
+    property Sign: Boolean read FSign write SetSign default False;
+    property SignOnce: Boolean read FSignOnce write SetSignOnce default False;
+    property SkipIfSourceDoesntExist: Boolean read FSkipIfSourceDoesntExist write SetSkipIfSourceDoesntExist default False;
+    property SolidBreak: Boolean read FSolidBreak write SetSolidBreak default False;
+    property SortFileByExtension: Boolean read FSortFileByExtension write SetSortFileByExtension default False;
+    property SortFileByName: Boolean read FSortFileByName write SetSortFileByName default False;
+    property Touch: Boolean read FTouch write SetTouch default False;
+    property UninsNoSharedFilePrompt: Boolean read FUninsNoSharedFilePrompt write SetUninsNoSharedFilePrompt default False;
+    property UninsRemoveReadOnly: Boolean read FUninsRemoveReadOnly write SetUninsRemoveReadOnly default False;
+    property UninsRestartDelete: Boolean read FUninsRestartDelete write SetUninsRestartDelete default False;
+    property UninsNeverUninstall: Boolean read FUninsNeverUninstall write SetUninsNeverUninstall default False;
+    property UnsetNTFSCompression: Boolean read FUnsetNTFSCompression write SetUnsetNTFSCompression default False;
   end;
 
 
@@ -1980,9 +1988,42 @@ end;
 
 { TJDISDefines }
 
+function TJDISDefines.Add: TJDISDefine;
+begin
+  Result:= TJDISDefine(inherited Add);
+end;
+
 constructor TJDISDefines.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISDefine);
+end;
+
+function TJDISDefines.GetExistsByName(const AName: String): Boolean;
+begin
+  Result:= GetItemByName(AName) <> nil;
+end;
+
+function TJDISDefines.GetItem(Index: Integer): TJDISDefine;
+begin
+  Result:= TJDISDefine(inherited Items[Index]);
+end;
+
+function TJDISDefines.GetItemByName(const AName: String): TJDISDefine;
+var
+  X: Integer;
+begin
+  Result:= nil;
+  for X := 0 to Count-1 do begin
+    if SameText(Items[X].Name, AName) then begin
+      Result:= Items[X];
+      Break;
+    end;
+  end;
+end;
+
+procedure TJDISDefines.SetItem(Index: Integer; const Value: TJDISDefine);
+begin
+  inherited Items[Index].Assign(Value);
 end;
 
 { TJDISDefine }
