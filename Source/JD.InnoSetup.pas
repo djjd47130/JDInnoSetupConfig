@@ -968,6 +968,7 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function FlagsStr: String;
   published
     property Name: String read FName write SetName;
     property Description: String read FDescription write SetDescription;
@@ -3689,15 +3690,20 @@ begin
   inherited;
 end;
 
+function TJDISType.FlagsStr: String;
+begin
+  Result:= '';
+  if TJDISTypeFlag.istfIsCustom in FFlags then
+    Result:= Result + 'iscustom ';
+end;
+
 function TJDISType.GetFullText: String;
 var
   T: String;
 begin
   T:= 'Name: "'+FName+'"; Description: "'+FDescription+'"';
   if FFlags <> [] then begin
-    T:= T + '; Flags: ';
-    if TJDISTypeFlag.istfIsCustom in FFlags then
-      T:= T + 'iscustom ';
+    T:= T + '; Flags: '+FlagsStr;
   end;
   Result:= T;
 end;
