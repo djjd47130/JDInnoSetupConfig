@@ -21,6 +21,7 @@ uses
   uDM,
   uTabBase,
   uCollectionBaseNEW,
+
   uSetupGeneral,
   uSetupAppInfo,
   uSetupVersion,
@@ -29,8 +30,10 @@ uses
   uItemsTypes,
   uItemsComponents,
   uItemsTasks,
+  uItemsDirs,
   uItemsFiles,
   uCode,
+
   SynEdit, SynEditHighlighter, SynEditCodeFolding,
   SynHighlighterPas, SynHighlighterInno, Vcl.Buttons, System.Actions,
   Vcl.ActnList, Vcl.ActnMan, Vcl.Menus, IDETheme.ActnCtrls,
@@ -113,7 +116,6 @@ type
     procedure btnGenerateClick(Sender: TObject);
     procedure actSaveAsExecute(Sender: TObject);
     procedure actOpenExecute(Sender: TObject);
-    procedure btnSaveSetupGeneralClick(Sender: TObject);
     procedure SetupGeneralChanged(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
@@ -131,15 +133,9 @@ type
     FTypes: TfrmTypes;
     FComponents: TfrmComponents;
     FTasks: TfrmTasks;
+    FDirs: TfrmDirs;
     FFiles: TfrmFiles;
     FCode: TfrmCode;
-    procedure LoadSetup;
-    procedure LoadDefines;
-    procedure LoadTypes;
-    procedure LoadComponents;
-    procedure LoadTasks;
-    procedure LoadFiles;
-    procedure LoadCode;
     procedure EmbedForms;
   public
     procedure ClearUI;
@@ -179,6 +175,7 @@ begin
   FTypes:= TfrmTypes.CreateEmbedded(tabTypes, Script, Script.Types);
   FComponents:= TfrmComponents.CreateEmbedded(tabComponents, Script, Script.Components);
   FTasks:= TfrmTasks.CreateEmbedded(tabTasks, Script, Script.Tasks);
+  FDirs:= TfrmDirs.CreateEmbedded(tabDirs, Script, Script.Dirs);
   FFiles:= TfrmFiles.CreateEmbedded(tabFiles, Script, Script.Files);
 
   FCode:= TfrmCode.CreateEmbedded(tabCode, Script);
@@ -196,16 +193,6 @@ end;
 
 procedure TfrmMain.btnGenerateClick(Sender: TObject);
 begin
-  {
-  Script.Defines.GetItemByName('MyAppName').Value:= txtAppName.Text;
-  Script.Defines.GetItemByName('MyAppVersion').Value:= txtAppVersion.Text;
-  Script.Defines.GetItemByName('MyAppPublisher').Value:= txtAppPublisher.Text;
-  Script.Defines.GetItemByName('MyAppURL').Value:= txtAppURL.Text;
-  Script.Setup.Installer.AppId:= txtAppID.Text;
-  Script.Setup.Compiler.OutputBaseFilename:= txtOutputBaseFilename.Text;
-  Script.Setup.Compiler.OutputDir:= txtOutputDir.Text;
-  }
-
   Txt.Lines.BeginUpdate;
   try
     Script.GetScript(Txt.Lines);
@@ -268,26 +255,8 @@ begin
   //
 end;
 
-procedure TfrmMain.btnSaveSetupGeneralClick(Sender: TObject);
-begin
-  {
-  Script.Defines.GetItemByName('MyAppName').Value:= txtAppName.Text;
-  Script.Defines.GetItemByName('MyAppVersion').Value:= txtAppVersion.Text;
-  Script.Defines.GetItemByName('MyAppPublisher').Value:= txtAppPublisher.Text;
-  Script.Defines.GetItemByName('MyAppURL').Value:= txtAppURL.Text;
-  Script.Setup.Installer.AppId:= txtAppID.Text;
-  Script.Setup.Compiler.OutputBaseFilename:= txtOutputBaseFilename.Text;
-  Script.Setup.Compiler.OutputDir:= txtOutputDir.Text;
-  }
-
-  //btnSaveSetupGeneral.Enabled:= False;
-
-end;
-
 procedure TfrmMain.ClearUI;
 begin
-
-
 
 end;
 
@@ -324,45 +293,6 @@ end;
 procedure TfrmMain.SetupGeneralChanged(Sender: TObject);
 begin
   //btnSaveSetupGeneral.Enabled:= True;
-end;
-
-procedure TfrmMain.LoadCode;
-begin
-  FCode.Load;
-end;
-
-procedure TfrmMain.LoadComponents;
-begin
-  FComponents.PopulateList;
-end;
-
-procedure TfrmMain.LoadDefines;
-begin
-  FDefines.PopulateList;
-end;
-
-procedure TfrmMain.LoadFiles;
-begin
-  FFiles.PopulateList;
-end;
-
-procedure TfrmMain.LoadSetup;
-begin
-  FSetupGeneral.Load;
-  FSetupAppInfo.Load;
-  FSetupVersion.Load;
-  FSetupCompiler.Load;
-
-end;
-
-procedure TfrmMain.LoadTasks;
-begin
-  FTasks.PopulateList;
-end;
-
-procedure TfrmMain.LoadTypes;
-begin
-  FTypes.PopulateList;
 end;
 
 end.

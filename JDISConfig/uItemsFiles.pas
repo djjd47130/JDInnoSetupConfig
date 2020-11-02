@@ -133,6 +133,14 @@ end;
 procedure TfrmFiles.LoadItemDetail(AItem: TJDISBaseCollectionItem);
 var
   I: TJDISFile;
+  A: TJDISAttrib;
+  Ind: Integer;
+  procedure CF(const AVal: Boolean);
+  begin
+    if AVal then
+      lstFlags.Checked[Ind]:= True;
+    Inc(Ind);
+  end;
 begin
   inherited;
   if Assigned(AItem) then begin
@@ -142,12 +150,60 @@ begin
     txtDestName.Text:= I.DestName;
     txtExcludes.Text:= I.Excludes;
     seExternalSize.Value:= I.ExternalSize;
-    //TODO: Attribs
+    for A := Low(TJDISAttrib) to High(TJDISAttrib) do begin
+      if A in I.Attribs then begin
+        lstAttribs.Checked[Integer(A)]:= True;;
+      end;
+    end;
     //TODO: Permissions
     txtComponents.Lines.Assign(I.Components);
     txtFontInstall.Text:= I.FontInstall;
     txtStrongAssemblyName.Text:= I.StrongAssemblyName;
-    //TODO: Flags
+
+    Ind:= 0;
+    CF(I.Flags.Is32bit);
+    CF(I.Flags.Is64bit);
+    CF(I.Flags.AllowUnsafeFiles);
+    CF(I.Flags.CompareTimestamp);
+    CF(I.Flags.ConfirmOverwrite);
+    CF(I.Flags.CreateAllSubdirs);
+    CF(I.Flags.DeleteAfterInstall);
+    CF(I.Flags.DontCopy);
+    CF(I.Flags.DontVerifyChecksum);
+    CF(I.Flags.External);
+
+    CF(I.Flags.FontIsntTrueType);
+    CF(I.Flags.GacInstall);
+    CF(I.Flags.IgnoreVersion);
+    CF(I.Flags.IsReadme);
+    CF(I.Flags.NoCompression);
+    CF(I.Flags.NoEncryption);
+    CF(I.Flags.NoRegError);
+    CF(I.Flags.OnlyIfDestFileExists);
+    CF(I.Flags.OnlyIfDoesntExists);
+    CF(I.Flags.OverwriteReadOnly);
+
+    CF(I.Flags.PromptIfOlder);
+    CF(I.Flags.RecurseSubdirs);
+    CF(I.Flags.RegServer);
+    CF(I.Flags.RegTypeLib);
+    CF(I.Flags.ReplaceSameVersion);
+    CF(I.Flags.RestartReplace);
+    CF(I.Flags.SetNTFSCompression);
+    CF(I.Flags.SharedFile);
+    CF(I.Flags.Sign);
+    CF(I.Flags.SignOnce);
+
+    CF(I.Flags.SkipIfSourceDoesntExist);
+    CF(I.Flags.SolidBreak);
+    CF(I.Flags.SortFileByExtension);
+    CF(I.Flags.SortFileByName);
+    CF(I.Flags.Touch);
+    CF(I.Flags.UninsNoSharedFilePrompt);
+    CF(I.Flags.UninsRemoveReadOnly);
+    CF(I.Flags.UninsRestartDelete);
+    CF(I.Flags.UninsNeverUninstall);
+    CF(I.Flags.UnsetNTFSCompression);
 
   end;
 end;
@@ -155,6 +211,13 @@ end;
 procedure TfrmFiles.SaveItemDetail(AItem: TJDISBaseCollectionItem);
 var
   I: TJDISFile;
+  A: TJDISAttrib;
+  Ind: Integer;
+  function CF: Boolean;
+  begin
+    Result:= lstFlags.Checked[Ind];
+    Inc(Ind);
+  end;
 begin
   inherited;
   if Assigned(AItem) then begin
@@ -164,12 +227,60 @@ begin
     I.DestName:= txtDestName.Text;
     I.Excludes:= txtExcludes.Text;
     I.ExternalSize:= seExternalSize.Value;
-    //TODO: Attribs
+    for A := Low(TJDISAttrib) to High(TJDISAttrib) do begin
+      if lstAttribs.Checked[Integer(A)] then begin
+        I.Attribs:= I.Attribs + [A];
+      end;
+    end;
     //TODO: Permissions
     I.Components.Assign(txtComponents.Lines);
     I.FontInstall:= txtFontInstall.Text;
     I.StrongAssemblyName:= txtStrongAssemblyName.Text;
-    //TODO: Flags
+
+    Ind:= 0;
+    I.Flags.Is32bit:= CF;
+    I.Flags.Is64bit:= CF;
+    I.Flags.AllowUnsafeFiles:= CF;
+    I.Flags.CompareTimestamp:= CF;
+    I.Flags.ConfirmOverwrite:= CF;
+    I.Flags.CreateAllSubdirs:= CF;
+    I.Flags.DeleteAfterInstall:= CF;
+    I.Flags.DontCopy:= CF;
+    I.Flags.DontVerifyChecksum:= CF;
+    I.Flags.External:= CF;
+
+    I.Flags.FontIsntTrueType:= CF;
+    I.Flags.GacInstall:= CF;
+    I.Flags.IgnoreVersion:= CF;
+    I.Flags.IsReadme:= CF;
+    I.Flags.NoCompression:= CF;
+    I.Flags.NoEncryption:= CF;
+    I.Flags.NoRegError:= CF;
+    I.Flags.OnlyIfDestFileExists:= CF;
+    I.Flags.OnlyIfDoesntExists:= CF;
+    I.Flags.OverwriteReadOnly:= CF;
+
+    I.Flags.PromptIfOlder:= CF;
+    I.Flags.RecurseSubdirs:= CF;
+    I.Flags.RegServer:= CF;
+    I.Flags.RegTypeLib:= CF;
+    I.Flags.ReplaceSameVersion:= CF;
+    I.Flags.RestartReplace:= CF;
+    I.Flags.SetNTFSCompression:= CF;
+    I.Flags.SharedFile:= CF;
+    I.Flags.Sign:= CF;
+    I.Flags.SignOnce:= CF;
+
+    I.Flags.SkipIfSourceDoesntExist:= CF;
+    I.Flags.SolidBreak:= CF;
+    I.Flags.SortFileByExtension:= CF;
+    I.Flags.SortFileByName:= CF;
+    I.Flags.Touch:= CF;
+    I.Flags.UninsNoSharedFilePrompt:= CF;
+    I.Flags.UninsRemoveReadOnly:= CF;
+    I.Flags.UninsRestartDelete:= CF;
+    I.Flags.UninsNeverUninstall:= CF;
+    I.Flags.UnsetNTFSCompression:= CF;
 
   end;
 end;

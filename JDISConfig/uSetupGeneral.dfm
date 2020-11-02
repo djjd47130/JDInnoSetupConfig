@@ -87,6 +87,8 @@ inherited frmSetupGeneral: TfrmSetupGeneral
   inherited ToolBar1: TToolBar
     Top = 303
     Width = 794
+    ExplicitTop = 303
+    ExplicitWidth = 794
   end
   object txtAppName: TEdit [12]
     Left = 8

@@ -48,16 +48,20 @@ begin
 
 end;
 
-procedure TfrmTypes.ClearDetail;
-var
-  X: Integer;
-begin
-  inherited;
-  txtTypeName.Text:= '';
-  txtTypeDescription.Text:= '';
-  for X := 0 to lstTypeFlags.Count-1 do begin
-    lstTypeFlags.Checked[X]:= False;
+procedure TfrmTypes.PrepareColumns(AColumns: TListColumns);
+  procedure AC(const ACaption: String; AWidth: Integer);
+  var
+    C: TListColumn;
+  begin
+    C:= AColumns.Add;
+    C.Caption:= ACaption;
+    C.Width:= AWidth;
   end;
+begin
+  AColumns.Clear;
+  AC('Type Name', 200);
+  AC('Description', 200);
+  AC('Flags', 200);
 end;
 
 procedure TfrmTypes.GetListItemDetails(AItem: TJDISBaseCollectionItem;
@@ -77,28 +81,24 @@ begin
   Result:= (txtTypeName.Text <> '') and (txtTypeDescription.Text <> '');
 end;
 
-procedure TfrmTypes.PrepareColumns(AColumns: TListColumns);
-  procedure AC(const ACaption: String; AWidth: Integer);
-  var
-    C: TListColumn;
-  begin
-    C:= AColumns.Add;
-    C.Caption:= ACaption;
-    C.Width:= AWidth;
-  end;
-begin
-  AColumns.Clear;
-  AC('Type Name', 200);
-  AC('Description', 200);
-  AC('Flags', 200);
-end;
-
 procedure TfrmTypes.SetEditState(const AEditing: Boolean);
 begin
   inherited;
   txtTypeName.ReadOnly:= not AEditing;
   txtTypeDescription.ReadOnly:= not AEditing;
-  lstTypeFlags.Enabled:= AEditing; //TODO
+  lstTypeFlags.Enabled:= AEditing;
+end;
+
+procedure TfrmTypes.ClearDetail;
+var
+  X: Integer;
+begin
+  inherited;
+  txtTypeName.Text:= '';
+  txtTypeDescription.Text:= '';
+  for X := 0 to lstTypeFlags.Count-1 do begin
+    lstTypeFlags.Checked[X]:= False;
+  end;
 end;
 
 procedure TfrmTypes.LoadItemDetail(AItem: TJDISBaseCollectionItem);
@@ -107,7 +107,6 @@ var
   F: TJDISTypeFlag;
 begin
   inherited;
-  ClearDetail;
   if Assigned(AItem) then begin
     I:= TJDISType(AItem);
     txtTypeName.Text:= I.Name;

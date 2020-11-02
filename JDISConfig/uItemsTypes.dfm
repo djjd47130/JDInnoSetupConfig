@@ -3,6 +3,10 @@ inherited frmTypes: TfrmTypes
   PixelsPerInch = 96
   TextHeight = 13
   inherited Details: TPanel
+    Top = 280
+    Height = 140
+    ExplicitTop = 280
+    ExplicitHeight = 140
     object Label9: TLabel
       Left = 16
       Top = 13
@@ -18,7 +22,7 @@ inherited frmTypes: TfrmTypes
       Caption = 'Description'
     end
     object Label11: TLabel
-      Left = 456
+      Left = 240
       Top = 13
       Width = 25
       Height = 13
@@ -39,7 +43,7 @@ inherited frmTypes: TfrmTypes
       TabOrder = 1
     end
     object lstTypeFlags: TCheckListBox
-      Left = 456
+      Left = 240
       Top = 32
       Width = 129
       Height = 73
@@ -48,5 +52,8 @@ inherited frmTypes: TfrmTypes
         'iscustom')
       TabOrder = 2
     end
+  end
+  inherited Items: TListView
+    Height = 271
   end
 end

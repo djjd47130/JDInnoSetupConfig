@@ -6,6 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uTabBase, System.Actions, Vcl.ActnList,
   Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls,
+  System.UITypes,
   JD.InnoSetup, JD.InnoSetup.Common;
 
 type

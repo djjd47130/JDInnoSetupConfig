@@ -18,7 +18,8 @@ uses
   uSetupAppInfo in 'uSetupAppInfo.pas' {frmSetupAppInfo},
   uSetupVersion in 'uSetupVersion.pas' {frmSetupVersion},
   uSetupCompiler in 'uSetupCompiler.pas' {frmSetupCompiler},
-  uCode in 'uCode.pas' {frmCode};
+  uCode in 'uCode.pas' {frmCode},
+  uItemsDirs in 'uItemsDirs.pas' {frmDirs};
 
 {$R *.res}
 
