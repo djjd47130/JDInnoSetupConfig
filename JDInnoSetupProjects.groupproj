@@ -12,6 +12,9 @@
         <Projects Include="Demo\JDInnoSetupDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="JDISConfig\JDISConfig.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +50,23 @@
     <Target Name="JDInnoSetupDemo:Make">
         <MSBuild Projects="Demo\JDInnoSetupDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="JDISConfig">
+        <MSBuild Projects="JDISConfig\JDISConfig.dproj"/>
+    </Target>
+    <Target Name="JDISConfig:Clean">
+        <MSBuild Projects="JDISConfig\JDISConfig.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="JDISConfig:Make">
+        <MSBuild Projects="JDISConfig\JDISConfig.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="JDInnoSetupConfig;dclJDInnoSetupConfig;JDInnoSetupDemo"/>
+        <CallTarget Targets="JDInnoSetupConfig;dclJDInnoSetupConfig;JDInnoSetupDemo;JDISConfig"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="JDInnoSetupConfig:Clean;dclJDInnoSetupConfig:Clean;JDInnoSetupDemo:Clean"/>
+        <CallTarget Targets="JDInnoSetupConfig:Clean;dclJDInnoSetupConfig:Clean;JDInnoSetupDemo:Clean;JDISConfig:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="JDInnoSetupConfig:Make;dclJDInnoSetupConfig:Make;JDInnoSetupDemo:Make"/>
+        <CallTarget Targets="JDInnoSetupConfig:Make;dclJDInnoSetupConfig:Make;JDInnoSetupDemo:Make;JDISConfig:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
