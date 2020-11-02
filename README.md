@@ -29,3 +29,4 @@ NOTE: This application requires the following third-party libraries:
  - [DDetours](https://github.com/MahdiSafsafi/DDetours) - DDetours for VCL Styles Utils
  - [FontAwesome](https://fontawesome.com/) - Font Awesome Font Glyphs
 
+![image](./Readme/SS-Configurator.png)
