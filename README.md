@@ -18,5 +18,14 @@ You can take a look at the demo project to see its usage. But in general, there 
  - `GetScript(AStrings: TStrings);` - Use this to populate a `TStrings` object with the script. This will forcibly clear any existing data and replace it with ISS script.
  - `SaveScript(const AFilename: String);` - Use this to save the script to a file. It directly uses `GetScript` and then saves it to the specified file.
 
+## Application: JDISConfig
 
+This is a new project which makes use of this component. The app allows you to configure an Inno Setup script using the component via a user interface. 
+
+NOTE: This application requires the following third-party libraries:
+ - [JDLib](https://github.com/djjd47130/JDLib) - Font glyphs
+ - [SynEdit](https://github.com/SynEdit/SynEdit) - Syntax Highlighter
+ - [Vcl-Styles-Utils](https://github.com/RRUZ/vcl-styles-utils) - VCL Styles Utils
+ - [DDetours](https://github.com/MahdiSafsafi/DDetours) - DDetours for VCL Styles Utils
+ - [FontAwesome](https://fontawesome.com/) - Font Awesome Font Glyphs
 
