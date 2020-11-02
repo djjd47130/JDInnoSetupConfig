@@ -101,10 +101,10 @@ type
 
 
 
-  TJDISArchitecture = (isaDefault, isaX86, isaX64, isaArm64, isaIa64);
+  TJDISArchitecture = (isaX86, isaX64, isaArm64, isaIa64);
   TJDISArchitectures = set of TJDISArchitecture;
 
-  TJDISArchitecture64 = (isa64Default, isa64X64, isa64Arm64, isa64Ia64);
+  TJDISArchitecture64 = (isa64X64, isa64Arm64, isa64Ia64);
   TJDISArchitectures64 = set of TJDISArchitecture64;
 
   TJDISBoolForce = (isbfDefault, isbfFalse, isbfTrue, isbfForce);
