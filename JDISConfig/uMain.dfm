@@ -12,6 +12,7 @@ object frmMain: TfrmMain
   Font.Style = []
   Menu = MM
   OldCreateOrder = False
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -62,236 +63,120 @@ object frmMain: TfrmMain
           object tabDefines: TTabSheet
             Caption = 'Defines'
             ImageIndex = 18
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabAppInfo: TTabSheet
             Caption = 'App Info'
             ImageIndex = 13
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabVersion: TTabSheet
             Caption = 'Version'
             ImageIndex = 6
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabCompiler: TTabSheet
             Caption = 'Compiler'
             ImageIndex = 2
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabInstaller: TTabSheet
             Caption = 'Installer'
             ImageIndex = 3
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabCosmetic: TTabSheet
             Caption = 'Cosmetic'
             ImageIndex = 5
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabWizard: TTabSheet
             Caption = 'Wizard'
             ImageIndex = 8
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabCompression: TTabSheet
             Caption = 'Compression'
             ImageIndex = 1
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabSignature: TTabSheet
             Caption = 'Signature'
             ImageIndex = 4
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabDiskSlicing: TTabSheet
             Caption = 'Disk Slicing'
             ImageIndex = 7
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabUpdate: TTabSheet
             Caption = 'Update'
             ImageIndex = 9
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
           object tabUninstall: TTabSheet
             Caption = 'Uninstall'
             ImageIndex = 10
-            ExplicitLeft = 0
-            ExplicitTop = 0
-            ExplicitWidth = 0
-            ExplicitHeight = 0
           end
         end
       end
       object tabTypes: TTabSheet
         Caption = 'Types'
         ImageIndex = 1
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabComponents: TTabSheet
         Caption = 'Components'
         ImageIndex = 2
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabTasks: TTabSheet
         Caption = 'Tasks'
         ImageIndex = 3
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabDirs: TTabSheet
         Caption = '  Dirs'
         ImageIndex = 4
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabFiles: TTabSheet
         Caption = '  Files'
         ImageIndex = 5
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabIcons: TTabSheet
         Caption = 'Icons'
         ImageIndex = 6
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabINI: TTabSheet
         Caption = '  INI'
         ImageIndex = 7
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabInstallDelete: TTabSheet
         Caption = 'Install Delete'
         ImageIndex = 8
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabLanguages: TTabSheet
         Caption = 'Languages'
         ImageIndex = 9
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabMessages: TTabSheet
         Caption = 'Messages'
         ImageIndex = 10
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabCustomMessages: TTabSheet
         Caption = 'Custom Messages'
         ImageIndex = 11
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabLangOptions: TTabSheet
         Caption = 'Lang Options'
         ImageIndex = 12
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabRegistry: TTabSheet
         Caption = 'Registry'
         ImageIndex = 13
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabRun: TTabSheet
         Caption = '  Run'
         ImageIndex = 14
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabUninstallDelete: TTabSheet
         Caption = 'Uninst Delete'
         ImageIndex = 15
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabUninstallRun: TTabSheet
         Caption = 'Uninst Run'
         ImageIndex = 16
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
       object tabCode: TTabSheet
         Caption = '  Code  '
         ImageIndex = 17
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
       end
     end
   end
@@ -345,18 +230,18 @@ object frmMain: TfrmMain
       Top = 0
       Action = actNew
     end
-    object ToolButton4: TToolButton
+    object ToolButton2: TToolButton
       Left = 32
+      Top = 0
+      Action = actOpen
+    end
+    object ToolButton4: TToolButton
+      Left = 64
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
       ImageIndex = 3
       Style = tbsSeparator
-    end
-    object ToolButton2: TToolButton
-      Left = 40
-      Top = 0
-      Action = actOpen
     end
     object ToolButton3: TToolButton
       Left = 72
@@ -367,11 +252,6 @@ object frmMain: TfrmMain
       Left = 104
       Top = 0
       Action = actSaveAs
-    end
-    object ToolButton6: TToolButton
-      Left = 136
-      Top = 0
-      Action = actCloseFile
     end
   end
   object Script: TJDInnoSetupScript
@@ -437,20 +317,17 @@ object frmMain: TfrmMain
       object New1: TMenuItem
         Action = actNew
       end
-      object N2: TMenuItem
-        Caption = '-'
-      end
       object Open1: TMenuItem
         Action = actOpen
+      end
+      object N2: TMenuItem
+        Caption = '-'
       end
       object Save1: TMenuItem
         Action = actSave
       end
       object SaveAs1: TMenuItem
         Action = actSaveAs
-      end
-      object Close1: TMenuItem
-        Action = actCloseFile
       end
       object N1: TMenuItem
         Caption = '-'
@@ -513,17 +390,11 @@ object frmMain: TfrmMain
       ImageIndex = 7
       OnExecute = actSaveAsExecute
     end
-    object actCloseFile: TAction
-      Category = 'File'
-      Caption = 'Close'
-      ImageIndex = 8
-      OnExecute = actCloseFileExecute
-    end
     object actExit: TAction
       Category = 'File'
       Caption = 'Exit'
       ImageIndex = 9
-      OnExecute = actOpenExecute
+      OnExecute = actExitExecute
     end
   end
 end

@@ -9,6 +9,8 @@ inherited frmDirs: TfrmDirs
   inherited ToolBar1: TToolBar
     Top = 346
     Width = 772
+    ExplicitTop = 346
+    ExplicitWidth = 772
   end
   inherited Details: TPanel
     Top = 171
@@ -91,5 +93,7 @@ inherited frmDirs: TfrmDirs
   inherited Items: TListView
     Width = 766
     Height = 162
+    ExplicitWidth = 766
+    ExplicitHeight = 162
   end
 end

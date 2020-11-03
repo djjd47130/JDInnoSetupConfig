@@ -55,5 +55,6 @@ inherited frmTypes: TfrmTypes
   end
   inherited Items: TListView
     Height = 271
+    ExplicitHeight = 271
   end
 end

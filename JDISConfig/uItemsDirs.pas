@@ -4,13 +4,13 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCollectionBaseNEW, System.Actions,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCollectionBase, System.Actions,
   Vcl.ActnList, Vcl.ComCtrls, Vcl.ExtCtrls, Vcl.ToolWin, Vcl.StdCtrls,
   Vcl.CheckLst, Vcl.Grids, Vcl.ValEdit,
   JD.InnoSetup, JD.InnoSetup.Common;
 
 type
-  TfrmDirs = class(TfrmCollectionBaseNEW)
+  TfrmDirs = class(TfrmCollectionBase)
     Label9: TLabel;
     txtName: TEdit;
     lstAttribs: TCheckListBox;
@@ -77,9 +77,9 @@ begin
   if Assigned(AItem) then begin
     I:= TJDISDir(AItem);
     AListItem.Caption:= I.Name;
-    AListItem.SubItems.Add(''); //TODO: Attribs
-    AListItem.SubItems.Add(''); //TODO: Permissions
-    AListItem.SubItems.Add(''); //TODO: Flags
+    AListItem.SubItems.Add(I.AttribsStr);
+    AListItem.SubItems.Add(I.Permissions.GetFullText);
+    AListItem.SubItems.Add(I.FlagsStr);
   end;
 end;
 

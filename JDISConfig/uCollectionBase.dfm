@@ -1,5 +1,5 @@
-inherited frmCollectionBaseNEW: TfrmCollectionBaseNEW
-  Caption = 'frmCollectionBaseNEW'
+inherited frmCollectionBase: TfrmCollectionBase
+  Caption = 'Collection Base'
   ClientHeight = 457
   ClientWidth = 759
   ExplicitWidth = 775

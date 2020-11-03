@@ -4,13 +4,13 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCollectionBaseNEW, System.Actions,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uCollectionBase, System.Actions,
   Vcl.ActnList, Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls,
   JD.InnoSetup, JD.InnoSetup.Common, Vcl.StdCtrls, Vcl.CheckLst,
   Vcl.Samples.Spin, Vcl.Grids, Vcl.ValEdit;
 
 type
-  TfrmFiles = class(TfrmCollectionBaseNEW)
+  TfrmFiles = class(TfrmCollectionBase)
     Label11: TLabel;
     Label2: TLabel;
     lstFlags: TCheckListBox;

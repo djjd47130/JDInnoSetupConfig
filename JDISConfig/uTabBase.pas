@@ -10,6 +10,10 @@ uses
   JD.InnoSetup, System.Actions, Vcl.ActnList, Vcl.ComCtrls, Vcl.ToolWin;
 
 type
+  TfrmTabBase = class;
+
+  TfrmTabBaseClass = class of TfrmTabBase;
+
   TfrmTabBase = class(TForm)
     ToolBar1: TToolBar;
     ToolButton3: TToolButton;
@@ -25,6 +29,10 @@ type
   private
     FScript: TJDInnoSetupScript;
     FEditing: Boolean;
+    FModified: Boolean;
+    FOnChanged: TNotifyEvent;
+    procedure SetModified(const Value: Boolean);
+    procedure DoOnChanged;
   public
     constructor CreateEmbedded(AOwner: TWinControl; AScript: TJDInnoSetupScript); virtual;
     procedure SetEditState(const AEditing: Boolean); virtual;
@@ -35,6 +43,8 @@ type
     procedure Save; virtual;
     function Editing: Boolean;
     function Script: TJDInnoSetupScript;
+    property Modified: Boolean read FModified write SetModified;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
   end;
 
 var
@@ -56,6 +66,12 @@ begin
   AOwner.Tag:= 1; //So that main screen can know which tabs have embedded form
   SetEditState(False);
   UpdateActions;
+end;
+
+procedure TfrmTabBase.DoOnChanged;
+begin
+  if Assigned(FOnChanged) then
+    FOnChanged(Self);
 end;
 
 procedure TfrmTabBase.actCancelItemExecute(Sender: TObject);
@@ -106,6 +122,11 @@ begin
   UpdateActions;
 end;
 
+procedure TfrmTabBase.SetModified(const Value: Boolean);
+begin
+  FModified := Value;
+end;
+
 procedure TfrmTabBase.UpdateActions;
 begin
   actEditItem.Enabled:= (not FEditing);
@@ -120,7 +141,8 @@ end;
 
 procedure TfrmTabBase.Save;
 begin
-
+  FModified:= True;
+  DoOnChanged;
 end;
 
 end.

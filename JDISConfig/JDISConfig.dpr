@@ -13,7 +13,7 @@ uses
   IDETheme.ActnCtrls in 'IDETheme.ActnCtrls.pas',
   uItemsDefines in 'uItemsDefines.pas' {frmDefines},
   uTabBase in 'uTabBase.pas' {frmTabBase},
-  uCollectionBaseNEW in 'uCollectionBaseNEW.pas' {frmCollectionBaseNEW},
+  uCollectionBase in 'uCollectionBase.pas' {frmCollectionBase},
   uSetupGeneral in 'uSetupGeneral.pas' {frmSetupGeneral},
   uSetupAppInfo in 'uSetupAppInfo.pas' {frmSetupAppInfo},
   uSetupVersion in 'uSetupVersion.pas' {frmSetupVersion},

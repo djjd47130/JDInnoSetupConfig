@@ -135,8 +135,8 @@
             <Form>frmTabBase</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="uCollectionBaseNEW.pas">
-            <Form>frmCollectionBaseNEW</Form>
+        <DCCReference Include="uCollectionBase.pas">
+            <Form>frmCollectionBase</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="uSetupGeneral.pas">

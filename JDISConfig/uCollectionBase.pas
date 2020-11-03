@@ -1,4 +1,4 @@
-unit uCollectionBaseNEW;
+unit uCollectionBase;
 
 interface
 
@@ -10,7 +10,11 @@ uses
   JD.InnoSetup, JD.InnoSetup.Common;
 
 type
-  TfrmCollectionBaseNEW = class(TfrmTabBase)
+  TfrmCollectionBase = class;
+
+  TfrmCollectionBaseClass = class of TfrmCollectionBase;
+
+  TfrmCollectionBase = class(TfrmTabBase)
     actAddItem: TAction;
     actDeleteItem: TAction;
     ToolButton1: TToolButton;
@@ -44,7 +48,7 @@ type
   end;
 
 var
-  frmCollectionBaseNEW: TfrmCollectionBaseNEW;
+  frmCollectionBase: TfrmCollectionBase;
 
 implementation
 
@@ -52,7 +56,7 @@ implementation
 
 { TfrmCollectionBaseNEW }
 
-constructor TfrmCollectionBaseNEW.CreateEmbedded(AOwner: TWinControl;
+constructor TfrmCollectionBase.CreateEmbedded(AOwner: TWinControl;
   AScript: TJDInnoSetupScript; ACollection: TJDISBaseCollection);
 begin
   inherited CreateEmbedded(AOwner, AScript);
@@ -60,7 +64,7 @@ begin
   PrepareColumns(Items.Columns);
 end;
 
-procedure TfrmCollectionBaseNEW.actAddItemExecute(Sender: TObject);
+procedure TfrmCollectionBase.actAddItemExecute(Sender: TObject);
 begin
   Items.ItemIndex:= -1;
   ClearDetail;
@@ -68,22 +72,43 @@ begin
   SetEditState(True);
 end;
 
-procedure TfrmCollectionBaseNEW.actDeleteItemExecute(Sender: TObject);
+procedure TfrmCollectionBase.actDeleteItemExecute(Sender: TObject);
+var
+  I: Integer;
 begin
-  //
+  if SelectedItem <> nil then begin
+    if MessageDlg('Are you sure you want to delete selected item?',
+      mtConfirmation, [mbYes,mbNo], 0) = mrYes then
+    begin
+      I:= SelectedItem.Index;
+      FCollection.Delete(I);
+      Items.Items.Delete(I);
+      ClearDetail;
+    end;
+  end;
 end;
 
-procedure TfrmCollectionBaseNEW.actSaveItemExecute(Sender: TObject);
+procedure TfrmCollectionBase.actSaveItemExecute(Sender: TObject);
+var
+  I: TJDISBaseCollectionItem;
+  LI: TListItem;
 begin
   if IsValid then begin
     if FIsNew then begin
-      //TODO: Create a new item...
-
+      //Create a new item...
+      I:= FCollection.Add;
+      SaveItemDetail(I);
+      LI:= Items.Items.Add;
+      LI.Data:= I;
+      GetListItemDetails(I, LI);
+      SetEditState(False);
+      FIsNew:= False;
+      Items.ItemIndex:= LI.Index;
     end else begin
-      //TODO: Save over selected item...
-      Self.SaveItemDetail(SelectedItem);
+      //Save existing item
+      SaveItemDetail(SelectedItem);
       Items.Selected.SubItems.Clear;
-      Self.GetListItemDetails(SelectedItem, Items.Selected);
+      GetListItemDetails(SelectedItem, Items.Selected);
       SetEditState(False);
     end;
   end else begin
@@ -91,20 +116,20 @@ begin
   end;
 end;
 
-procedure TfrmCollectionBaseNEW.ClearList;
+procedure TfrmCollectionBase.ClearList;
 begin
   Items.Items.Clear;
   ClearDetail;
 end;
 
-procedure TfrmCollectionBaseNEW.GetListItemDetails(
+procedure TfrmCollectionBase.GetListItemDetails(
   AItem: TJDISBaseCollectionItem; AListItem: TListItem);
 begin
   AListItem.Caption:= AItem.GetFullText;
   //TODO: Expected to override...
 end;
 
-procedure TfrmCollectionBaseNEW.ItemsSelectItem(Sender: TObject;
+procedure TfrmCollectionBase.ItemsSelectItem(Sender: TObject;
   Item: TListItem; Selected: Boolean);
 var
   I: TJDISBaseCollectionItem;
@@ -118,7 +143,7 @@ begin
   UpdateActions;
 end;
 
-procedure TfrmCollectionBaseNEW.PopulateList;
+procedure TfrmCollectionBase.PopulateList;
 var
   X: Integer;
   I: TJDISBaseCollectionItem;
@@ -134,7 +159,7 @@ begin
   UpdateActions;
 end;
 
-procedure TfrmCollectionBaseNEW.PrepareColumns(AColumns: TListColumns);
+procedure TfrmCollectionBase.PrepareColumns(AColumns: TListColumns);
 var
   C: TListColumn;
 begin
@@ -145,35 +170,35 @@ begin
   //TODO: Expected to override...
 end;
 
-procedure TfrmCollectionBaseNEW.Load;
+procedure TfrmCollectionBase.Load;
 begin
   inherited;
   Self.PopulateList;
 end;
 
-procedure TfrmCollectionBaseNEW.LoadItemDetail(AItem: TJDISBaseCollectionItem);
+procedure TfrmCollectionBase.LoadItemDetail(AItem: TJDISBaseCollectionItem);
 begin
   ClearDetail;
 
 end;
 
-procedure TfrmCollectionBaseNEW.Save;
+procedure TfrmCollectionBase.Save;
 begin
   inherited;
 
 end;
 
-procedure TfrmCollectionBaseNEW.SaveItemDetail(AItem: TJDISBaseCollectionItem);
+procedure TfrmCollectionBase.SaveItemDetail(AItem: TJDISBaseCollectionItem);
 begin
 
 end;
 
-function TfrmCollectionBaseNEW.SelectedItem: TJDISBaseCollectionItem;
+function TfrmCollectionBase.SelectedItem: TJDISBaseCollectionItem;
 begin
   Result:= TJDISBaseCollectionItem(Items.Selected.Data);
 end;
 
-procedure TfrmCollectionBaseNEW.UpdateActions;
+procedure TfrmCollectionBase.UpdateActions;
 begin
   inherited;
   actEditItem.Enabled:= (not Editing) and (Items.Selected <> nil);

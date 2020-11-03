@@ -145,9 +145,12 @@ type
 
 
 
+  TJDISBaseCollectionItemClass = class of TJDISBaseCollectionItem;
+
   TJDISBaseCollection = class(TOwnedCollection)
   private
     FOwner: TJDInnoSetupScript;
+    FBaseItemClass: TJDISBaseCollectionItemClass;
     FXTextBefore: TStringList;
     FXTextAfter: TStringList;
     function GetXTextAfter: TStrings;
@@ -158,6 +161,8 @@ type
     constructor Create(AOwner: TJDInnoSetupScript;
       ItemClass: TCollectionItemClass); reintroduce;
     destructor Destroy; override;
+    function Add: TJDISBaseCollectionItem;
+    property BaseItemClass: TJDISBaseCollectionItemClass read FBaseItemClass;
     procedure AddToScript(const ASectionName: String; AScript: TStrings); virtual;
     property XTextBefore: TStrings read GetXTextBefore write SetXTextBefore;
     property XTextAfter: TStrings read GetXTextAfter write SetXTextAfter;
@@ -1069,6 +1074,8 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function AttribsStr: String;
+    function FlagsStr: String;
   published
     property Name: String read FName write SetName;
     property Attribs: TJDISAttribs read FAttribs write SetAttribs;
@@ -1893,6 +1900,7 @@ constructor TJDISBaseCollection.Create(AOwner: TJDInnoSetupScript;
 begin
   inherited Create(AOwner, ItemClass);
   FOwner:= AOwner;
+  FBaseItemClass:= TJDISBaseCollectionItemClass(ItemClass);
   FXTextBefore:= TStringList.Create;
   FXTextAfter:= TStringList.Create;
 end;
@@ -1902,6 +1910,11 @@ begin
   FreeAndNil(FXTextAfter);
   FreeAndNil(FXTextBefore);
   inherited;
+end;
+
+function TJDISBaseCollection.Add: TJDISBaseCollectionItem;
+begin
+  Result:= TJDISBaseCollectionItem(inherited Add);
 end;
 
 procedure TJDISBaseCollection.AddToScript(const ASectionName: String;
@@ -3916,22 +3929,39 @@ begin
   inherited;
 end;
 
+function TJDISDir.AttribsStr: String;
+begin
+  Result:= '';
+  if TJDISAttrib.isaReadOnly in FAttribs then
+    Result:= Result + 'readonly ';
+  if TJDISAttrib.isaHidden in FAttribs then
+    Result:= Result + 'hidden ';
+  if TJDISAttrib.isaSystem in FAttribs then
+    Result:= Result + 'system ';
+  if TJDISAttrib.isaNotContentIndexed in FAttribs then
+    Result:= Result + 'notcontentindexed ';
+end;
+
+function TJDISDir.FlagsStr: String;
+begin
+  Result:= '';
+  if TJDISDirFlag.isdfDeleteAfterInstall in FFlags then
+    Result:= Result + 'deleteafterinstall ';
+  if TJDISDirFlag.isdfSetNTFSCompression in FFlags then
+    Result:= Result + 'setntfscompression ';
+  if TJDISDirFlag.isdfUninsAlwaysUninstall in FFlags then
+    Result:= Result + 'uninsalwaysuninstall ';
+  if TJDISDirFlag.isdfUninsNeverUninstall in FFlags then
+    Result:= Result + 'uninsneveruninstall ';
+  if TJDISDirFlag.isdfUnsetNTFSCompression in FFlags then
+    Result:= Result + 'unsetntfscompression ';
+end;
+
 function TJDISDir.GetFullText: String;
-var
-  T: String;
 begin
   Result:= 'Name: "'+FName+'"';
   if FAttribs <> [] then begin
-    T:= '';
-    if TJDISAttrib.isaReadOnly in FAttribs then
-      T:= T + 'readonly ';
-    if TJDISAttrib.isaHidden in FAttribs then
-      T:= T + 'hidden ';
-    if TJDISAttrib.isaSystem in FAttribs then
-      T:= T + 'system ';
-    if TJDISAttrib.isaNotContentIndexed in FAttribs then
-      T:= T + 'notcontentindexed ';
-    Result:= Result + '; Attribs: '+T;
+    Result:= Result + '; Attribs: '+AttribsStr;
   end;
 
   if FPermissions.Count > 0 then begin
@@ -3939,18 +3969,7 @@ begin
   end;
 
   if FFlags <> [] then begin
-    T:= '';
-    if TJDISDirFlag.isdfDeleteAfterInstall in FFlags then
-      T:= T + 'deleteafterinstall ';
-    if TJDISDirFlag.isdfSetNTFSCompression in FFlags then
-      T:= T + 'setntfscompression ';
-    if TJDISDirFlag.isdfUninsAlwaysUninstall in FFlags then
-      T:= T + 'uninsalwaysuninstall ';
-    if TJDISDirFlag.isdfUninsNeverUninstall in FFlags then
-      T:= T + 'uninsneveruninstall ';
-    if TJDISDirFlag.isdfUnsetNTFSCompression in FFlags then
-      T:= T + 'unsetntfscompression ';
-    Result:= Result + '; Flags: '+T;
+    Result:= Result + '; Flags: '+FlagsStr;
   end;
 
 end;

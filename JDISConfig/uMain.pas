@@ -20,7 +20,7 @@ uses
 
   uDM,
   uTabBase,
-  uCollectionBaseNEW,
+  uCollectionBase,
 
   uSetupGeneral,
   uSetupAppInfo,
@@ -86,13 +86,11 @@ type
     N1: TMenuItem;
     Exit1: TMenuItem;
     N2: TMenuItem;
-    Close1: TMenuItem;
     Acts: TActionManager;
     actNew: TAction;
     actOpen: TAction;
     actSave: TAction;
     actSaveAs: TAction;
-    actCloseFile: TAction;
     actExit: TAction;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
@@ -100,7 +98,6 @@ type
     ToolButton3: TToolButton;
     ToolButton4: TToolButton;
     ToolButton5: TToolButton;
-    ToolButton6: TToolButton;
     tabVersion: TTabSheet;
     tabDiskSlicing: TTabSheet;
     tabWizard: TTabSheet;
@@ -116,15 +113,13 @@ type
     procedure btnGenerateClick(Sender: TObject);
     procedure actSaveAsExecute(Sender: TObject);
     procedure actOpenExecute(Sender: TObject);
-    procedure SetupGeneralChanged(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure actExitExecute(Sender: TObject);
     procedure actNewExecute(Sender: TObject);
     procedure actSaveExecute(Sender: TObject);
-    procedure actCloseFileExecute(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FCurFilename: String;
-    FModified: Boolean;
     FSetupGeneral: TfrmSetupGeneral;
     FSetupAppInfo: TfrmSetupAppInfo;
     FSetupVersion: TfrmSetupVersion;
@@ -137,9 +132,19 @@ type
     FFiles: TfrmFiles;
     FCode: TfrmCode;
     procedure EmbedForms;
+    function DoSave: Boolean;
+    function DoSaveAs: Boolean;
+    function SaveFile(const AFilename: String): Boolean;
+    procedure UpdateUI;
+    function FormTitle: String;
+    function PromptSave: Boolean;
+    procedure SetAllModified(const AValue: Boolean);
+    function GetAnyModified: Boolean;
+    procedure TabBaseChanged(Sender: TObject);
   public
     procedure ClearUI;
     procedure LoadUI;
+    function IsEditing: Boolean;
   end;
 
 var
@@ -162,28 +167,78 @@ begin
   Pages.ActivePageIndex:= 0;
   SetupPages.ActivePageIndex:= 0;
   WindowState:= wsMaximized;
+  UpdateUI;
+end;
+
+procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if IsEditing then begin
+    CanClose:= False;
+    MessageDlg('Cannot close file because you are currently in edit mode. Save or cancel your changes first.',
+      mtError, [mbOK], 0);
+  end else begin
+    if GetAnyModified then begin
+      CanClose:= PromptSave;
+    end;
+  end;
+  UpdateUI;
+end;
+
+function TfrmMain.PromptSave: Boolean;
+begin
+  case MessageDlg('Would you like to save your changes?',
+    mtConfirmation, [mbYes,mbNo,mbCancel], 0) of
+    mrYes: begin
+      //Save changes
+      Result:= DoSave;
+    end;
+    mrNo: begin
+      //Abort changes
+      Result:= True;
+    end;
+    else begin
+      //User cancelled
+      Result:= False;
+    end;
+  end;
+  UpdateUI;
 end;
 
 procedure TfrmMain.EmbedForms;
+  procedure ET(AClass: TfrmTabBaseClass; ATab: TTabSheet);
+  var
+    F: TfrmTabBase;
+  begin
+    F:= AClass.CreateEmbedded(ATab, Script);
+    F.OnChanged:= TabBaseChanged;
+  end;
+  procedure EC(AClass: TfrmCollectionBaseClass;ATab: TTabSheet;
+    AColl: TJDISBaseCollection);
+  var
+    F: TfrmCollectionBase;
+  begin
+    F:= AClass.CreateEmbedded(ATab, Script, AColl);
+    F.OnChanged:= TabBaseChanged;
+  end;
 begin
-  FSetupGeneral:= TfrmSetupGeneral.CreateEmbedded(tabGeneral, Script);
-  FSetupAppInfo:= TfrmSetupAppInfo.CreateEmbedded(tabAppInfo, Script);
-  FSetupVersion:= TfrmSetupVersion.CreateEmbedded(tabVersion, Script);
-  FSetupCompiler:= TfrmSetupCompiler.CreateEmbedded(tabCompiler, Script);
+  ET(TfrmSetupGeneral, tabGeneral);
+  ET(TfrmSetupAppInfo, tabAppInfo);
+  ET(TfrmSetupVersion, tabVersion);
+  ET(TfrmSetupCompiler, tabCompiler);
 
-  FDefines:= TfrmDefines.CreateEmbedded(tabDefines, Script, Script.Defines);
-  FTypes:= TfrmTypes.CreateEmbedded(tabTypes, Script, Script.Types);
-  FComponents:= TfrmComponents.CreateEmbedded(tabComponents, Script, Script.Components);
-  FTasks:= TfrmTasks.CreateEmbedded(tabTasks, Script, Script.Tasks);
-  FDirs:= TfrmDirs.CreateEmbedded(tabDirs, Script, Script.Dirs);
-  FFiles:= TfrmFiles.CreateEmbedded(tabFiles, Script, Script.Files);
+  EC(TfrmDefines, tabDefines, Script.Defines);
+  EC(TfrmTypes, tabTypes, Script.Types);
+  EC(TfrmComponents, tabComponents, Script.Components);
+  EC(TfrmTasks, tabTasks, Script.Tasks);
+  EC(TfrmDirs, tabDirs, Script.Dirs);
+  EC(TfrmFiles, tabFiles, Script.Files);
 
-  FCode:= TfrmCode.CreateEmbedded(tabCode, Script);
+  ET(TfrmCode, tabCode);
 end;
 
-procedure TfrmMain.actCloseFileExecute(Sender: TObject);
+procedure TfrmMain.TabBaseChanged(Sender: TObject);
 begin
-  //
+  UpdateUI;
 end;
 
 procedure TfrmMain.actExitExecute(Sender: TObject);
@@ -199,64 +254,239 @@ begin
   finally
     Txt.Lines.EndUpdate;
   end;
+  UpdateUI;
 end;
 
 procedure TfrmMain.actNewExecute(Sender: TObject);
+var
+  C: Boolean;
 begin
-  //TODO: Prompt to create a new file...
+  //Detect if editing or modified first...
+  if IsEditing then begin
+    C:= False;
+    MessageDlg('Cannot close file because you are currently in edit mode. Save or cancel your changes first.',
+      mtError, [mbOK], 0);
+  end else begin
+    if GetAnyModified then begin
+      C:= PromptSave;
+    end else begin
+      C:= True;
+    end;
+  end;
 
+  if C then begin
+    if MessageDlg('Are you sure you would like to create a new file?',
+      mtConfirmation, [mbYes,mbNo], 0) = mrYes then
+    begin
+      //TODO
+
+    end;
+  end;
+
+  UpdateUI;
 end;
 
 procedure TfrmMain.actOpenExecute(Sender: TObject);
 var
   Stream2: TFileStream;
   Stream1: TMemoryStream;
+  C: Boolean;
 begin
-  if dlgOpen.Execute then begin
-    Stream1:= TMemoryStream.Create;
-    Stream2 := TFileStream.Create(dlgOpen.FileName, fmOpenRead);
-    try
-      Stream2.Position:= 0;
-      ObjectTextToBinary(Stream2, Stream1);
-      Stream2.Position:= 0;
-      Stream1.Position:= 0;
-      Stream1.ReadComponent(Script);
-    finally
-      Stream2.Free;
-      Stream1.Free;
+  //Detect if editing or modified first...
+  if IsEditing then begin
+    C:= False;
+    MessageDlg('Cannot close file because you are currently in edit mode. Save or cancel your changes first.',
+      mtError, [mbOK], 0);
+  end else begin
+    if GetAnyModified then begin
+      C:= PromptSave;
+    end else begin
+      C:= True;
     end;
-    LoadUI;
-    FCurFilename:= dlgOpen.FileName;
-    FModified:= False;
   end;
+
+  if C then begin
+    if dlgOpen.Execute = True then begin
+      Stream1:= TMemoryStream.Create;
+      Stream2 := TFileStream.Create(dlgOpen.FileName, fmOpenRead);
+      try
+        Stream2.Position:= 0;
+        ObjectTextToBinary(Stream2, Stream1);
+        Stream2.Position:= 0;
+        Stream1.Position:= 0;
+        Stream1.ReadComponent(Script);
+      finally
+        Stream2.Free;
+        Stream1.Free;
+      end;
+      LoadUI;
+      FCurFilename:= dlgOpen.FileName;
+      SetAllModified(False);
+    end;
+  end;
+
+  UpdateUI;
 end;
 
 procedure TfrmMain.actSaveAsExecute(Sender: TObject);
-var
-  Stream2: TFileStream;
-  Stream1: TMemoryStream;
 begin
-  if dlgSave.Execute then begin
-    Stream1 := TMemoryStream.Create;
-    Stream2 := TFileStream.Create(dlgSave.FileName, fmCreate);
-    try
-      Stream1.WriteComponent(Script);
-      Stream1.Position := 0;
-      ObjectBinaryToText(Stream1, Stream2);
-    finally
-      Stream1.Free;
-      Stream2.Free;
-    end;
-  end;
+  DoSaveAs;
+  UpdateUI;
 end;
 
 procedure TfrmMain.actSaveExecute(Sender: TObject);
 begin
-  //
+  DoSave;
+  UpdateUI;
+end;
+
+function TfrmMain.SaveFile(const AFilename: String): Boolean;
+var
+  Stream2: TFileStream;
+  Stream1: TMemoryStream;
+begin
+  Stream1 := TMemoryStream.Create;
+  Stream2 := TFileStream.Create(AFilename, fmCreate);
+  try
+    Stream1.WriteComponent(Script);
+    Stream1.Position := 0;
+    ObjectBinaryToText(Stream1, Stream2);
+    Result:= True;
+    FCurFilename:= AFilename;
+      SetAllModified(False);
+  finally
+    Stream1.Free;
+    Stream2.Free;
+  end;
+end;
+
+function TfrmMain.DoSave: Boolean;
+begin
+  if FCurFilename = '' then begin
+    Result:= DoSaveAs;
+  end else begin
+    Result:= SaveFile(FCurFilename);
+  end;
+  UpdateUI;
+end;
+
+function TfrmMain.DoSaveAs: Boolean;
+begin
+  if dlgSave.Execute = True then begin
+    Result:= SaveFile(dlgSave.FileName);
+  end else begin
+    Result:= False;
+  end;
+  UpdateUI;
+end;
+
+procedure TfrmMain.UpdateUI;
+begin
+  Caption:= FormTitle;
+  actSave.Enabled:= GetAnyModified;
+end;
+
+function TfrmMain.FormTitle: String;
+begin
+  Result:= 'JD Inno Setup Config - ';
+  if FCurFilename <> '' then begin
+    Result:= Result + ExtractFileName(FCurFilename);
+  end else begin
+    Result:= Result + '(Unsaved File)';
+  end;
 end;
 
 procedure TfrmMain.ClearUI;
 begin
+
+end;
+
+procedure TfrmMain.SetAllModified(const AValue: Boolean);
+var
+  X: Integer;
+  T: TTabSheet;
+  F: TfrmTabBase;
+begin
+  for X := 0 to Pages.PageCount-1 do begin
+    T:= TTabSheet(Pages.Pages[X]);
+    if T.Tag = 1 then begin
+      F:= TfrmTabBase(T.Components[0]);
+      if Assigned(F) then begin
+        F.Modified:= AValue;
+      end;
+    end;
+  end;
+
+  for X := 0 to SetupPages.PageCount-1 do begin
+    T:= TTabSheet(SetupPages.Pages[X]);
+    if T.Tag = 1 then begin
+      F:= TfrmTabBase(T.Components[0]);
+      if Assigned(F) then begin
+        F.Modified:= AValue;
+      end;
+    end;
+  end;
+
+end;
+
+function TfrmMain.GetAnyModified: Boolean;
+var
+  X: Integer;
+  T: TTabSheet;
+  F: TfrmTabBase;
+begin
+  Result:= False;
+  for X := 0 to Pages.PageCount-1 do begin
+    if Result then Break;
+    T:= TTabSheet(Pages.Pages[X]);
+    if T.Tag = 1 then begin
+      F:= TfrmTabBase(T.Components[0]);
+      if Assigned(F) then begin
+        Result:= F.Modified;
+      end;
+    end;
+  end;
+
+  for X := 0 to SetupPages.PageCount-1 do begin
+    if Result then Break;
+    T:= TTabSheet(SetupPages.Pages[X]);
+    if T.Tag = 1 then begin
+      F:= TfrmTabBase(T.Components[0]);
+      if Assigned(F) then begin
+        Result:= F.Modified;
+      end;
+    end;
+  end;
+end;
+
+function TfrmMain.IsEditing: Boolean;
+var
+  X: Integer;
+  T: TTabSheet;
+  F: TfrmTabBase;
+begin
+  Result:= False;
+  for X := 0 to Pages.PageCount-1 do begin
+    if Result then Break;
+    T:= TTabSheet(Pages.Pages[X]);
+    if T.Tag = 1 then begin
+      F:= TfrmTabBase(T.Components[0]);
+      if Assigned(F) then begin
+        Result:= F.Editing;
+      end;
+    end;
+  end;
+
+  for X := 0 to SetupPages.PageCount-1 do begin
+    if Result then Break;
+    T:= TTabSheet(SetupPages.Pages[X]);
+    if T.Tag = 1 then begin
+      F:= TfrmTabBase(T.Components[0]);
+      if Assigned(F) then begin
+        Result:= F.Editing;
+      end;
+    end;
+  end;
 
 end;
 
@@ -288,11 +518,6 @@ begin
     end;
   end;
 
-end;
-
-procedure TfrmMain.SetupGeneralChanged(Sender: TObject);
-begin
-  //btnSaveSetupGeneral.Enabled:= True;
 end;
 
 end.

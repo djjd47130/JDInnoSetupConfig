@@ -7,11 +7,11 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Actions,
   Vcl.ActnList, Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls, Vcl.StdCtrls,
   Vcl.CheckLst, Vcl.Samples.Spin,
-  uCollectionBaseNEW,
+  uCollectionBase,
   JD.InnoSetup, JD.InnoSetup.Common;
 
 type
-  TfrmComponents = class(TfrmCollectionBaseNEW)
+  TfrmComponents = class(TfrmCollectionBase)
     Label9: TLabel;
     Label10: TLabel;
     Label11: TLabel;
