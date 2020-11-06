@@ -19,7 +19,8 @@ uses
   uSetupVersion in 'uSetupVersion.pas' {frmSetupVersion},
   uSetupCompiler in 'uSetupCompiler.pas' {frmSetupCompiler},
   uCode in 'uCode.pas' {frmCode},
-  uItemsDirs in 'uItemsDirs.pas' {frmDirs};
+  uItemsDirs in 'uItemsDirs.pas' {frmDirs},
+  JD.CmdLine in 'JD.CmdLine.pas';
 
 {$R *.res}
 

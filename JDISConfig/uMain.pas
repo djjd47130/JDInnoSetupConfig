@@ -34,6 +34,8 @@ uses
   uItemsFiles,
   uCode,
 
+  JD.CmdLine,
+
   SynEdit, SynEditHighlighter, SynEditCodeFolding,
   SynHighlighterPas, SynHighlighterInno, Vcl.Buttons, System.Actions,
   Vcl.ActnList, Vcl.ActnMan, Vcl.Menus, IDETheme.ActnCtrls,
@@ -145,6 +147,8 @@ type
     procedure SetAllModified(const AValue: Boolean);
     function GetAnyModified: Boolean;
     procedure TabBaseChanged(Sender: TObject);
+    procedure ProcessOpenFile;
+    procedure OpenFile(const AFilename: String);
   public
     procedure ClearUI;
     procedure LoadUI;
@@ -176,6 +180,23 @@ begin
   Height:= 850;
   //WindowState:= wsMaximized;
   UpdateUI;
+  ProcessOpenFile;
+
+end;
+
+procedure TfrmMain.ProcessOpenFile;
+var
+  C: TCmdLine;
+begin
+  C:= TCmdLine.Create;
+  try
+    C.AsString:= GetCommandLine;
+    if C.OpenFilename <> '' then begin
+      OpenFile(C.OpenFilename);
+    end;
+  finally
+    C.Free;
+  end;
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -296,8 +317,6 @@ end;
 
 procedure TfrmMain.actOpenExecute(Sender: TObject);
 var
-  Stream2: TFileStream;
-  Stream1: TMemoryStream;
   C: Boolean;
 begin
   //Detect if editing or modified first...
@@ -315,24 +334,33 @@ begin
 
   if C then begin
     if dlgOpen.Execute = True then begin
-      Stream1:= TMemoryStream.Create;
-      Stream2 := TFileStream.Create(dlgOpen.FileName, fmOpenRead);
-      try
-        Stream2.Position:= 0;
-        ObjectTextToBinary(Stream2, Stream1);
-        Stream2.Position:= 0;
-        Stream1.Position:= 0;
-        Stream1.ReadComponent(Script);
-      finally
-        Stream2.Free;
-        Stream1.Free;
-      end;
-      LoadUI;
-      FCurFilename:= dlgOpen.FileName;
-      SetAllModified(False);
+      OpenFile(dlgOpen.FileName);
     end;
   end;
 
+  UpdateUI;
+end;
+
+procedure TfrmMain.OpenFile(const AFilename: String);
+var
+  Stream2: TFileStream;
+  Stream1: TMemoryStream;
+begin
+  Stream1:= TMemoryStream.Create;
+  Stream2 := TFileStream.Create(AFilename, fmOpenRead);
+  try
+    Stream2.Position:= 0;
+    ObjectTextToBinary(Stream2, Stream1);
+    Stream2.Position:= 0;
+    Stream1.Position:= 0;
+    Stream1.ReadComponent(Script);
+  finally
+    Stream2.Free;
+    Stream1.Free;
+  end;
+  LoadUI;
+  FCurFilename:= AFilename;
+  SetAllModified(False);
   UpdateUI;
 end;
 
