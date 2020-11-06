@@ -3,7 +3,8 @@ unit JD.InnoSetup.Common;
 interface
 
 uses
-  System.Classes, System.SysUtils;
+  System.Classes, System.SysUtils, System.TypInfo,
+  Vcl.CheckLst, Vcl.StdCtrls;
 
 type
 
@@ -234,6 +235,20 @@ type
 
 
 
+
+
+  {
+  TEnumSerialize<EnumType: record> = class
+  private
+    class function GetEnumTypeData: PTypeData;
+  public
+    type SetType = Set of EnumType;
+    class procedure LoadEnums(const ASet: SetType; AList: TCheckListBox);
+    class procedure SaveEnums(var VSet: SetType; AList: TCheckListBox);
+  end;
+  }
+
+
 function GetSpacedList(AStrings: TStrings): String;
 
 implementation
@@ -247,6 +262,18 @@ begin
     if Result <> '' then
       Result:= Result + ' ';
     Result:= Result + AStrings[X];
+  end;
+end;
+
+procedure PopulateEnumCheckList(TypeInfo: PTypeInfo; Lst: TCheckListBox);
+var
+  D: PTypeData;
+  I: Integer;
+begin
+  Lst.Items.Clear;
+  D:= GetTypeData(TypeInfo);
+  for I := D.MinValue to D.MaxValue do begin
+    Lst.Items.Add(GetEnumName(TypeInfo, I));
   end;
 end;
 
@@ -333,5 +360,54 @@ procedure TJDISPermission.SetIdentifier(const Value: String);
 begin
   FIdentifier := Value;
 end;
+
+{ TEnumSerialize }
+
+{
+class function TEnumSerialize<EnumType>.GetEnumTypeData: PTypeData;
+var
+  TI: PTypeInfo;
+begin
+  TI := TypeInfo(EnumType);
+  if Assigned(TI) and (TI^.Kind = tkEnumeration) then
+    Result := GetTypeData(TI)
+  else
+    Result := nil;
+end;
+
+class procedure TEnumSerialize<EnumType>.LoadEnums(const ASet: SetType; AList: TCheckListBox);
+var
+  TD: PTypeData;
+  Value: Integer;
+begin
+  AList.CheckAll(cbUnchecked);
+
+  TD := GetEnumTypeData;
+  if not Assigned(TD) then Exit;
+
+  for Value := TD^.MinValue to TD^.MaxValue do
+  begin
+    if EnumType(Value) in ASet then
+      AList.Checked[Value] := True;
+  end;
+end;
+
+class procedure TEnumSerialize<EnumType>.SaveEnums(var VSet: SetType; AList: TCheckListBox);
+var
+  TD: PTypeData;
+  Value: Integer;
+begin
+  VSet := [];
+
+  TD := GetEnumTypeData;
+  if not Assigned(TD) then Exit;
+
+  for Value := TD^.MinValue to TD^.MaxValue do
+  begin
+    if AList.Checked[Value] then
+      Include(VSet, EnumType(Value));
+  end;
+end;
+}
 
 end.

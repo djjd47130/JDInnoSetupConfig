@@ -32,7 +32,6 @@ type
     FModified: Boolean;
     FOnChanged: TNotifyEvent;
     procedure SetModified(const Value: Boolean);
-    procedure DoOnChanged;
   public
     constructor CreateEmbedded(AOwner: TWinControl; AScript: TJDInnoSetupScript); virtual;
     procedure SetEditState(const AEditing: Boolean); virtual;
@@ -43,6 +42,7 @@ type
     procedure Save; virtual;
     function Editing: Boolean;
     function Script: TJDInnoSetupScript;
+    procedure DoOnChanged; virtual;
     property Modified: Boolean read FModified write SetModified;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
   end;

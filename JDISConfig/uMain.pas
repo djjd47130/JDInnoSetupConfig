@@ -43,7 +43,6 @@ type
   TfrmMain = class(TForm)
     Script: TJDInnoSetupScript;
     pTop: TPanel;
-    btnGenerate: TButton;
     SetupPages: TPageControl;
     tabGeneral: TTabSheet;
     tabCompression: TTabSheet;
@@ -110,7 +109,12 @@ type
     About1: TMenuItem;
     N3: TMenuItem;
     HelpContents1: TMenuItem;
-    procedure btnGenerateClick(Sender: TObject);
+    ToolButton6: TToolButton;
+    actGenerate: TAction;
+    ToolButton7: TToolButton;
+    N4: TMenuItem;
+    GenerateScript1: TMenuItem;
+    procedure actGenerateExecute(Sender: TObject);
     procedure actSaveAsExecute(Sender: TObject);
     procedure actOpenExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -161,12 +165,16 @@ begin
   {$ENDIF}
   UseLatestCommonDialogs:= True;
   TStyleManager.Engine.RegisterStyleHook(TCustomSynEdit, TScrollingStyleHook);
+
   Txt.Align:= alClient;
+  Pages.Align:= alClient;
   SetupPages.Align:= alClient;
   EmbedForms;
   Pages.ActivePageIndex:= 0;
   SetupPages.ActivePageIndex:= 0;
-  WindowState:= wsMaximized;
+  Width:= 1100;
+  Height:= 850;
+  //WindowState:= wsMaximized;
   UpdateUI;
 end;
 
@@ -246,7 +254,7 @@ begin
   Close;
 end;
 
-procedure TfrmMain.btnGenerateClick(Sender: TObject);
+procedure TfrmMain.actGenerateExecute(Sender: TObject);
 begin
   Txt.Lines.BeginUpdate;
   try
@@ -372,6 +380,13 @@ end;
 
 function TfrmMain.DoSaveAs: Boolean;
 begin
+  if Self.FCurFilename <> '' then begin
+    dlgSave.InitialDir:= ExtractFilePath(FCurFilename);
+    dlgSave.FileName:= ExtractFileName(FCurFilename);
+  end else begin
+    dlgSave.InitialDir:= '';
+    dlgSave.FileName:= 'Untitled.jdis';
+  end;
   if dlgSave.Execute = True then begin
     Result:= SaveFile(dlgSave.FileName);
   end else begin
@@ -388,12 +403,14 @@ end;
 
 function TfrmMain.FormTitle: String;
 begin
-  Result:= 'JD Inno Setup Config - ';
   if FCurFilename <> '' then begin
-    Result:= Result + ExtractFileName(FCurFilename);
+    Result:= ExtractFileName(FCurFilename);
   end else begin
-    Result:= Result + '(Unsaved File)';
+    Result:= 'Untitled.jdis';
   end;
+  Result:= Result + ' - JD Inno Setup Config';
+  if Self.GetAnyModified then
+    Result:= '*' + Result;
 end;
 
 procedure TfrmMain.ClearUI;

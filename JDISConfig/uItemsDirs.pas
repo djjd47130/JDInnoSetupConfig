@@ -95,35 +95,59 @@ begin
   lstAttribs.CheckAll(TCheckBoxState.cbUnchecked);
   //TODO: Permissions
   lstFlags.CheckAll(TCheckBoxState.cbUnchecked);
+    //TODO: Components
+    //TODO: Tasks
 end;
 
 procedure TfrmDirs.LoadItemDetail(AItem: TJDISBaseCollectionItem);
 var
   I: TJDISDir;
+  A: TJDISAttrib;
   F: TJDISDirFlag;
 begin
   inherited;
   if Assigned(AItem) then begin
     I:= TJDISDir(AItem);
     txtName.Text:= I.Name;
-    //TODO: Attribs
+    for A:= Low(TJDISAttrib) to High(TJDISAttrib) do begin
+      if A in I.Attribs then begin
+        lstAttribs.Checked[Integer(A)]:= True;
+      end;
+    end;
     //TODO: Permissions
-    //TODO: Flags
+    for F:= Low(TJDISDirFlag) to High(TJDISDirFlag) do begin
+      if F in I.Flags then begin
+        lstFlags.Checked[Integer(F)]:= True;
+      end;
+    end;
+    //TODO: Components
+    //TODO: Tasks
   end;
 end;
 
 procedure TfrmDirs.SaveItemDetail(AItem: TJDISBaseCollectionItem);
 var
   I: TJDISDir;
+  A: TJDISAttrib;
   F: TJDISDirFlag;
 begin
   inherited;
   if Assigned(AItem) then begin
     I:= TJDISDir(AItem);
     I.Name:= txtName.Text;
-    //TODO: Attribs
+    for A:= Low(TJDISAttrib) to High(TJDISAttrib) do begin
+      if lstAttribs.Checked[Integer(A)] then begin
+        I.Attribs:= I.Attribs + [A];
+      end;
+    end;
     //TODO: Permissions
-    //TODO: Flags
+    for F:= Low(TJDISDirFlag) to High(TJDISDirFlag) do begin
+      if lstFlags.Checked[Integer(F)] then begin
+        I.Flags:= I.Flags + [F];
+      end;
+    end;
+    //TODO: Components
+    //TODO: Tasks
   end;
 end;
 

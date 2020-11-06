@@ -12,6 +12,7 @@ object frmMain: TfrmMain
   Font.Style = []
   Menu = MM
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   PixelsPerInch = 96
@@ -20,163 +21,185 @@ object frmMain: TfrmMain
     Left = 0
     Top = 29
     Width = 1035
-    Height = 481
+    Height = 436
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
-    DesignSize = (
-      1035
-      481)
-    object btnGenerate: TButton
-      Left = 872
-      Top = 448
-      Width = 147
-      Height = 25
-      Anchors = [akRight, akBottom]
-      Caption = 'Generate Script'
-      TabOrder = 0
-      OnClick = btnGenerateClick
-    end
     object Pages: TPageControl
       Left = 0
       Top = 0
       Width = 1035
-      Height = 441
+      Height = 396
       ActivePage = tabSetup
       Align = alTop
       Anchors = [akLeft, akTop, akRight, akBottom]
-      TabOrder = 1
+      TabOrder = 0
+      ExplicitTop = 6
+      ExplicitHeight = 428
       object tabSetup: TTabSheet
         Caption = 'Setup'
+        ExplicitHeight = 400
         object SetupPages: TPageControl
           Left = 0
           Top = 0
           Width = 1027
-          Height = 377
+          Height = 332
           ActivePage = tabGeneral
           Align = alTop
           Anchors = [akLeft, akTop, akRight, akBottom]
           TabOrder = 0
+          ExplicitHeight = 364
           object tabGeneral: TTabSheet
             Caption = 'General'
+            ExplicitLeft = 0
+            ExplicitHeight = 336
           end
           object tabDefines: TTabSheet
             Caption = 'Defines'
             ImageIndex = 18
+            ExplicitHeight = 336
           end
           object tabAppInfo: TTabSheet
             Caption = 'App Info'
             ImageIndex = 13
+            ExplicitHeight = 336
           end
           object tabVersion: TTabSheet
             Caption = 'Version'
             ImageIndex = 6
+            ExplicitHeight = 336
           end
           object tabCompiler: TTabSheet
             Caption = 'Compiler'
             ImageIndex = 2
+            ExplicitHeight = 336
           end
           object tabInstaller: TTabSheet
             Caption = 'Installer'
             ImageIndex = 3
+            ExplicitHeight = 336
           end
           object tabCosmetic: TTabSheet
             Caption = 'Cosmetic'
             ImageIndex = 5
+            ExplicitHeight = 336
           end
           object tabWizard: TTabSheet
             Caption = 'Wizard'
             ImageIndex = 8
+            ExplicitHeight = 336
           end
           object tabCompression: TTabSheet
             Caption = 'Compression'
             ImageIndex = 1
+            ExplicitHeight = 336
           end
           object tabSignature: TTabSheet
             Caption = 'Signature'
             ImageIndex = 4
+            ExplicitHeight = 336
           end
           object tabDiskSlicing: TTabSheet
             Caption = 'Disk Slicing'
             ImageIndex = 7
+            ExplicitHeight = 336
           end
           object tabUpdate: TTabSheet
             Caption = 'Update'
             ImageIndex = 9
+            ExplicitHeight = 336
           end
           object tabUninstall: TTabSheet
             Caption = 'Uninstall'
             ImageIndex = 10
+            ExplicitHeight = 336
           end
         end
       end
       object tabTypes: TTabSheet
         Caption = 'Types'
         ImageIndex = 1
+        ExplicitHeight = 400
       end
       object tabComponents: TTabSheet
         Caption = 'Components'
         ImageIndex = 2
+        ExplicitHeight = 400
       end
       object tabTasks: TTabSheet
         Caption = 'Tasks'
         ImageIndex = 3
+        ExplicitHeight = 400
       end
       object tabDirs: TTabSheet
         Caption = '  Dirs'
         ImageIndex = 4
+        ExplicitHeight = 400
       end
       object tabFiles: TTabSheet
         Caption = '  Files'
         ImageIndex = 5
+        ExplicitHeight = 400
       end
       object tabIcons: TTabSheet
         Caption = 'Icons'
         ImageIndex = 6
+        ExplicitHeight = 400
       end
       object tabINI: TTabSheet
         Caption = '  INI'
         ImageIndex = 7
+        ExplicitHeight = 400
       end
       object tabInstallDelete: TTabSheet
         Caption = 'Install Delete'
         ImageIndex = 8
+        ExplicitHeight = 400
       end
       object tabLanguages: TTabSheet
         Caption = 'Languages'
         ImageIndex = 9
+        ExplicitHeight = 400
       end
       object tabMessages: TTabSheet
         Caption = 'Messages'
         ImageIndex = 10
+        ExplicitHeight = 400
       end
       object tabCustomMessages: TTabSheet
         Caption = 'Custom Messages'
         ImageIndex = 11
+        ExplicitHeight = 400
       end
       object tabLangOptions: TTabSheet
         Caption = 'Lang Options'
         ImageIndex = 12
+        ExplicitHeight = 400
       end
       object tabRegistry: TTabSheet
         Caption = 'Registry'
         ImageIndex = 13
+        ExplicitHeight = 400
       end
       object tabRun: TTabSheet
         Caption = '  Run'
         ImageIndex = 14
+        ExplicitHeight = 400
       end
       object tabUninstallDelete: TTabSheet
         Caption = 'Uninst Delete'
         ImageIndex = 15
+        ExplicitHeight = 400
       end
       object tabUninstallRun: TTabSheet
         Caption = 'Uninst Run'
         ImageIndex = 16
+        ExplicitHeight = 400
       end
       object tabCode: TTabSheet
         Caption = '  Code  '
         ImageIndex = 17
+        ExplicitHeight = 400
       end
     end
   end
@@ -224,15 +247,19 @@ object frmMain: TfrmMain
     ButtonWidth = 32
     Caption = 'ToolBar1'
     Images = DM.Img24
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 2
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
+      Cursor = crHandPoint
       Action = actNew
     end
     object ToolButton2: TToolButton
       Left = 32
       Top = 0
+      Cursor = crHandPoint
       Action = actOpen
     end
     object ToolButton4: TToolButton
@@ -246,12 +273,28 @@ object frmMain: TfrmMain
     object ToolButton3: TToolButton
       Left = 72
       Top = 0
+      Cursor = crHandPoint
       Action = actSave
     end
     object ToolButton5: TToolButton
       Left = 104
       Top = 0
+      Cursor = crHandPoint
       Action = actSaveAs
+    end
+    object ToolButton6: TToolButton
+      Left = 136
+      Top = 0
+      Width = 8
+      Caption = 'ToolButton6'
+      ImageIndex = 8
+      Style = tbsSeparator
+    end
+    object ToolButton7: TToolButton
+      Left = 144
+      Top = 0
+      Cursor = crHandPoint
+      Action = actGenerate
     end
   end
   object Script: TJDInnoSetupScript
@@ -287,16 +330,24 @@ object frmMain: TfrmMain
     Run = <>
     UninstallDelete = <>
     UninstallRun = <>
-    Left = 72
-    Top = 496
+    Left = 40
+    Top = 472
   end
   object dlgOpen: TOpenDialog
-    Left = 152
-    Top = 496
+    DefaultExt = '.jdis'
+    Filter = 'JD Inno Setup Config Files (*.jdis)|*.jdis|All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing]
+    Title = 'Open JD Inno Setup Config File'
+    Left = 120
+    Top = 472
   end
   object dlgSave: TSaveDialog
-    Left = 216
-    Top = 496
+    DefaultExt = '.jdis'
+    Filter = 'JD Inno Setup Config Files (*.jdis)|*.jdis|All Files (*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
+    Title = 'Save JD Inno Setup Config File'
+    Left = 184
+    Top = 472
   end
   object SynInno: TSynInnoSyn
     Options.AutoDetectEnabled = False
@@ -304,14 +355,14 @@ object frmMain: TfrmMain
     Options.Visible = False
     KeyAttri.Foreground = clSkyBlue
     NumberAttri.Foreground = clRed
-    StringAttri.Foreground = clSkyBlue
-    Left = 144
-    Top = 568
+    StringAttri.Foreground = clMoneyGreen
+    Left = 352
+    Top = 472
   end
   object MM: TMainMenu
     Images = DM.Img16
-    Left = 280
-    Top = 496
+    Left = 248
+    Top = 472
     object File1: TMenuItem
       Caption = 'File'
       object New1: TMenuItem
@@ -347,6 +398,12 @@ object frmMain: TfrmMain
       object Settings1: TMenuItem
         Caption = 'Settings...'
       end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object GenerateScript1: TMenuItem
+        Action = actGenerate
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'
@@ -363,38 +420,54 @@ object frmMain: TfrmMain
   end
   object Acts: TActionManager
     Images = DM.Img16
-    Left = 432
-    Top = 496
+    Left = 400
+    Top = 472
     StyleName = 'Standard'
     object actNew: TAction
       Category = 'File'
       Caption = 'New...'
+      Hint = 'Create new config file'
       ImageIndex = 0
+      ShortCut = 16462
       OnExecute = actNewExecute
     end
     object actOpen: TAction
       Category = 'File'
       Caption = 'Open...'
+      Hint = 'Open existing config file'
       ImageIndex = 5
+      ShortCut = 16463
       OnExecute = actOpenExecute
     end
     object actSave: TAction
       Category = 'File'
       Caption = 'Save'
+      Hint = 'Save current config file'
       ImageIndex = 6
+      ShortCut = 16467
       OnExecute = actSaveExecute
     end
     object actSaveAs: TAction
       Category = 'File'
       Caption = 'Save As...'
+      Hint = 'Save current config file as'
       ImageIndex = 7
       OnExecute = actSaveAsExecute
     end
     object actExit: TAction
       Category = 'File'
       Caption = 'Exit'
+      Hint = 'Exit application'
       ImageIndex = 9
       OnExecute = actExitExecute
+    end
+    object actGenerate: TAction
+      Category = 'Options'
+      Caption = 'Generate Script'
+      Hint = 'Generate script'
+      ImageIndex = 10
+      ShortCut = 16455
+      OnExecute = actGenerateExecute
     end
   end
 end

@@ -114,6 +114,8 @@ begin
   end else begin
     MessageDlg('The information entered is not valid.', mtError, [mbOK], 0);
   end;
+  Self.Modified:= True;
+  Self.DoOnChanged;
 end;
 
 procedure TfrmCollectionBase.ClearList;
@@ -185,7 +187,7 @@ end;
 procedure TfrmCollectionBase.Save;
 begin
   inherited;
-
+  Self.DoOnChanged;
 end;
 
 procedure TfrmCollectionBase.SaveItemDetail(AItem: TJDISBaseCollectionItem);

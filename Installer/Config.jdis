@@ -1,0 +1,63 @@
+object Script: TJDInnoSetupScript
+  Defines = <
+    item
+      Name = 'MyAppName'
+      Value = 'JD Inno Setup Configurator'
+    end
+    item
+      Name = 'MyAppVersion'
+      Value = '1.0'
+    end
+    item
+      Name = 'MyAppPublisher'
+      Value = 'Jerry Dodge'
+    end
+    item
+      Name = 'MyAppURL'
+      Value = 'http://www.jerrydodge.com'
+    end>
+  Setup.Compiler.Compression.Compression = iscDefault
+  Setup.Compiler.Compression.CompressionVer = 0
+  Setup.Compiler.Compression.LZMAAlgorithm = 0
+  Setup.Compiler.Compression.LZMABlockSize = 0
+  Setup.Compiler.Compression.LZMADictionarySize = 0
+  Setup.Compiler.Compression.LZMAMatchFinder = iscmfDefault
+  Setup.Compiler.Compression.LZMANumBlockThreads = 0
+  Setup.Compiler.Compression.LZMANumFastBytes = 0
+  Setup.Compiler.OutputBaseFilename = 'JDISConfigSetup'
+  Setup.Compiler.OutputDir = '.\Output'
+  Setup.Installer.AppContact = 'Jerry Dodge'
+  Setup.Installer.AppId = '{{12D041DB-D462-4D24-B869-4B5902D00E4C}'
+  Setup.Installer.AppName = '{#MyAppName}'
+  Setup.Installer.AppPublisher = '{#MyAppPublisher}'
+  Setup.Installer.AppPublisherURL = '{#MyAppURL}'
+  Setup.Installer.AppSupportURL = '{#MyAppURL}'
+  Setup.Installer.AppUpdatesURL = '{#MyAppURL}'
+  Setup.Installer.AppVerName = '{#MyAppName} {#MyAppVersion}'
+  Setup.Installer.AppVersion = '{#MyAppVersion}'
+  Setup.Installer.ArchitecturesAllowed = []
+  Setup.Installer.ArchitecturesInstallIn64BitMode = []
+  Setup.Installer.DirExistsWarning = isbaDefault
+  Setup.Installer.DisableDirPage = isbaDefault
+  Setup.Installer.DisableProgramGroupPage = isbaDefault
+  Setup.Installer.PrivilegesRequiredOverridesAllowed = []
+  Setup.Installer.TimeStampsInUTC = bdDefault
+  Setup.Cosmetic.WizardStyle = iswsModern
+  Types = <>
+  Components = <>
+  Tasks = <>
+  Dirs = <>
+  Files = <>
+  Icons = <>
+  Ini = <>
+  InstallDelete = <>
+  Languages = <>
+  Messages = <>
+  CustomMessages = <>
+  Registry = <>
+  Run = <>
+  UninstallDelete = <>
+  UninstallRun = <>
+  Left = 72
+  Top = 496
+end

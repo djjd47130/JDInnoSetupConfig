@@ -13,7 +13,6 @@ type
   TfrmCode = class(TfrmTabBase)
     Txt: TSynEdit;
     SynPas: TSynPasSyn;
-    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -37,6 +36,7 @@ constructor TfrmCode.CreateEmbedded(AOwner: TWinControl;
   AScript: TJDInnoSetupScript);
 begin
   inherited;
+  Txt.Align:= alClient;
 
 end;
 
@@ -44,12 +44,6 @@ procedure TfrmCode.ClearDetail;
 begin
   inherited;
   Txt.Lines.Clear;
-end;
-
-procedure TfrmCode.FormCreate(Sender: TObject);
-begin
-  inherited;
-  Txt.Align:= alClient;
 end;
 
 function TfrmCode.IsValid: Boolean;

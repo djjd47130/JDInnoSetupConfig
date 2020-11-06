@@ -29,7 +29,9 @@ package JDInnoSetupConfig;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  vcl,
+  vclx;
 
 contains
   JD.InnoSetup in '..\Source\JD.InnoSetup.pas',

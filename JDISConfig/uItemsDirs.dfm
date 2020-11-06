@@ -15,8 +15,8 @@ inherited frmDirs: TfrmDirs
   inherited Details: TPanel
     Top = 171
     Width = 766
-    ExplicitTop = 320
-    ExplicitWidth = 875
+    ExplicitTop = 171
+    ExplicitWidth = 766
     object Label9: TLabel
       Left = 16
       Top = 13

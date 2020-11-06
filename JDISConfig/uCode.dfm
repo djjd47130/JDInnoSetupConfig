@@ -1,6 +1,5 @@
 inherited frmCode: TfrmCode
   Caption = 'Code'
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Txt: TSynEdit [1]
@@ -37,12 +36,17 @@ inherited frmCode: TfrmCode
     FontSmoothing = fsmNone
   end
   inherited Acts: TActionList
-    Left = 467
+    Top = 139
   end
   object SynPas: TSynPasSyn
     Options.AutoDetectEnabled = False
     Options.AutoDetectLineLimit = 0
     Options.Visible = False
+    DirectiveAttri.Foreground = clOlive
+    KeyAttri.Foreground = clWhite
+    NumberAttri.Foreground = clRed
+    FloatAttri.Foreground = clRed
+    StringAttri.Foreground = clMoneyGreen
     Left = 240
     Top = 136
   end

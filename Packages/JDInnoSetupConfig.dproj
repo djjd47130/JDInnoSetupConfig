@@ -82,6 +82,8 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="vclx.dcp"/>
         <DCCReference Include="..\Source\JD.InnoSetup.pas"/>
         <DCCReference Include="..\Source\JD.InnoSetup.Common.pas"/>
         <DCCReference Include="..\Source\JD.InnoSetup.Defaults.pas"/>
