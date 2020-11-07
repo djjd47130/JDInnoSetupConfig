@@ -71,7 +71,6 @@ procedure TfrmDirs.GetListItemDetails(AItem: TJDISBaseCollectionItem;
   AListItem: TListItem);
 var
   I: TJDISDir;
-  F: TJDISDirFlag;
 begin
   inherited;
   if Assigned(AItem) then begin

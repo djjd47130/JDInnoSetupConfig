@@ -1306,6 +1306,7 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function FlagsStr: String;
   published
     property Components: TStrings read GetComponents write SetComponents;
     property Name: String read FName write SetName;
@@ -4416,14 +4417,37 @@ begin
   inherited;
 end;
 
+function TJDISIcon.FlagsStr: String;
+begin
+  Result:= '';
+  if TJDISIconFlag.isifCloseOnExit in FFlags then
+    Result:= Result + 'closeonexit ';
+  if TJDISIconFlag.isifCreateOnlyIfFileExists in FFlags then
+    Result:= Result + 'createonlyiffileexists ';
+  if TJDISIconFlag.isifDontCloseOnExit in FFlags then
+    Result:= Result + 'dontcloseonexit ';
+  if TJDISIconFlag.isifExcludeFromShowInNewInstall in FFlags then
+    Result:= Result + 'excludefromshowinnewinstall ';
+  if TJDISIconFlag.isifFolderShortcut in FFlags then
+    Result:= Result + 'foldershortcut ';
+  if TJDISIconFlag.isifPreventPinning in FFlags then
+    Result:= Result + 'preventpinning ';
+  if TJDISIconFlag.isifRunMaximized in FFlags then
+    Result:= Result + 'runmaximized ';
+  if TJDISIconFlag.isifRunMinimized in FFlags then
+    Result:= Result + 'runminimized ';
+  if TJDISIconFlag.isifUninsNeverUninstall in FFlags then
+    Result:= Result + 'uninsneveruninstall ';
+  if TJDISIconFlag.isifUseAppPaths in FFlags then
+    Result:= Result + 'useapppaths ';
+end;
+
 function TJDISIcon.GetComponents: TStrings;
 begin
   Result:= TStrings(FComponents);
 end;
 
 function TJDISIcon.GetFullText: String;
-var
-  T: String;
 begin
   Result:= 'Name: "'+FName+'"; ';
   Result:= Result + 'Filename: "'+FFilename+'"';
@@ -4444,28 +4468,7 @@ begin
   if FComponents.Count > 0 then
     Result:= Result + '; Components: '+GetSpacedList(FComponents);
   if FFlags <> [] then begin
-    T:= '';
-    if TJDISIconFlag.isifCloseOnExit in FFlags then
-      T:= T + 'closeonexit ';
-    if TJDISIconFlag.isifCreateOnlyIfFileExists in FFlags then
-      T:= T + 'createonlyiffileexists ';
-    if TJDISIconFlag.isifDontCloseOnExit in FFlags then
-      T:= T + 'dontcloseonexit ';
-    if TJDISIconFlag.isifExcludeFromShowInNewInstall in FFlags then
-      T:= T + 'excludefromshowinnewinstall ';
-    if TJDISIconFlag.isifFolderShortcut in FFlags then
-      T:= T + 'foldershortcut ';
-    if TJDISIconFlag.isifPreventPinning in FFlags then
-      T:= T + 'preventpinning ';
-    if TJDISIconFlag.isifRunMaximized in FFlags then
-      T:= T + 'runmaximized ';
-    if TJDISIconFlag.isifRunMinimized in FFlags then
-      T:= T + 'runminimized ';
-    if TJDISIconFlag.isifUninsNeverUninstall in FFlags then
-      T:= T + 'uninsneveruninstall ';
-    if TJDISIconFlag.isifUseAppPaths in FFlags then
-      T:= T + 'useapppaths ';
-    Result:= Result + '; Flags: '+T;
+    Result:= Result + '; Flags: '+FlagsStr;
   end;
 end;
 

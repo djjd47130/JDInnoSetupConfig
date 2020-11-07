@@ -22,7 +22,8 @@ uses
   uItemsDirs in 'uItemsDirs.pas' {frmDirs},
   JD.CmdLine in 'JD.CmdLine.pas',
   uSetupInstaller in 'uSetupInstaller.pas' {frmSetupInstaller},
-  uItemsRegistry in 'uItemsRegistry.pas' {frmRegistry};
+  uItemsRegistry in 'uItemsRegistry.pas' {frmRegistry},
+  uItemsIcons in 'uItemsIcons.pas' {frmIcons};
 
 {$R *.res}
 
@@ -33,6 +34,5 @@ begin
   TStyleManager.TrySetStyle('Windows10 Dark');
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmRegistry, frmRegistry);
   Application.Run;
 end.

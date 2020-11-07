@@ -34,6 +34,7 @@ uses
   uItemsTasks,
   uItemsDirs,
   uItemsFiles,
+  uItemsIcons,
   uItemsRegistry,
   uCode,
 
@@ -176,6 +177,41 @@ begin
 
 end;
 
+procedure TfrmMain.EmbedForms;
+  procedure ET(AClass: TfrmTabBaseClass; ATab: TTabSheet);
+  var
+    F: TfrmTabBase;
+  begin
+    F:= AClass.CreateEmbedded(ATab, Script);
+    F.OnChanged:= TabBaseChanged;
+  end;
+  procedure EC(AClass: TfrmCollectionBaseClass;ATab: TTabSheet;
+    AColl: TJDISBaseCollection);
+  var
+    F: TfrmCollectionBase;
+  begin
+    F:= AClass.CreateEmbedded(ATab, Script, AColl);
+    F.OnChanged:= TabBaseChanged;
+  end;
+begin
+  ET(TfrmSetupGeneral, tabGeneral);
+  ET(TfrmSetupAppInfo, tabAppInfo);
+  ET(TfrmSetupVersion, tabVersion);
+  ET(TfrmSetupCompiler, tabCompiler);
+  ET(TfrmSetupInstaller, tabInstaller);
+
+  EC(TfrmDefines, tabDefines, Script.Defines);
+  EC(TfrmTypes, tabTypes, Script.Types);
+  EC(TfrmComponents, tabComponents, Script.Components);
+  EC(TfrmTasks, tabTasks, Script.Tasks);
+  EC(TfrmDirs, tabDirs, Script.Dirs);
+  EC(TfrmFiles, tabFiles, Script.Files);
+  EC(TfrmIcons, tabIcons, Script.Icons);
+  EC(TfrmRegistry, tabRegistry, Script.Registry);
+
+  ET(TfrmCode, tabCode);
+end;
+
 procedure TfrmMain.ProcessOpenFile;
 var
   C: TCmdLine;
@@ -223,40 +259,6 @@ begin
     end;
   end;
   UpdateUI;
-end;
-
-procedure TfrmMain.EmbedForms;
-  procedure ET(AClass: TfrmTabBaseClass; ATab: TTabSheet);
-  var
-    F: TfrmTabBase;
-  begin
-    F:= AClass.CreateEmbedded(ATab, Script);
-    F.OnChanged:= TabBaseChanged;
-  end;
-  procedure EC(AClass: TfrmCollectionBaseClass;ATab: TTabSheet;
-    AColl: TJDISBaseCollection);
-  var
-    F: TfrmCollectionBase;
-  begin
-    F:= AClass.CreateEmbedded(ATab, Script, AColl);
-    F.OnChanged:= TabBaseChanged;
-  end;
-begin
-  ET(TfrmSetupGeneral, tabGeneral);
-  ET(TfrmSetupAppInfo, tabAppInfo);
-  ET(TfrmSetupVersion, tabVersion);
-  ET(TfrmSetupCompiler, tabCompiler);
-  ET(TfrmSetupInstaller, tabInstaller);
-
-  EC(TfrmDefines, tabDefines, Script.Defines);
-  EC(TfrmTypes, tabTypes, Script.Types);
-  EC(TfrmComponents, tabComponents, Script.Components);
-  EC(TfrmTasks, tabTasks, Script.Tasks);
-  EC(TfrmDirs, tabDirs, Script.Dirs);
-  EC(TfrmFiles, tabFiles, Script.Files);
-  EC(TfrmRegistry, tabRegistry, Script.Registry);
-
-  ET(TfrmCode, tabCode);
 end;
 
 procedure TfrmMain.TabBaseChanged(Sender: TObject);

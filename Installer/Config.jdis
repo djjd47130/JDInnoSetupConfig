@@ -58,8 +58,24 @@ object Script: TJDInnoSetupScript
       Flags = []
     end>
   Dirs = <>
-  Files = <>
-  Icons = <>
+  Files = <
+    item
+      Source = 
+        'D:\GitHub\JDInnoSetupConfig\JDISConfig\Win32\Debug\JDISConfig.ex' +
+        'e'
+      DestDir = '{app}'
+      ExternalSize = 0
+      Attribs = []
+      Permissions = <>
+      Flags.IgnoreVersion = True
+    end>
+  Icons = <
+    item
+      Name = 'JDIS Configurator'
+      Filename = '{app}\JDISConfig.exe'
+      IconIndex = 0
+      Flags = []
+    end>
   Ini = <>
   InstallDelete = <>
   Languages = <>
