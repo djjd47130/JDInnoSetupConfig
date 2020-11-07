@@ -26,12 +26,15 @@ uses
   uSetupAppInfo,
   uSetupVersion,
   uSetupCompiler,
+  uSetupInstaller,
+
   uItemsDefines,
   uItemsTypes,
   uItemsComponents,
   uItemsTasks,
   uItemsDirs,
   uItemsFiles,
+  uItemsRegistry,
   uCode,
 
   JD.CmdLine,
@@ -126,17 +129,6 @@ type
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
   private
     FCurFilename: String;
-    FSetupGeneral: TfrmSetupGeneral;
-    FSetupAppInfo: TfrmSetupAppInfo;
-    FSetupVersion: TfrmSetupVersion;
-    FSetupCompiler: TfrmSetupCompiler;
-    FDefines: TfrmDefines;
-    FTypes: TfrmTypes;
-    FComponents: TfrmComponents;
-    FTasks: TfrmTasks;
-    FDirs: TfrmDirs;
-    FFiles: TfrmFiles;
-    FCode: TfrmCode;
     procedure EmbedForms;
     function DoSave: Boolean;
     function DoSaveAs: Boolean;
@@ -254,6 +246,7 @@ begin
   ET(TfrmSetupAppInfo, tabAppInfo);
   ET(TfrmSetupVersion, tabVersion);
   ET(TfrmSetupCompiler, tabCompiler);
+  ET(TfrmSetupInstaller, tabInstaller);
 
   EC(TfrmDefines, tabDefines, Script.Defines);
   EC(TfrmTypes, tabTypes, Script.Types);
@@ -261,6 +254,7 @@ begin
   EC(TfrmTasks, tabTasks, Script.Tasks);
   EC(TfrmDirs, tabDirs, Script.Dirs);
   EC(TfrmFiles, tabFiles, Script.Files);
+  EC(TfrmRegistry, tabRegistry, Script.Registry);
 
   ET(TfrmCode, tabCode);
 end;
@@ -355,8 +349,8 @@ begin
     Stream1.Position:= 0;
     Stream1.ReadComponent(Script);
   finally
-    Stream2.Free;
-    Stream1.Free;
+    FreeAndNil(Stream2);
+    FreeAndNil(Stream1);
   end;
   LoadUI;
   FCurFilename:= AFilename;
@@ -391,8 +385,8 @@ begin
     FCurFilename:= AFilename;
       SetAllModified(False);
   finally
-    Stream1.Free;
-    Stream2.Free;
+    FreeAndNil(Stream1);
+    FreeAndNil(Stream2);
   end;
 end;
 
@@ -436,7 +430,7 @@ begin
   end else begin
     Result:= 'Untitled.jdis';
   end;
-  Result:= Result + ' - JD Inno Setup Config';
+  Result:= Result + ' - JD Inno Setup Configurator';
   if Self.GetAnyModified then
     Result:= '*' + Result;
 end;

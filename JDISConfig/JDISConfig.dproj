@@ -86,8 +86,7 @@
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <Debugger_RunParams>&quot;D:\GitHub\JDInnoSetupConfig\Installer\Config.jdis&quot;</Debugger_RunParams>
+        <Icon_MainIcon>inno_extract_icon_jOz_icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -98,6 +97,9 @@
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=JD Software Inc.;FileDescription=JD Inno Setup Configurator;FileVersion=1.0.0.0;InternalName=JDISConfig;LegalCopyright=;LegalTrademarks=;OriginalFilename=jdisconfig.exe;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=JD Inno Setup Configurator;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <Icon_MainIcon>inno_extract_icon_jOz_icon.ico</Icon_MainIcon>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -166,6 +168,14 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="JD.CmdLine.pas"/>
+        <DCCReference Include="uSetupInstaller.pas">
+            <Form>frmSetupInstaller</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uItemsRegistry.pas">
+            <Form>frmRegistry</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

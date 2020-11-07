@@ -64,9 +64,9 @@ inherited frmFiles: TfrmFiles
     object Label5: TLabel
       Left = 231
       Top = 61
-      Width = 62
+      Width = 100
       Height = 13
-      Caption = 'External Size'
+      Caption = 'External Size (Bytes)'
     end
     object Label6: TLabel
       Left = 609
@@ -185,7 +185,7 @@ inherited frmFiles: TfrmFiles
     object seExternalSize: TSpinEdit
       Left = 231
       Top = 80
-      Width = 110
+      Width = 209
       Height = 22
       MaxValue = 0
       MinValue = 0

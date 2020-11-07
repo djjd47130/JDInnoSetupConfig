@@ -1546,6 +1546,7 @@ type
     constructor Create(Collection: TCollection); override;
     destructor Destroy; override;
     function GetFullText: String; override;
+    function FlagsStr: String;
   published
     property Root: TJDISRegRoot read FRoot write SetRoot;
     property Subkey: String read FSubkey write SetSubkey;
@@ -4945,28 +4946,36 @@ begin
   inherited;
 end;
 
-function TJDISRegistryItem.GetFullText: String;
-var
-  T: String;
+function TJDISRegistryItem.FlagsStr: String;
 begin
-  case Self.FRoot of
-    isrrCurrentUser:      Result:= 'HKCU';
-    isrrLocalMachine:     Result:= 'HKLM';
-    isrrClassesRoot:      Result:= 'HKCR';
-    isrrUsers:            Result:= 'HKU';
-    isrrCurrentConfig:    Result:= 'HKCC';
-    isrrAutoUserMachine:  Result:= 'HKA';
-  end;
+  Result:= '';
+  if TJDISRegFlag.isrfCreateValueIfDoesntExist in FFlags then
+    Result:= Result + 'createvalueifdoesntexist ';
+  if TJDISRegFlag.isrfDeleteKey in FFlags then
+    Result:= Result + 'deletekey ';
+  if TJDISRegFlag.isrfDeleteValue in FFlags then
+    Result:= Result + 'deletevalue ';
+  if TJDISRegFlag.isrfDontCreateKey in FFlags then
+    Result:= Result + 'dontcreatekey ';
+  if TJDISRegFlag.isrfNoError in FFlags then
+    Result:= Result + 'noerror ';
+  if TJDISRegFlag.isrfPreserveStringType in FFlags then
+    Result:= Result + 'preservestringtype ';
+  if TJDISRegFlag.isrfUninsClearValue in FFlags then
+    Result:= Result + 'uninsclearvalue ';
+  if TJDISRegFlag.isrfUninsDeleteKey in FFlags then
+    Result:= Result + 'uninsdeletekey ';
+  if TJDISRegFlag.isrfUninsDeleteKeyIfEmpty in FFlags then
+    Result:= Result + 'uninsdeletekeyifempty ';
+  if TJDISRegFlag.isrfUninsDeleteValue in FFlags then
+    Result:= Result + 'uninsdeletevalue ';
+end;
+
+function TJDISRegistryItem.GetFullText: String;
+begin
+  Result:= 'Root: '+RegRootToStr(FRoot);
   Result:= Result + '; Subkey: "'+FSubkey+'"';
-  case Self.FValueType of
-    isrtNone:     Result:= Result + '; ValueType: none';
-    isrtString:   Result:= Result + '; ValueType: string';
-    isrtExpandSz: Result:= Result + '; ValueType: expandsz';
-    isrtMultiSz:  Result:= Result + '; ValueType: multisz';
-    isrtDword:    Result:= Result + '; ValueType: dword';
-    isrtQword:    Result:= Result + '; ValueType: qword';
-    isrtBinary:   Result:= Result + '; ValueType: binary';
-  end;
+  Result:= Result + '; ValueType: '+RegTypeToStr(FValueType);
   if FValueName <> '' then
     Result:= Result + '; ValueName: "'+FValueName+'"';
   if FValueData <> '' then
@@ -4975,28 +4984,7 @@ begin
     Result:= Result + '; Permissions: '+FPermissions.GetFullText;
   end;
   if FFlags <> [] then begin
-    T:= '';
-    if TJDISRegFlag.isrfCreateValueIfDoesntExist in FFlags then
-      Result:= Result + 'createvalueifdoesntexist ';
-    if TJDISRegFlag.isrfDeleteKey in FFlags then
-      Result:= Result + 'deletekey ';
-    if TJDISRegFlag.isrfDeleteValue in FFlags then
-      Result:= Result + 'deletevalue ';
-    if TJDISRegFlag.isrfDontCreateKey in FFlags then
-      Result:= Result + 'dontcreatekey ';
-    if TJDISRegFlag.isrfNoError in FFlags then
-      Result:= Result + 'noerror ';
-    if TJDISRegFlag.isrfPreserveStringType in FFlags then
-      Result:= Result + 'preservestringtype ';
-    if TJDISRegFlag.isrfUninsClearValue in FFlags then
-      Result:= Result + 'uninsclearvalue ';
-    if TJDISRegFlag.isrfUninsDeleteKey in FFlags then
-      Result:= Result + 'uninsdeletekey ';
-    if TJDISRegFlag.isrfUninsDeleteKeyIfEmpty in FFlags then
-      Result:= Result + 'uninsdeletekeyifempty ';
-    if TJDISRegFlag.isrfUninsDeleteValue in FFlags then
-      Result:= Result + 'uninsdeletevalue ';
-    Result:= Result + '; Flags: '+T;
+    Result:= Result + '; Flags: '+FlagsStr;
   end;
 end;
 

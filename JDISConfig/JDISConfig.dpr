@@ -20,16 +20,19 @@ uses
   uSetupCompiler in 'uSetupCompiler.pas' {frmSetupCompiler},
   uCode in 'uCode.pas' {frmCode},
   uItemsDirs in 'uItemsDirs.pas' {frmDirs},
-  JD.CmdLine in 'JD.CmdLine.pas';
+  JD.CmdLine in 'JD.CmdLine.pas',
+  uSetupInstaller in 'uSetupInstaller.pas' {frmSetupInstaller},
+  uItemsRegistry in 'uItemsRegistry.pas' {frmRegistry};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.Title := 'JD Inno Setup Config';
+  Application.Title := 'JD Inno Setup Configurator';
   TStyleManager.TrySetStyle('Windows10 Dark');
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmRegistry, frmRegistry);
   Application.Run;
 end.

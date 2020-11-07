@@ -251,6 +251,9 @@ type
 
 function GetSpacedList(AStrings: TStrings): String;
 
+function RegRootToStr(const AValue: TJDISRegRoot): String;
+function RegTypeToStr(const AValue: TJDISRegType): String;
+
 implementation
 
 function GetSpacedList(AStrings: TStrings): String;
@@ -277,6 +280,33 @@ begin
   end;
 end;
 
+function RegRootToStr(const AValue: TJDISRegRoot): String;
+begin
+  case AValue of
+    isrrCurrentUser:      Result:= 'HKCU';
+    isrrLocalMachine:     Result:= 'HKLM';
+    isrrClassesRoot:      Result:= 'HKCR';
+    isrrUsers:            Result:= 'HKU';
+    isrrCurrentConfig:    Result:= 'HKCC';
+    isrrAutoUserMachine:  Result:= 'HKA';
+    else                  Result:= '';
+  end;
+end;
+
+function RegTypeToStr(const AValue: TJDISRegType): String;
+begin
+  case AValue of
+    isrtNone:     Result:= 'none';
+    isrtString:   Result:= 'string';
+    isrtExpandSz: Result:= 'expandsz';
+    isrtMultiSz:  Result:= 'multisz';
+    isrtDword:    Result:= 'dword';
+    isrtQword:    Result:= 'qword';
+    isrtBinary:   Result:= 'binary';
+    else          Result:= '';
+  end;
+end;
+
 { TBoolDefExpression }
 
 constructor TBoolDefExpression.Create;
@@ -292,8 +322,10 @@ end;
 
 procedure TBoolDefExpression.SetExpression(const Value: String);
 begin
-  FExpression := Value;
-  FValue:= bdeExpression;
+  if Value <> '' then begin
+    FExpression := Value;
+    FValue:= bdeExpression;
+  end;
 end;
 
 procedure TBoolDefExpression.SetValue(const Value: TBoolDefExp);

@@ -64,27 +64,6 @@ begin
 
 end;
 
-procedure TfrmFiles.GetListItemDetails(AItem: TJDISBaseCollectionItem;
-  AListItem: TListItem);
-var
-  I: TJDISFile;
-begin
-  inherited;
-  I:= TJDISFile(AItem);
-  AListItem.SubItems.Clear;
-  AListItem.Caption:= I.Source;
-  AListItem.SubItems.Add(I.DestDir);
-  AListItem.SubItems.Add(I.DestName);
-  AListItem.SubItems.Add(I.Excludes);
-  AListItem.SubItems.Add(IntToStr(I.ExternalSize));
-  AListItem.SubItems.Add(I.AttribsStr);
-  AListItem.SubItems.Add(I.Permissions.GetFullText);
-  AListItem.SubItems.Add(I.FontInstall);
-  AListItem.SubItems.Add(I.StrongAssemblyName);
-  AListItem.SubItems.Add(GetSpacedList(I.Components));
-  AListItem.SubItems.Add(I.Flags.GetFlagText);
-end;
-
 procedure TfrmFiles.PrepareColumns(AColumns: TListColumns);
   procedure AC(const ACaption: String; AWidth: Integer);
   var
@@ -107,6 +86,27 @@ begin
   AC('Strong Assembly Name', 100);
   AC('Components', 200);
   AC('Flags', 200);
+end;
+
+procedure TfrmFiles.GetListItemDetails(AItem: TJDISBaseCollectionItem;
+  AListItem: TListItem);
+var
+  I: TJDISFile;
+begin
+  inherited;
+  I:= TJDISFile(AItem);
+  AListItem.SubItems.Clear;
+  AListItem.Caption:= I.Source;
+  AListItem.SubItems.Add(I.DestDir);
+  AListItem.SubItems.Add(I.DestName);
+  AListItem.SubItems.Add(I.Excludes);
+  AListItem.SubItems.Add(IntToStr(I.ExternalSize));
+  AListItem.SubItems.Add(I.AttribsStr);
+  AListItem.SubItems.Add(I.Permissions.GetFullText);
+  AListItem.SubItems.Add(I.FontInstall);
+  AListItem.SubItems.Add(I.StrongAssemblyName);
+  AListItem.SubItems.Add(GetSpacedList(I.Components));
+  AListItem.SubItems.Add(I.Flags.GetFlagText);
 end;
 
 procedure TfrmFiles.ClearDetail;

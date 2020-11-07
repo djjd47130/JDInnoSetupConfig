@@ -9,6 +9,7 @@ inherited frmCollectionBase: TfrmCollectionBase
   inherited ToolBar1: TToolBar
     Top = 423
     Width = 759
+    Images = DM.Img24
     ExplicitTop = 423
     ExplicitWidth = 759
     object ToolButton1: TToolButton
@@ -60,6 +61,7 @@ inherited frmCollectionBase: TfrmCollectionBase
     OnSelectItem = ItemsSelectItem
   end
   inherited Acts: TActionList
+    Images = DM.Img16
     object actAddItem: TAction
       Caption = 'actAddItem'
       ImageIndex = 0

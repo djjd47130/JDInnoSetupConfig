@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'JD Inno Setup Config'
+  Caption = 'JD Inno Setup Configurator'
   ClientHeight = 645
   ClientWidth = 1035
   Color = clBtnFace

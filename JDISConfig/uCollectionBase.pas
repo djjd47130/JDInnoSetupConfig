@@ -7,6 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uTabBase, System.Actions, Vcl.ActnList,
   Vcl.ComCtrls, Vcl.ToolWin, Vcl.ExtCtrls,
   System.UITypes,
+  uDM,
   JD.InnoSetup, JD.InnoSetup.Common;
 
 type

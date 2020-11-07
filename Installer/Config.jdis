@@ -37,6 +37,7 @@ object Script: TJDInnoSetupScript
   Setup.Installer.AppVersion = '{#MyAppVersion}'
   Setup.Installer.ArchitecturesAllowed = []
   Setup.Installer.ArchitecturesInstallIn64BitMode = []
+  Setup.Installer.ChangesAssociations.Value = bdeTrue
   Setup.Installer.DirExistsWarning = isbaDefault
   Setup.Installer.DisableDirPage = isbaDefault
   Setup.Installer.DisableProgramGroupPage = isbaDefault
@@ -45,7 +46,17 @@ object Script: TJDInnoSetupScript
   Setup.Cosmetic.WizardStyle = iswsModern
   Types = <>
   Components = <>
-  Tasks = <>
+  Tasks = <
+    item
+      Name = 'desktopicon'
+      Description = 'Create a Desktop Icon'
+      Flags = []
+    end
+    item
+      Name = 'associate'
+      Description = 'Associate .jdis File Extensions'
+      Flags = []
+    end>
   Dirs = <>
   Files = <>
   Icons = <>
@@ -54,7 +65,39 @@ object Script: TJDInnoSetupScript
   Languages = <>
   Messages = <>
   CustomMessages = <>
-  Registry = <>
+  Registry = <
+    item
+      Root = isrrClassesRoot
+      Subkey = '.jdis'
+      ValueType = isrtString
+      ValueData = '{#MyAppName}'
+      Permissions = <>
+      Flags = [isrfUninsDeleteValue]
+    end
+    item
+      Root = isrrClassesRoot
+      Subkey = '{#MyAppName}'
+      ValueType = isrtString
+      ValueData = 'Program {#MyAppName}'
+      Permissions = <>
+      Flags = [isrfUninsDeleteKey]
+    end
+    item
+      Root = isrrClassesRoot
+      Subkey = '{#MyAppName}\DefaultIcon'
+      ValueType = isrtString
+      ValueData = '{app}\{#MyAppExeName},0'
+      Permissions = <>
+      Flags = []
+    end
+    item
+      Root = isrrClassesRoot
+      Subkey = '{#MyAppName}\shell\open\command'
+      ValueType = isrtString
+      ValueData = '""{app}\{#MyAppExeName}"" ""%1""'
+      Permissions = <>
+      Flags = []
+    end>
   Run = <>
   UninstallDelete = <>
   UninstallRun = <>
