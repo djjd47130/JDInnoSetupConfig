@@ -3554,8 +3554,83 @@ end;
 { TJDISSetupCosmetic }
 
 procedure TJDISSetupCosmetic.AddToScript(AScript: TStrings);
+  procedure A(const S: String);
+  begin
+    AScript.Append(S);
+  end;
+  procedure AP(const N, V: String);
+  begin
+    A(N+'='+V);
+  end;
+  procedure ABD(const AName: String; const AValue: TBoolDef);
+  begin
+    case AValue of
+      bdDefault:  ;
+      bdFalse:    AP(AName, 'no');
+      bdTrue:     AP(AName, 'yes');
+    end;
+  end;
+  procedure AST(const AName: String; const AValue: String);
+  begin
+    if AValue <> '' then
+      AP(AName, AValue);
+  end;
 begin
-  //TODO
+
+  AST('AppCopyright', Self.FAppCopyright);
+
+  //TODO: BackColor
+
+  //TODO: BackColor2
+
+  case Self.FBackColorDirection of
+    iscdDefault:      ;
+    iscdTopToBottom:  AP('BackColorDirection', 'toptobottom');
+    iscdLeftToRight:  AP('BackColorDirection', 'lefttoright');
+  end;
+
+  ABD('BackSolid', Self.FBackSolid);
+
+  ABD('FlatComponentsList', Self.FFlatComponentsList);
+
+  AST('SetupIconFile', Self.FSetupIconFile);
+
+  ABD('ShowComponentSizes', Self.FShowComponentSizes);
+
+  ABD('ShowTasksTreeLines', Self.FShowTasksTreeLines);
+
+  ABD('WindowShowCaption', Self.FWindowShowCaption);
+
+  ABD('WindowStartMaximized', Self.FWindowStartMaximized);
+
+  ABD('WindowResizable', Self.FWindowResizable);
+
+  ABD('WindowVisible', Self.FWindowVisible);
+
+  case Self.FWizardImageAlphaFormat of
+    isafNone:           ;
+    isafDefined:        AP('WizardImageAlphaFormat', 'defined');
+    isafPreMultiplied:  AP('WizardImageAlphaFormat', 'premultiplied');
+  end;
+
+  AST('WizardImageFile', Self.FWizardImageFile);
+
+  ABD('WizardImageStretch', Self.FWizardImageStretch);
+
+  ABD('WizardResizable', Self.FWizardResizable);
+
+  AST('WizardSizePercent', Self.FWizardSizePercent.GetText);
+
+  AST('WizardSmallImageFile', Self.FWizardSmallImageFile);
+
+  case Self.FWizardStyle of
+    iswsDefault:  ;
+    iswsClassic:  AP('WizardStyle', 'classic');
+    iswsModern:   AP('WizardStyle', 'modern');
+  end;
+
+
+
 
 end;
 

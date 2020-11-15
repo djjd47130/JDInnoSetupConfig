@@ -263,6 +263,7 @@ end;
 
 procedure TfrmMain.TabBaseChanged(Sender: TObject);
 begin
+  actGenerate.Execute;
   UpdateUI;
 end;
 
@@ -308,6 +309,7 @@ begin
     end;
   end;
 
+  actGenerate.Execute;
   UpdateUI;
 end;
 
@@ -357,18 +359,22 @@ begin
   LoadUI;
   FCurFilename:= AFilename;
   SetAllModified(False);
+
+  actGenerate.Execute;
   UpdateUI;
 end;
 
 procedure TfrmMain.actSaveAsExecute(Sender: TObject);
 begin
   DoSaveAs;
+
   UpdateUI;
 end;
 
 procedure TfrmMain.actSaveExecute(Sender: TObject);
 begin
   DoSave;
+
   UpdateUI;
 end;
 
@@ -390,6 +396,9 @@ begin
     FreeAndNil(Stream1);
     FreeAndNil(Stream2);
   end;
+
+  actGenerate.Execute;
+  UpdateUI;
 end;
 
 function TfrmMain.DoSave: Boolean;
@@ -440,6 +449,8 @@ end;
 procedure TfrmMain.ClearUI;
 begin
 
+  actGenerate.Execute;
+  UpdateUI;
 end;
 
 procedure TfrmMain.SetAllModified(const AValue: Boolean);

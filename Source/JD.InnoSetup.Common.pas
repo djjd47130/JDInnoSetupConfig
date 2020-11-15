@@ -7,24 +7,10 @@ uses
   Vcl.CheckLst, Vcl.StdCtrls;
 
 type
-
-  TBoolDefExpression = class;
-
   TJDISPermission = class;
-
   TJDISPermissions = class;
 
-
-
-
   TBoolDef = (bdDefault, bdFalse, bdTrue);
-
-  TJDISAttrib = (isaReadOnly, isaHidden, isaSystem, isaNotContentIndexed);
-  TJDISAttribs = set of TJDISAttrib;
-
-
-
-
 
   TBoolDefExp = (bdeDefault, bdeFalse, bdeTrue, bdeExpression);
 
@@ -44,9 +30,6 @@ type
     property Value: TBoolDefExp read FValue write SetValue default TBoolDefExp.bdeDefault;
     property Expression: String read FExpression write SetExpression;
   end;
-
-
-
 
   ///<summary>
   ///  Represents a collection of Windows permissions, associating either
@@ -81,8 +64,8 @@ type
     property Identifier: String read FIdentifier write SetIdentifier;
   end;
 
-
-
+  TJDISAttrib = (isaReadOnly, isaHidden, isaSystem, isaNotContentIndexed);
+  TJDISAttribs = set of TJDISAttrib;
 
   TJDISCompression = (iscDefault, iscZip, iscZipVer, iscBzip, iscBzipVer, iscLzma,
     iscLzmaFast, iscLzmaNormal, iscLzmaMax, iscLzmaUltra, iscLzmaUltra64,
@@ -97,10 +80,6 @@ type
   TJDISCompressMatchFinder = (iscmfDefault, iscmfHashChain, iscmfBinaryTree);
 
   TJDISCompressSeparateProcess = (iscspDefault, iscspYes, iscspNo, iscspX86);
-
-
-
-
 
   TJDISArchitecture = (isaX86, isaX64, isaArm64, isaIa64);
   TJDISArchitectures = set of TJDISArchitecture;
@@ -123,73 +102,37 @@ type
   TJDISPrivilegesReqOverride = (ispoCommandLine, ispoDialog);
   TJDISPrivilegesReqOverrides = set of TJDISPrivilegesReqOverride;
 
+  TJDISBackColorDir = (iscdDefault, iscdTopToBottom, iscdLeftToRight);
 
-
-
-
-  TJDISBackColorDir = (iscdTopToBottom, iscdLeftToRight);
-
-  TJDISWizardStyle = (iswsClassic, iswsModern);
+  TJDISWizardStyle = (iswsDefault, iswsClassic, iswsModern);
 
   TJDISWizardImageAlphaFormat = (isafNone, isafDefined, isafPreMultiplied);
 
-
-
-
-
   TJDISTypeFlag = (istfIsCustom);
   TJDISTypeFlags = set of TJDISTypeFlag;
-
-
-
-
 
   TJDISComponentFlag = (iscfCheckAbleAlone, iscfDontInheritCheck, iscfExclusive,
     iscfFixed, iscfRestart, iscfDisableNounInstallWarning);
   TJDISComponentFlags = set of TJDISComponentFlag;
 
-
-
-
-
   TJDISTaskFlag = (istfCheckAbleAlone, istfCheckedOnce, istfDontInheritCheck,
     istfExclusive, istfRestart, istfUnchecked);
   TJDISTaskFlags = set of TJDISTaskFlag;
 
-
-
-
-
   TJDISDirFlag = (isdfDeleteAfterInstall, isdfSetNTFSCompression,
     isdfUninsAlwaysUninstall, isdfUninsNeverUninstall, isdfUnsetNTFSCompression);
   TJDISDirFlags = set of TJDISDirFlag;
-
-
-
-
 
   TJDISIconFlag = (isifCloseOnExit, isifCreateOnlyIfFileExists, isifDontCloseOnExit,
     isifExcludeFromShowInNewInstall, isifFolderShortcut, isifPreventPinning,
     isifRunMaximized, isifRunMinimized, isifUninsNeverUninstall, isifUseAppPaths);
   TJDISIconFlags = set of TJDISIconFlag;
 
-
-
-
-
   TJDISIniFlag = (isinfCreateKeyIfDoesntExist, isinfUninsDeleteEntry,
     isinfUninsDeleteSection, isinfUninsDeleteSectionIfEmpty);
   TJDISIniFlags = set of TJDISIniFlag;
 
-
-
-
-
   TJDISInstallDeleteType = (isdtFiles, isdtFilesAndOrDirs, isdtDirIfEmpty);
-
-
-
-
 
   TJDISRegRoot = (isrrCurrentUser, isrrLocalMachine, isrrClassesRoot,
     isrrUsers, isrrCurrentConfig, isrrAutoUserMachine);
@@ -202,10 +145,6 @@ type
     isrfUninsDeleteKey, isrfUninsDeleteKeyIfEmpty, isrfUninsDeleteValue);
   TJDISRegFlags = set of TJDISRegFlag;
 
-
-
-
-
   TJDISRunFlag = (isrnf32bit, isrnf64bit, isrnfHideWizard, isrnfNoWait,
     isrnfPostInstall, isrnfRunAsCurrentUser, isrnfRunAsOriginalUser,
     isrnfRunHidden, isrnfRunMaximized, isrnfRunMinimized, isrnfShellExec,
@@ -213,16 +152,7 @@ type
     isrnfUnchecked, isrnfWaitUntilIdle, isrnfWaitUntilTerminated);
   TJDISRunFlags = set of TJDISRunFlag;
 
-
-
-
-
-
   TJDISUninstallDeleteType = (isudtFiles, isudtFilesAndOrDirs, isudtDirIfEmpty);
-
-
-
-
 
   TJDISUninstallRunFlag = (isurf32bit, isurf64bit, isurfHideWizard,
     isurfNoWait, isurfPostInstall, isurfRunAsCurrentUser, isurfRunAsOriginalUser,
@@ -231,13 +161,8 @@ type
     isurfUnchecked, isurfWaitUntilIdle, isurfWaitUntilTerminated);
   TJDISUninstallRunFlags = set of TJDISUninstallRunFlag;
 
-
-
-
-
-
-
   {
+  //From https://stackoverflow.com/questions/64685038/how-to-traverse-the-enums-in-any-given-set
   TEnumSerialize<EnumType: record> = class
   private
     class function GetEnumTypeData: PTypeData;
@@ -248,8 +173,16 @@ type
   end;
   }
 
-
 function GetSpacedList(AStrings: TStrings): String;
+
+procedure PopulateEnumCheckList(TypeInfo: PTypeInfo; Lst: TCheckListBox);
+
+function BoolDefToStr(const AValue: TBoolDef): String;
+function StrToBoolDef(const AValue: String): TBoolDef;
+
+function BoolDefExpToStr(const AValue: TBoolDefExp;
+  const AExpression: String = ''): String;
+function StrToBoolDefExp(const AValue: String): TBoolDefExp;
 
 function RegRootToStr(const AValue: TJDISRegRoot): String;
 function RegTypeToStr(const AValue: TJDISRegType): String;
@@ -305,6 +238,47 @@ begin
     isrtBinary:   Result:= 'binary';
     else          Result:= '';
   end;
+end;
+
+function BoolDefToStr(const AValue: TBoolDef): String;
+begin
+  case AValue of
+    bdDefault:  ;
+    bdFalse:    Result:= 'no';
+    bdTrue:     Result:= 'yes';
+  end;
+end;
+
+function StrToBoolDef(const AValue: String): TBoolDef;
+begin
+  if SameText(AValue, 'yes') then
+    Result:= bdTrue
+  else if SameText(AValue, 'no') then
+    Result:= bdFalse
+  else
+    Result:= bdDefault;
+end;
+
+function BoolDefExpToStr(const AValue: TBoolDefExp;
+  const AExpression: String = ''): String;
+begin
+  case AValue of
+    bdeDefault:     ;
+    bdeFalse:       Result:= '';
+    bdeTrue:        Result:= '';
+    bdeExpression:  Result:= AExpression;
+  end;
+end;
+
+function StrToBoolDefExp(const AValue: String): TBoolDefExp;
+begin
+  if AValue = '' then
+    Result:= bdeDefault
+  else if AValue = 'yes' then
+    Result:= bdeTrue
+  else if AValue = 'no' then
+    Result:= bdeFalse
+  else Result:= bdeExpression;
 end;
 
 { TBoolDefExpression }
