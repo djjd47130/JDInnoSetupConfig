@@ -2008,14 +2008,14 @@ end;
 
 { TJDISDefines }
 
-function TJDISDefines.Add: TJDISDefine;
-begin
-  Result:= TJDISDefine(inherited Add);
-end;
-
 constructor TJDISDefines.Create(AOwner: TJDInnoSetupScript);
 begin
   inherited Create(AOwner, TJDISDefine);
+end;
+
+function TJDISDefines.Add: TJDISDefine;
+begin
+  Result:= TJDISDefine(inherited Add);
 end;
 
 function TJDISDefines.GetExistsByName(const AName: String): Boolean;
@@ -2031,11 +2031,13 @@ end;
 function TJDISDefines.GetItemByName(const AName: String): TJDISDefine;
 var
   X: Integer;
+  D: TJDISDefine;
 begin
   Result:= nil;
   for X := 0 to Count-1 do begin
-    if SameText(Items[X].Name, AName) then begin
-      Result:= Items[X];
+    D:= TJDISDefine(Items[X]);
+    if SameText(D.Name, AName) then begin
+      Result:= D;
       Break;
     end;
   end;

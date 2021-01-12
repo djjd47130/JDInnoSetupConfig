@@ -87,6 +87,7 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Icon_MainIcon>inno_extract_icon_jOz_icon.ico</Icon_MainIcon>
+        <DCC_DebugDCUs>false</DCC_DebugDCUs>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -178,6 +179,14 @@
         </DCCReference>
         <DCCReference Include="uItemsIcons.pas">
             <Form>frmIcons</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uNewScriptWizard.pas">
+            <Form>frmNewScriptWizard</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="uSettings.pas">
+            <Form>frmSettings</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">

@@ -19,12 +19,13 @@ object frmMain: TfrmMain
   TextHeight = 13
   object pTop: TPanel
     Left = 0
-    Top = 29
+    Top = 36
     Width = 1035
     Height = 436
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 29
     object Pages: TPageControl
       Left = 0
       Top = 0
@@ -207,9 +208,9 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 1035
-    Height = 29
-    ButtonHeight = 32
-    ButtonWidth = 32
+    Height = 36
+    ButtonHeight = 36
+    ButtonWidth = 36
     Caption = 'ToolBar1'
     Images = DM.Img24
     ParentShowHint = False
@@ -222,13 +223,13 @@ object frmMain: TfrmMain
       Action = actNew
     end
     object ToolButton2: TToolButton
-      Left = 32
+      Left = 36
       Top = 0
       Cursor = crHandPoint
       Action = actOpen
     end
     object ToolButton4: TToolButton
-      Left = 64
+      Left = 72
       Top = 0
       Width = 8
       Caption = 'ToolButton4'
@@ -236,19 +237,19 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object ToolButton3: TToolButton
-      Left = 72
+      Left = 80
       Top = 0
       Cursor = crHandPoint
       Action = actSave
     end
     object ToolButton5: TToolButton
-      Left = 104
+      Left = 116
       Top = 0
       Cursor = crHandPoint
       Action = actSaveAs
     end
     object ToolButton6: TToolButton
-      Left = 136
+      Left = 152
       Top = 0
       Width = 8
       Caption = 'ToolButton6'
@@ -256,10 +257,16 @@ object frmMain: TfrmMain
       Style = tbsSeparator
     end
     object ToolButton7: TToolButton
-      Left = 144
+      Left = 160
       Top = 0
       Cursor = crHandPoint
       Action = actGenerate
+    end
+    object ToolButton8: TToolButton
+      Left = 196
+      Top = 0
+      Cursor = crHandPoint
+      Action = actSettings
     end
   end
   object Script: TJDInnoSetupScript
@@ -361,7 +368,7 @@ object frmMain: TfrmMain
     object Options1: TMenuItem
       Caption = 'Options'
       object Settings1: TMenuItem
-        Caption = 'Settings...'
+        Action = actSettings
       end
       object N4: TMenuItem
         Caption = '-'
@@ -433,6 +440,14 @@ object frmMain: TfrmMain
       ImageIndex = 10
       ShortCut = 16455
       OnExecute = actGenerateExecute
+    end
+    object actSettings: TAction
+      Category = 'Options'
+      Caption = 'Settings'
+      Hint = 'Open Settings'
+      ImageIndex = 11
+      ShortCut = 16468
+      OnExecute = actSettingsExecute
     end
   end
 end

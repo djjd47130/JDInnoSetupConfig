@@ -22,6 +22,8 @@ uses
   uTabBase,
   uCollectionBase,
 
+  uSettings,
+
   uSetupGeneral,
   uSetupAppInfo,
   uSetupVersion,
@@ -37,6 +39,8 @@ uses
   uItemsIcons,
   uItemsRegistry,
   uCode,
+
+  uNewScriptWizard,
 
   JD.CmdLine,
 
@@ -120,6 +124,8 @@ type
     ToolButton7: TToolButton;
     N4: TMenuItem;
     GenerateScript1: TMenuItem;
+    actSettings: TAction;
+    ToolButton8: TToolButton;
     procedure actGenerateExecute(Sender: TObject);
     procedure actSaveAsExecute(Sender: TObject);
     procedure actOpenExecute(Sender: TObject);
@@ -128,6 +134,7 @@ type
     procedure actNewExecute(Sender: TObject);
     procedure actSaveExecute(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+    procedure actSettingsExecute(Sender: TObject);
   private
     FCurFilename: String;
     procedure EmbedForms;
@@ -142,6 +149,7 @@ type
     procedure TabBaseChanged(Sender: TObject);
     procedure ProcessOpenFile;
     procedure OpenFile(const AFilename: String);
+    function DoNewFile: Boolean;
   public
     procedure ClearUI;
     procedure LoadUI;
@@ -283,6 +291,27 @@ begin
   UpdateUI;
 end;
 
+function TfrmMain.DoNewFile: Boolean;
+var
+  F: TfrmNewScriptWizard;
+begin
+  Result:= False;
+  F:= TfrmNewScriptWizard.Create(nil);
+  try
+    if F.ShowModal = mrOK then begin
+
+      //TODO: Read input of wizard and prepare new script config...
+
+
+
+
+      Result:= True;
+    end;
+  finally
+    F.Free;
+  end;
+end;
+
 procedure TfrmMain.actNewExecute(Sender: TObject);
 var
   C: Boolean;
@@ -305,7 +334,7 @@ begin
       mtConfirmation, [mbYes,mbNo], 0) = mrYes then
     begin
       //TODO
-
+      DoNewFile;
     end;
   end;
 
@@ -376,6 +405,21 @@ begin
   DoSave;
 
   UpdateUI;
+end;
+
+procedure TfrmMain.actSettingsExecute(Sender: TObject);
+var
+  F: TfrmSettings;
+begin
+  F:= TfrmSettings.Create(Self);
+  try
+    F.LoadSettings;
+    if F.ShowModal = mrOK then begin
+      F.SaveSettings;
+    end;
+  finally
+    F.Free;
+  end;
 end;
 
 function TfrmMain.SaveFile(const AFilename: String): Boolean;

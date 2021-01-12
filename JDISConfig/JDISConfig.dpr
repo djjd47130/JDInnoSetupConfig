@@ -23,7 +23,9 @@ uses
   JD.CmdLine in 'JD.CmdLine.pas',
   uSetupInstaller in 'uSetupInstaller.pas' {frmSetupInstaller},
   uItemsRegistry in 'uItemsRegistry.pas' {frmRegistry},
-  uItemsIcons in 'uItemsIcons.pas' {frmIcons};
+  uItemsIcons in 'uItemsIcons.pas' {frmIcons},
+  uNewScriptWizard in 'uNewScriptWizard.pas' {frmNewScriptWizard},
+  uSettings in 'uSettings.pas' {frmSettings};
 
 {$R *.res}
 
